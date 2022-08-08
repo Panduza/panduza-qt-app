@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${default}",
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include**",
+                "${workspaceFolder}/include/Interface/**",
+                "${workspaceFolder}/include/Interface"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

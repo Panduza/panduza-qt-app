@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="20"
+   height="20"
+   viewBox="0 0 5.2916665 5.2916667"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2 (56b05e47e7, 2022-06-09, custom)"
+   sodipodi:docname="plus.svg"
+   inkscape:export-filename="hello.svg"
+   inkscape:export-xdpi="307.20001"
+   inkscape:export-ydpi="307.20001"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="16"
+     inkscape:cx="-1.1875"
+     inkscape:cy="11.59375"
+     inkscape:window-width="2560"
+     inkscape:window-height="1338"
+     inkscape:window-x="2560"
+     inkscape:window-y="27"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1">
+    <sodipodi:guide
+       position="0,5.2916666"
+       orientation="0,20"
+       id="guide441"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="5.2916666,5.2916666"
+       orientation="20,0"
+       id="guide443"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="5.2916666,0"
+       orientation="0,-20"
+       id="guide445"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="0,0"
+       orientation="-20,0"
+       id="guide447"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect10597"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0.79375,0,1 @ F,0,0,1,0,0.79375,0,1 @ F,0,0,1,0,0.79375,0,1 @ F,0,0,1,0,0.79375,0,1"
+       unit="px"
+       method="auto"
+       mode="F"
+       radius="3"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect6473"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0.79375,0,1 @ F,0,0,1,0,0.79375,0,1 @ F,0,0,1,0,0.79375,0,1"
+       unit="px"
+       method="bezier"
+       mode="F"
+       radius="3"
+       chamfer_steps="3"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;stroke:#d8d8d8;stroke-width:0.309;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       id="rect7735"
+       width="4.9818225"
+       height="4.981822"
+       x="0.15478407"
+       y="0.15506047"
+       inkscape:path-effect="#path-effect10597"
+       d="m 0.94853407,0.15506047 3.39432253,0 a 0.79375,0.79375 45 0 1 0.79375,0.79375 V 4.3431325 a 0.79375,0.79375 135 0 1 -0.79375,0.79375 H 0.94853407 a 0.79375,0.79375 45 0 1 -0.79375,-0.79375 V 0.94881047 a 0.79375,0.79375 135 0 1 0.79375,-0.79375 z"
+       sodipodi:type="rect" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:5.90944px;line-height:1.25;font-family:sans-serif;fill:#d8d8d8;fill-opacity:1;stroke:none;stroke-width:0.148229;stroke-dasharray:none"
+       x="0.1700995"
+       y="4.4983053"
+       id="text10653"><tspan
+         sodipodi:role="line"
+         id="tspan10651"
+         style="fill:#d8d8d8;fill-opacity:1;stroke-width:0.148229;stroke-dasharray:none"
+         x="0.1700995"
+         y="4.4983053">+</tspan></text>
+  </g>
+</svg>

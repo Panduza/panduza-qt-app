@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>styles/DefaultTheme.json</file>
+        <file>images/noder/execplug_off.png</file>
+        <file>images/noder/execplug_on.png</file>
+        <file>images/noder/checkbox/unchecked.png</file>
+        <file>images/noder/checkbox/checked.png</file>
+        <file>images/noder/checkbox/hover.png</file>
+        <file>images/noder/plus.png</file>
+        <file>images/noder/minus.png</file>
+        <file>images/noder/plus_hover.png</file>
+        <file>images/noder/minus_hover.png</file>
+        <file>images/noder/start.svg</file>
+        <file>images/noder/start_hover.svg</file>
+    </qresource>
+</RCC>
