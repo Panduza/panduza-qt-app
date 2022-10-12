@@ -1,30 +1,23 @@
-#ifndef NODERSCENE_HPP
-#define NODERSCENE_HPP
+#pragma once
 
 #include <QGraphicsScene>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <PanduzaEngine.hpp>
 
-class Node;
+class GNode;
 
 class NoderScene : public QGraphicsScene
 {
     public:
-    
         NoderScene(PanduzaEngine *engine);
         ~NoderScene();
 
-        PanduzaEngine *engine() {return _engine;}
-        Node *findNodeAt(QPointF pos);
-        void executeSection(Node *start);
+        GNode *findNodeAt(QPointF pos);
+        std::vector<GNode *> findInputEventNodes(void);
+        void executeSection(GNode *start);
+        void executeScene(void);
 
     private:
-        std::vector<Node *> findInputEventNodes(void);
         PanduzaEngine *_engine;
-
-    public slots:
-        void executeScene(void);
 };
-
-#endif

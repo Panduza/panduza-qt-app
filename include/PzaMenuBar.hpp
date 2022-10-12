@@ -1,5 +1,4 @@
-#ifndef PZAMENUBAR_HPP
-#define PZAMENUBAR_HPP
+#pragma once
 
 #include <QMenuBar>
 
@@ -28,5 +27,3 @@ class PzaMenuBar : public QMenuBar
         }
         ~PzaMenuBar() = default;
 };
-
-#endif

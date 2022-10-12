@@ -1,5 +1,6 @@
 #include <NoderScene.hpp>
-#include <NodeEvent.hpp>
+#include <GNode.hpp>
+#include <GNodeEvent.hpp>
 
 NoderScene::NoderScene(PanduzaEngine *engine)
     : QGraphicsScene(),
@@ -8,27 +9,27 @@ NoderScene::NoderScene(PanduzaEngine *engine)
 
 }
 
-Node *NoderScene::findNodeAt(QPointF pos)
+GNode *NoderScene::findNodeAt(QPointF pos)
 {
     QList<QGraphicsItem *> list;
-    Node *node = nullptr;
+    GNode *node = nullptr;
 
     list = items(pos);
     for (auto elem: list) {
-        node = dynamic_cast<Node *>(elem);
+        node = dynamic_cast<GNode *>(elem);
         if (node != nullptr)
             break;
     }
     return node;
 }
 
-std::vector<Node *> NoderScene::findInputEventNodes(void)
+std::vector<GNode *> NoderScene::findInputEventNodes(void)
 {
-    std::vector<Node *> list;
-    Node *node;
+    std::vector<GNode *> list;
+    GNode *node;
 
     for (auto elem: items()) {
-        node = dynamic_cast<NodeEvent *>(elem);
+        node = dynamic_cast<GNodeEvent *>(elem);
         if (node != nullptr) {
             list.push_back(node);
         }
@@ -36,18 +37,20 @@ std::vector<Node *> NoderScene::findInputEventNodes(void)
     return list;
 }
 
-void NoderScene::executeSection(Node *start)
+void NoderScene::executeSection(GNode *start)
 {
-    Node *node;
+    GNode *node;
 
     node = start;
-    while (node)
+    while (node) {
+        node->process();
         node = node->branch();
+    }
 }
 
 void NoderScene::executeScene(void)
 {
-    std::vector<Node *> inputs;
+    std::vector<GNode *> inputs;
 
     _engine->showTree();
 

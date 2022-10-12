@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#pragma once
 
 #include <QMainWindow>
 #include <QFile>
@@ -23,5 +22,3 @@ class MainWindow : public QMainWindow
         void setBackgroundCol(QString color);
         QColor backgroundCol() const { return _backgroundcol; };
 };
-
-#endif

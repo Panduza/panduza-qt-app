@@ -1,15 +1,19 @@
 #include <NoderView.hpp>
-#include <Node.hpp>
+#include <NoderStyle.hpp>
 
-NoderView::NoderView(PanduzaEngine *engine, NoderDataModel *model)
+#include <NoderDataBase.hpp>
+#include <GNode.hpp>
+
+NoderView::NoderView(PanduzaEngine *engine)
     : QGraphicsView(),
     _clickpos(0, 0),
-    _model(model),
     _engine(engine)
 {
     NoderScene *scene = new NoderScene(engine);
     setScene(scene);
     _scene = scene;
+
+    setAcceptDrops(true);
 
     _style = NoderStyle("DefaultTheme.json");
 
@@ -25,6 +29,23 @@ NoderView::NoderView(PanduzaEngine *engine, NoderDataModel *model)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     initViewMenu();
+}
+
+void NoderView::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->accept();
+}
+
+#include <QMimeData>
+
+void NoderView::dragMoveEvent(QDragMoveEvent *event)
+{
+    event->accept();
+}
+
+void NoderView::dropEvent(QDropEvent *event)
+{
+    qDebug() << "lol" << event->mimeData()->text();
 }
 
 void NoderView::wheelEvent(QWheelEvent *event)
@@ -50,7 +71,6 @@ void NoderView::wheelEvent(QWheelEvent *event)
         scale(0.9, 0.9);
 }
 
-
 void NoderView::keyPressEvent(QKeyEvent *event)
 {
     QGraphicsView::keyPressEvent(event);
@@ -59,9 +79,6 @@ void NoderView::keyPressEvent(QKeyEvent *event)
         case Qt::Key_Shift:
             setDragMode(QGraphicsView::RubberBandDrag);
             break ;
-        case Qt::Key_A:
-            _scene->executeScene();
-            break;
         case Qt::Key_Delete:
             QList<QGraphicsItem *> items;
 
@@ -70,7 +87,7 @@ void NoderView::keyPressEvent(QKeyEvent *event)
                 _scene->removeItem(item);
                 delete item;
             }
-            _scene->executeScene();
+            //_scene->executeScene();
             break;
     }
 }
@@ -80,51 +97,12 @@ void NoderView::keyReleaseEvent(QKeyEvent *event)
     QGraphicsView::keyReleaseEvent(event);
 
     switch (event->key()) {
+        case Qt::Key_A:
+            _scene->executeScene();
+            break;
         case Qt::Key_Shift:
             setDragMode(QGraphicsView::ScrollHandDrag);
             break ;
-    }
-}
-
-void NoderView::initViewMenu(void)
-{
-    std::vector<PzaMenu *> menus;
-    QLabel *label;
-    QWidgetAction *ALabel;
-    
-    menus = _model->nodeMenuList();
-    _viewMenu = new PzaMenu(this);
-
-    label = new QLabel("Add node");
-    ALabel = new QWidgetAction(label);
-    ALabel->setDefaultWidget(label);
-
-    _viewMenu->addAction(ALabel);
-
-    for (auto menu: menus) {
-        setViewMenuCallback(menu);
-        _viewMenu->addMenu(menu);
-    }
-}
-
-void NoderView::setViewMenuCallback(QMenu *menu)
-{
-    foreach(QAction *action, menu->actions()) {
-        if (action->menu()) {
-            setViewMenuCallback(action->menu());
-        }
-        else if (action) {
-            connect(action, &QAction::triggered, this, [&]
-            {
-                QAction *action = static_cast<QAction *>(sender());
-                action->data();
-                NoderDataModel::t_createChildNode f = action->data().value<NoderDataModel::t_createChildNode>();
-                if (f) {
-                    Node *node = f(_scene);
-                    node->setPos(_clickpos);
-                }
-            });
-        }
     }
 }
 
@@ -161,6 +139,48 @@ void NoderView::mouseMoveEvent(QMouseEvent *event)
 void NoderView::mouseReleaseEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseReleaseEvent(event);
+}
+
+void NoderView::initViewMenu(void)
+{
+    QLabel *label;
+    QWidgetAction *ALabel;
+    
+    std::vector<PzaMenu *> &menus = NBD_INST->nodeMenuList();
+    _viewMenu = new PzaMenu(this);
+
+    label = new QLabel("Add node");
+    ALabel = new QWidgetAction(label);
+    ALabel->setDefaultWidget(label);
+
+    _viewMenu->addAction(ALabel);
+
+    for (auto menu: menus) {
+        setViewMenuCallback(menu);
+        _viewMenu->addMenu(menu);
+    }
+}
+
+void NoderView::setViewMenuCallback(QMenu *menu)
+{
+    foreach(QAction *action, menu->actions()) {
+        if (action->menu()) {
+            setViewMenuCallback(action->menu());
+        }
+        else if (action) {
+            connect(action, &QAction::triggered, this, [&]
+            {
+                QAction *action = static_cast<QAction *>(sender());
+                action->data();
+                NoderDataBase::t_createNode f = action->data().value<NoderDataBase::t_createNode>();
+                if (f) {
+                    GNode *node = f();
+                    node->setScene(_scene);
+                    node->setPos(_clickpos);
+                }
+            });
+        }
+    }
 }
 
 void NoderView::showEvent(QShowEvent *event)
@@ -248,7 +268,6 @@ void NoderView::drawBackground(QPainter *painter, const QRectF &r)
     QPointF dot;
     QRectF ellispe;
     int gridStep;
-    double fac;
     double distance;
     double realcenterx;
     QPointF mirror;

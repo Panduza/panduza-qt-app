@@ -1,5 +1,4 @@
-#ifndef NODERSTYLE_HPP
-#define NODERSTYLE_HPP
+#pragma once
 
 #include <QColor>
 #include <QFile>
@@ -27,5 +26,3 @@ class NoderStyle
 
 
 };
-
-#endif

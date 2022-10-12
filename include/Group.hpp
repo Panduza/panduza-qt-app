@@ -1,10 +1,11 @@
-#ifndef GROUP_HPP
-#define GROUP_HPP
+#pragma once
 
 #include <PzaUtils.hpp>
 #include <Interface.hpp>
 
 class Machine;
+
+using namespace PzaInterface;
 
 class Group
 {
@@ -14,7 +15,7 @@ class Group
 
         Interface *findInterface(const QString &name)
         {
-            return (PzaUtils::isInHash<Interface *>(_interfaceMap, name)) ?_interfaceMap[name] : nullptr;
+            return (PzaUtils::isInStdMap<Interface *>(_interfaceMap, name)) ?_interfaceMap[name] : nullptr;
         }
 
         void addInterface(Interface *interface)
@@ -27,9 +28,7 @@ class Group
         const std::unordered_map<QString, Interface *> &interfaces(void) const {return _interfaceMap;}
 
     private:
-        QString _name;
         Machine *_machine;
+        QString _name;
         std::unordered_map<QString, Interface *> _interfaceMap;
 };
-
-#endif

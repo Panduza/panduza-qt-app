@@ -1,5 +1,4 @@
-#ifndef PZAJSON_HPP
-#define PZAJSON_HPP
+#pragma once
 
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -65,5 +64,3 @@ class PzaJSON
         PzaJSON() = default;
         ~PzaJSON() = default;
 };
-
-#endif

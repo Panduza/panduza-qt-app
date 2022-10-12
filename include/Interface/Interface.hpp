@@ -1,20 +1,18 @@
-#ifndef INTERFACE_HPP
-#define INTERFACE_HPP
+#pragma once
 
 #include <PzaJSON.hpp>
-#include <InterfaceDataModel.hpp>
 
 class Machine;
 class Group;
 class PanduzaEngine;
+
+namespace PzaInterface {
 
 class Interface : public QObject
 {
     public:
         const QString &name() const {return _name;}
         const QString &path() const {return _path;}
-
-        virtual const e_InterfaceType type(void) = 0;
 
         void parseMsg(const QString &atts, const QJsonDocument &json);
         void sendMsg(const QString &cmds, const QByteArray &msg);
@@ -31,9 +29,9 @@ class Interface : public QObject
 
         PanduzaEngine *_engine;
         Machine *_machine;
-        Group *_group;
         QString _name;
+        Group *_group;
         QString _path;
 };
 
-#endif
+}

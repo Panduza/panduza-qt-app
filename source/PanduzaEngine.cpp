@@ -2,7 +2,6 @@
 #include <QJsonObject>
 
 #include <PanduzaEngine.hpp>
-#include <InterfaceFamilies.hpp>
 #include <PzaTopic.hpp>
 #include <PzaUtils.hpp>
 
@@ -10,14 +9,11 @@ PanduzaEngine::PanduzaEngine()
 {
     _broker = new Broker();
     connect(_broker, &Broker::msgReceived, this, &PanduzaEngine::parseMsg);
-
-    _interfaceTypeMap["platform"] = PanduzaEngine::createInterface<Platform>;
-    _interfaceTypeMap["io"] = PanduzaEngine::createInterface<Io>;
 }
 
 Machine *PanduzaEngine::findMachine(const QString &name)
 {
-    return (PzaUtils::isInHash<Machine *>(_machineMap, name)) ?_machineMap[name] : nullptr;
+    return (PzaUtils::isInStdMap<Machine *>(_machineMap, name)) ?_machineMap[name] : nullptr;
 }
 
 Machine *PanduzaEngine::createMachine(const QString &name)

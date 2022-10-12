@@ -1,5 +1,4 @@
-#ifndef NODERVIEW_HPP
-#define NODERVIEW_HPP
+#pragma once
 
 #include <QGraphicsView>
 #include <QMouseEvent>
@@ -11,13 +10,12 @@
 
 #include <NoderStyle.hpp>
 #include <NoderScene.hpp>
-#include <NoderDataModel.hpp>
 #include <PzaMenu.hpp>
 
 class NoderView : public QGraphicsView
 {
     public:
-        NoderView(PanduzaEngine *engine, NoderDataModel *model);
+        NoderView(PanduzaEngine *engine);
         ~NoderView() = default;
 
     protected:
@@ -30,13 +28,15 @@ class NoderView : public QGraphicsView
         void showEvent(QShowEvent *event) override;
         void drawBackground(QPainter* painter, const QRectF& r) override;
         void contextMenuEvent(QContextMenuEvent *event) override;
+        void dragEnterEvent(QDragEnterEvent *event) override;
+        void dropEvent(QDropEvent *event) override;
+        void dragMoveEvent(QDragMoveEvent *event);
 
     private:
+        QPointF _clickpos;
         PanduzaEngine *_engine;
-        NoderDataModel *_model;
         NoderScene *_scene;
         NoderStyle _style;
-        QPointF _clickpos;
         QPointF _curpos;
         PzaMenu *_viewMenu;
 
@@ -47,5 +47,3 @@ class NoderView : public QGraphicsView
         double ellispeDistance(QRectF &rect, QPointF &point);
         QColor distanceColor(double distance);
 };
-
-#endif

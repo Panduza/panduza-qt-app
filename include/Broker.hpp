@@ -1,5 +1,4 @@
-#ifndef BROKER_HPP
-#define BROKER_HPP
+#pragma once
 
 #include <QMqttClient>
 
@@ -26,9 +25,9 @@ class Broker : public QObject
         void publish(const QString &topic ,const QByteArray &message);
     
     private:
-        bool _enabled;
         QString _addr;
         unsigned int _port;
+        bool _enabled;
         QMqttClient *_client;
 
         void fillClientProperties(void);
@@ -40,5 +39,3 @@ class Broker : public QObject
     signals:
         void msgReceived(const QMqttTopicName &topic, const QByteArray &message);
 };
-
-#endif

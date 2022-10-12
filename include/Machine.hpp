@@ -1,5 +1,4 @@
-#ifndef MACHINE_HPP
-#define MACHINE_HPP
+#pragma once
 
 #include <QString>
 
@@ -15,7 +14,7 @@ class Machine
 
         Group *findGroup(const QString &name)
         {
-            return (PzaUtils::isInHash<Group *>(_groupMap, name)) ?_groupMap[name] : nullptr;
+            return (PzaUtils::isInStdMap<Group *>(_groupMap, name)) ?_groupMap[name] : nullptr;
         }
 
         Group *createGroup(const QString &name);
@@ -25,9 +24,7 @@ class Machine
         std::unordered_map<QString, Group *> &groups(void) {return _groupMap;}
 
     private:
-        QString _name;
         PanduzaEngine *_engine;
+        QString _name;
         std::unordered_map<QString, Group *> _groupMap;
 };
-
-#endif

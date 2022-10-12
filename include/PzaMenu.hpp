@@ -1,5 +1,4 @@
-#ifndef PZAMENU_HPP
-#define PZAMENU_HPP
+#pragma once
 
 #include <QMenu>
 
@@ -51,5 +50,3 @@ class PzaMenu : public QMenu
         }
         ~PzaMenu() = default;
 };
-
-#endif

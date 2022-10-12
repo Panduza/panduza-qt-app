@@ -1,5 +1,4 @@
-#ifndef PZACOMBOBOX_HPP
-#define PZACOMBOBOX_HPP
+#pragma once
 
 #include <QComboBox>
 
@@ -24,5 +23,3 @@ class PzaComboBox : public QComboBox
     signals:
         void clicked(void);
 };
-
-#endif

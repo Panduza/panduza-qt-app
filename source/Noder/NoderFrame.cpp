@@ -1,51 +1,144 @@
 #include <NoderFrame.hpp>
 
+QWidget *sidePanel(QWidget *parent);
+
 NoderFrame::NoderFrame(PanduzaEngine *engine)
     : QWidget(),
     _engine(engine)
 {
     PzaMenuBar *menuBar = mainMenuBar();
 
-    NoderDataModel *dataModel = new NoderDataModel(engine);
-    NoderView *view = new NoderView(engine, dataModel);
+    NoderView *view = new NoderView(engine);
 
-    connect(engine, &PanduzaEngine::interfaceRegistered, this, &NoderFrame::newInterface);
+    //connect(engine, &PanduzaEngine::interfaceRegistered, this, &NoderFrame::newInterface);
 
-    _main_layout = new QVBoxLayout(this);
-    _main_layout->setContentsMargins(0, 0, 0, 5);
-    _main_layout->setSpacing(0);
+    _mainLayout = new QVBoxLayout(this);
+    _mainLayout->setContentsMargins(0, 0, 0, 5);
+    _mainLayout->setSpacing(0);
 
     QTabWidget *tabBar = new QTabWidget(this);
 
     tabBar->addTab(view, "Scenario 1");
-
-    QWidget *sidePanel = new QWidget(this);
-    _sidePanelLayout = new QVBoxLayout(sidePanel);
-    _sidePanelLayout->setContentsMargins(0, 0, 0, 0);
-    _sidePanelLayout->setSpacing(0);
-
+    
     QSplitter *graphFrame = new QSplitter(Qt::Horizontal, this);
     graphFrame->setContentsMargins(0, 0, 0, 0);
     graphFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
     graphFrame->setStyleSheet("background-color: #181818;");
 
-    graphFrame->addWidget(sidePanel);
+    graphFrame->addWidget(sidePanel(this));
     graphFrame->addWidget(tabBar);
     graphFrame->addWidget(new QFrame());
 
     graphFrame->setSizes(QList<int>({30, 500, 30}));
 
-    _main_layout->addWidget(menuBar);
-    _main_layout->addWidget(graphFrame);
+    _mainLayout->addWidget(menuBar);
+    _mainLayout->addWidget(graphFrame);
+
 }
 
-void NoderFrame::newInterface(Interface *interface)
+#include <QSpinBox>
+
+class Lol : public QWidget
 {
-    QLabel *label = new QLabel(interface->name());
+    public:
+        Lol(QWidget *parent);
+        ~Lol() = default;
 
-    label->setStyleSheet("color: white;");
+        void mouseMoveEvent(QMouseEvent *event);
+};
 
-    _sidePanelLayout->addWidget(label);
+Lol::Lol(QWidget *parent)
+    : QWidget(parent)
+{
+    
+}
+
+#include <QDrag>
+#include <QMimeData>
+
+void Lol::mouseMoveEvent(QMouseEvent *event)
+{
+    QDrag *drag = new QDrag(this);
+
+     QMimeData *mimeData = new QMimeData;
+
+    drag->setMimeData(mimeData);
+
+    Qt::DropAction dropAction = drag->exec();
+}
+
+QWidget *varTab(QWidget *parent)
+{
+    Lol *main = new Lol(parent);
+    QHBoxLayout *layout = new QHBoxLayout(main);
+    QLabel *name = new QLabel("Name", main);
+    QLabel *VarColor = new QLabel(main);
+    
+    name->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    VarColor->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    QSpinBox *valuebox = new QSpinBox(main);
+    valuebox->setStyleSheet("QSpinBox {"
+        "   color: #DCDCDC;"
+        "   background-color: #242424;"
+        "}"
+        "QSpinBox::hover {"
+        "   color: #EFEFEF;"
+        "   background-color: #474747;"
+        "}");
+    valuebox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    main->setStyleSheet("background-color:blue");
+
+    name->setStyleSheet("background-color: black;color: white");
+
+    VarColor->setFixedSize(15, 10);
+
+    VarColor->setStyleSheet(
+        "background-color: red;"
+        "border: 1px solid gray;"
+        "border-radius: 4px;"
+    );
+
+    layout->addWidget(name);
+    layout->addWidget(VarColor);
+    layout->addWidget(valuebox);
+
+    return main;
+}
+
+QWidget *sidePanel(QWidget *parent)
+{
+    QWidget *sidePanel = new QWidget(parent);
+    QVBoxLayout *sidePanelLayout = new QVBoxLayout(sidePanel);
+
+    sidePanel->setStyleSheet("background-color: red");
+
+    QWidget *varContainer = new QWidget(sidePanel);
+    QVBoxLayout *varContainerLayout = new QVBoxLayout(varContainer);
+
+    varContainer->setStyleSheet("background-color: yellow");
+
+    QLabel *varContainerTitle = new QLabel("Variables", varContainer);
+
+    varContainerLayout->addWidget(varContainerTitle);
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+
+    varContainerLayout->addStretch(1);
+
+    sidePanelLayout->addWidget(varContainer);
+
+    sidePanelLayout->addStretch(1);
+
+    sidePanelLayout->setContentsMargins(0, 0, 0, 0);
+    sidePanelLayout->setSpacing(0);
+
+    return sidePanel;
 }
 
 PzaMenuBar *NoderFrame::mainMenuBar(void)

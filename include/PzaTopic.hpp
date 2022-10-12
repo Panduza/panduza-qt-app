@@ -1,5 +1,4 @@
-#ifndef PZATOPIC_HPP
-#define PZATOPIC_HPP
+#pragma once
 
 #include <QString>
 #include <QStringList>
@@ -56,5 +55,3 @@ class PzaTopic
         QString _type;
         QString _property;
 };
-
-#endif
