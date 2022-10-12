@@ -1,4 +1,4 @@
-#include <Machine.hpp>
+#include "Machine.hpp"
 #include <PanduzaEngine.hpp>
 
 Machine::Machine(PanduzaEngine *engine, const QString &name)

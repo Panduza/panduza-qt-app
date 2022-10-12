@@ -1,8 +1,8 @@
 #pragma once
 
 #include <QObject>
-#include <Broker.hpp>
-#include <Interface.hpp>
+#include "Broker.hpp"
+#include <Interface/Interface.hpp>
 #include <Machine.hpp>
 
 using namespace PzaInterface;

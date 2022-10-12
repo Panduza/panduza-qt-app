@@ -79,6 +79,16 @@ class NoderDataBase
             return _database;
         }
 
+        static NoderDataBase &GetInstance(void)
+        {
+            static NoderDataBase _database;
+            
+
+            // if(_database == nullptr)
+                // _database = new NoderDataBase();
+            return _database;
+        }
+
     private:
         std::vector<PzaMenu *> _nodeMenuList;
 };

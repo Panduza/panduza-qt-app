@@ -1,4 +1,4 @@
-#include <NoderFrame.hpp>
+#include "NoderFrame.hpp"
 
 QWidget *sidePanel(QWidget *parent);
 

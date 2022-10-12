@@ -1,4 +1,4 @@
-#include <Group.hpp>
+#include "Group.hpp"
 #include <Interface.hpp>
 
 Group::Group(Machine *machine, const QString &name)

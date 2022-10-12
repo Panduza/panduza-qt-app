@@ -1,4 +1,4 @@
-#include <NFArray.hpp>
+#include "NFArray.hpp"
 
 Array::Array()
     : GNodeOp("Array"),

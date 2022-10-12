@@ -16,7 +16,7 @@
 #include <QFile>
 #include <QPushButton>
 
-#include <Pin.hpp>
+#include <Node/Pin.hpp>
 #include <PzaComboBox.hpp>
 #include <PzaUtils.hpp>
 

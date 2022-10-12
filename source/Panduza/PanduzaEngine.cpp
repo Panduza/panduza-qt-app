@@ -1,7 +1,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-#include <PanduzaEngine.hpp>
+#include "PanduzaEngine.hpp"
 #include <PzaTopic.hpp>
 #include <PzaUtils.hpp>
 
