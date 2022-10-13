@@ -28,10 +28,10 @@ void Pin::showWidgets()
 
 bool Pin::isCompatible(Pin *to)
 {
-    return PzaUtils::isInVector<PinProperty::Type>(compatibles(), to->type());
+    return PzaUtils::IsInVector<PinProperty::Type>(compatibles(), to->type());
 }
 
-void Pin::createLink(Pin *from)
+void Pin::CreateLink(Pin *from)
 {
     Link *link;
 
@@ -40,7 +40,7 @@ void Pin::createLink(Pin *from)
     link->grabKeyboard();
 }
 
-void Pin::createLink(Pin *from, Pin *to)
+void Pin::CreateLink(Pin *from, Pin *to)
 {
     Link *link;
 
@@ -49,7 +49,7 @@ void Pin::createLink(Pin *from, Pin *to)
     to->connectLink(link);
 }
 
-void Pin::createLink(Pin *from, const QPointF &pos)
+void Pin::CreateLink(Pin *from, const QPointF &pos)
 {
     Link *link;
 
@@ -67,7 +67,7 @@ void Pin::connectLink(Link *link)
     otherPin = link->oppositePin(this);
     otherNode = otherPin->node();
 
-    if (!PzaUtils::isInVector<GNode *>(_linkedNodes, otherNode))
+    if (!PzaUtils::IsInVector<GNode *>(_linkedNodes, otherNode))
         _linkedNodes.push_back(otherNode);
     _linkedPins.push_back(otherPin);
     _links.push_back(link);
@@ -91,9 +91,9 @@ void Pin::removeLink(Link *link)
         return ;
     otherNode = otherPin->node();
 
-    PzaUtils::deleteFromVector<Link *>(_links, link);
-    PzaUtils::deleteFromVector<GNode *>(_linkedNodes, otherNode);
-    PzaUtils::deleteFromVector<Pin *>(_linkedPins, otherPin);
+    PzaUtils::DeleteFromVector<Link *>(_links, link);
+    PzaUtils::DeleteFromVector<GNode *>(_linkedNodes, otherNode);
+    PzaUtils::DeleteFromVector<Pin *>(_linkedPins, otherPin);
 
     showWidgets();
 
@@ -121,7 +121,7 @@ void Pin::disconnectLink(const QPointF &pos)
     from = link->oppositePin(this);
     delete link;
 
-    createLink(from, pos);
+    CreateLink(from, pos);
 }
 
 void Pin::moveLinks(void)
@@ -291,7 +291,7 @@ Enum::Enum()
 
 void Enum::initialize(const QString &name)
 {
-    _list = NBD_INST->enumMap(name);
+    _list = NBD_INST.enumMap(name);
     _enumName = name;
     initialized();
 }
@@ -323,8 +323,8 @@ bool Array::isCompatible(Pin *to)
         return false;
 
     toArray = static_cast<PinDecl::Array *>(to);
-    elem = NBD_INST->pinTypeToObj(elemType());
-    toElem = NBD_INST->pinTypeToObj(toArray->elemType());
+    elem = NBD_INST.pinTypeToObj(elemType());
+    toElem = NBD_INST.pinTypeToObj(toArray->elemType());
 
     ret = elem->isCompatible(toElem);
 

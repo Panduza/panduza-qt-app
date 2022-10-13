@@ -1,4 +1,4 @@
-#include <NFMath.hpp>
+#include "NFMath.hpp"
 
 ABasicOperation::ABasicOperation(const QString &name)
     : GNodeOp(name)

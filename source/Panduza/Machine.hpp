@@ -14,7 +14,7 @@ class Machine
 
         Group *findGroup(const QString &name)
         {
-            return (PzaUtils::isInStdMap<Group *>(_groupMap, name)) ?_groupMap[name] : nullptr;
+            return (PzaUtils::IsInStdMap<Group *>(_groupMap, name)) ?_groupMap[name] : nullptr;
         }
 
         Group *createGroup(const QString &name);

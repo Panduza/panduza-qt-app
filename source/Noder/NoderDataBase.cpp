@@ -19,7 +19,7 @@ NoderDataBase::NoderDataBase()
 
 void NoderDataBase::initNodeMenuList(void)
 {
-    auto AddNodeToMenu = [](PzaMenu *toMenu, const QString &name, const t_createNode &f)
+    auto AddNodeToMenu = [](PzaMenu *toMenu, const QString &name, const t_CreateNode &f)
     {
         QAction *action;
     
@@ -52,30 +52,30 @@ void NoderDataBase::initNodeMenuList(void)
     InterfaceMenu->addMenu(IoMenu);
     InterfaceMenu->addMenu(PsuMenu);
 
-    AddNodeToMenu(EventMenu, "Event Start", GNode::createNode<MainEvent>);
+    AddNodeToMenu(EventMenu, "Event Start", GNode::CreateNode<MainEvent>);
     
-    AddNodeToMenu(BranchMenu, "If", GNode::createNode<If>);
-    AddNodeToMenu(BranchMenu, "For", GNode::createNode<For>);
-    AddNodeToMenu(BranchMenu, "For Each Element in Array", GNode::createNode<ForEachInArray>);
+    AddNodeToMenu(BranchMenu, "If", GNode::CreateNode<If>);
+    AddNodeToMenu(BranchMenu, "For", GNode::CreateNode<For>);
+    AddNodeToMenu(BranchMenu, "For Each Element in Array", GNode::CreateNode<ForEachInArray>);
     
-    AddNodeToMenu(ArithMenu, "Add", GNode::createNode<Addition>);
-    AddNodeToMenu(ArithMenu, "Substract", GNode::createNode<Substraction>);
-    AddNodeToMenu(ArithMenu, "Multiply", GNode::createNode<Multiply>);
-    AddNodeToMenu(ArithMenu, "Divide", GNode::createNode<Divide>);
-    AddNodeToMenu(ArithMenu, "Modulo", GNode::createNode<Modulo>);
+    AddNodeToMenu(ArithMenu, "Add", GNode::CreateNode<Addition>);
+    AddNodeToMenu(ArithMenu, "Substract", GNode::CreateNode<Substraction>);
+    AddNodeToMenu(ArithMenu, "Multiply", GNode::CreateNode<Multiply>);
+    AddNodeToMenu(ArithMenu, "Divide", GNode::CreateNode<Divide>);
+    AddNodeToMenu(ArithMenu, "Modulo", GNode::CreateNode<Modulo>);
 
-    AddNodeToMenu(StringMenu, "Print String", GNode::createNode<Print>);
-    AddNodeToMenu(StringMenu, "Append String", GNode::createNode<Cat>);
+    AddNodeToMenu(StringMenu, "Print String", GNode::CreateNode<Print>);
+    AddNodeToMenu(StringMenu, "Append String", GNode::CreateNode<Cat>);
     
-    AddNodeToMenu(TimeMenu, "Delay", GNode::createNode<Delay>);
+    AddNodeToMenu(TimeMenu, "Delay", GNode::CreateNode<Delay>);
     
-    AddNodeToMenu(ArrayMenu, "Array", GNode::createNode<Array>);
+    AddNodeToMenu(ArrayMenu, "Array", GNode::CreateNode<Array>);
 
-    AddNodeToMenu(InterfaceCommonMenu, "Find Interface", GNode::createNode<Addition>);
+    AddNodeToMenu(InterfaceCommonMenu, "Find Interface", GNode::CreateNode<Addition>);
 
-    AddNodeToMenu(IoMenu, "Initialize I/O", GNode::createNode<IoInit>);
-    AddNodeToMenu(IoMenu, "Set I/O Value", GNode::createNode<Addition>);
-    AddNodeToMenu(IoMenu, "Set I/O Direction", GNode::createNode<Addition>);
+    AddNodeToMenu(IoMenu, "Initialize I/O", GNode::CreateNode<IoInit>);
+    AddNodeToMenu(IoMenu, "Set I/O Value", GNode::CreateNode<Addition>);
+    AddNodeToMenu(IoMenu, "Set I/O Direction", GNode::CreateNode<Addition>);
 }
 
 const std::vector<QString> &NoderDataBase::enumMap(const QString &name)

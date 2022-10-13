@@ -1,8 +1,9 @@
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(${PROG} PRIVATE "./")
+target_include_directories(${PROG} PRIVATE "./Node")
+target_include_directories(${PROG} PRIVATE "./Node/Nodes")
 
-message(STATUS "PROUT" "${CMAKE_CURRENT_SOURCE_DIR}")
-
-set(LOCAL_SOURCE
+target_sources(${PROG}
+	PRIVATE
 	NoderFrame.cpp
 	NoderView.cpp
 	NoderStyle.cpp
@@ -25,11 +26,3 @@ set(LOCAL_SOURCE
 	NoderScene.cpp
 	NoderDataBase.cpp
 )
-
-set(LOCAL_SOURCE_APPEND "")
-
-foreach(SRC ${LOCAL_SOURCE})
-	set(LOCAL_SOURCE_APPEND ${LOCAL_SOURCE_APPEND} "${CMAKE_CURRENT_SOURCE_DIR}/${SRC}")
-endforeach()
-
-set(SOURCE "${SOURCE}" "${LOCAL_SOURCE_APPEND}" PARENT_SCOPE)

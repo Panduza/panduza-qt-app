@@ -62,7 +62,7 @@ class GNode : public QGraphicsObject
         virtual void onEventDisconnect(void) {};
 
         template <typename N>
-        static GNode *createNode(void) {return new N();}
+        static GNode *CreateNode(void) {return new N();}
 
     protected:
         enum class PlugType {

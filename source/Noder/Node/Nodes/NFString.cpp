@@ -1,4 +1,4 @@
-#include <NFString.hpp>
+#include "NFString.hpp"
 
 Print::Print()
     : GNodeExec("Print String")

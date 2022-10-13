@@ -1,7 +1,7 @@
-#include <NoderView.hpp>
-#include <NoderStyle.hpp>
+#include "NoderView.hpp"
+#include "NoderStyle.hpp"
+#include "NoderDataBase.hpp"
 
-#include <NoderDataBase.hpp>
 #include <GNode.hpp>
 
 NoderView::NoderView(PanduzaEngine *engine)
@@ -146,7 +146,7 @@ void NoderView::initViewMenu(void)
     QLabel *label;
     QWidgetAction *ALabel;
     
-    std::vector<PzaMenu *> &menus = NBD_INST->nodeMenuList();
+    std::vector<PzaMenu *> &menus = NBD_INST.nodeMenuList();
     _viewMenu = new PzaMenu(this);
 
     label = new QLabel("Add node");
@@ -172,7 +172,7 @@ void NoderView::setViewMenuCallback(QMenu *menu)
             {
                 QAction *action = static_cast<QAction *>(sender());
                 action->data();
-                NoderDataBase::t_createNode f = action->data().value<NoderDataBase::t_createNode>();
+                NoderDataBase::t_CreateNode f = action->data().value<NoderDataBase::t_CreateNode>();
                 if (f) {
                     GNode *node = f();
                     node->setScene(_scene);

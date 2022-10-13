@@ -14,7 +14,7 @@ Interface::Interface(Group *group, const QString &name)
 
 void Interface::parseMsg(const QString &atts, const QJsonDocument &json)
 {
-    if (PzaUtils::isInStdMap<t_fAtts>(_attsMap, atts))
+    if (PzaUtils::IsInStdMap<t_fAtts>(_attsMap, atts))
         _attsMap[atts](json);
 }
 

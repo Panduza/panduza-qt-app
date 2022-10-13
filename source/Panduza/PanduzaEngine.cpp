@@ -13,7 +13,7 @@ PanduzaEngine::PanduzaEngine()
 
 Machine *PanduzaEngine::findMachine(const QString &name)
 {
-    return (PzaUtils::isInStdMap<Machine *>(_machineMap, name)) ?_machineMap[name] : nullptr;
+    return (PzaUtils::IsInStdMap<Machine *>(_machineMap, name)) ?_machineMap[name] : nullptr;
 }
 
 Machine *PanduzaEngine::createMachine(const QString &name)
@@ -55,7 +55,7 @@ void PanduzaEngine::parseMsg(const QMqttTopicName &topic, const QByteArray &mess
         if (interface)
             return ;
 
-        interfaceType = PzaJSON::keyToString(doc, "type");
+        interfaceType = PzaJSON::KeyToString(doc, "type");
 
         if (isValidInterfaceType(interfaceType)) {
             interface = _interfaceTypeMap[interfaceType](group, pzaTopic.interface());

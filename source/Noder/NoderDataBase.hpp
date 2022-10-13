@@ -55,7 +55,7 @@ class NoderDataBase
         NoderDataBase();
 
     public:
-        typedef std::function<GNode *(void)> t_createNode;
+        typedef std::function<GNode *(void)> t_CreateNode;
 
         NoderDataBase(NoderDataBase &other) = delete;
         void operator=(const NoderDataBase &) = delete;
@@ -65,27 +65,15 @@ class NoderDataBase
         const QString &pinTypeToDir(const PinProperty::Direction direction);
         const QColor &plugColor(const PinProperty::Type type);
         const std::vector<QString> &enumMap(const QString &name);
-        const t_createNode &createNode(const QString &name);
+        const t_CreateNode &CreateNode(const QString &name);
         void initNodeMenuList(void);
 
         std::vector<PzaMenu *> &nodeMenuList(void) {return _nodeMenuList;}
 
-        static NoderDataBase *GetInstance(void)
-        {
-            static NoderDataBase *_database;
-
-            if(_database == nullptr)
-                _database = new NoderDataBase();
-            return _database;
-        }
-
         static NoderDataBase &GetInstance(void)
         {
             static NoderDataBase _database;
-            
 
-            // if(_database == nullptr)
-                // _database = new NoderDataBase();
             return _database;
         }
 

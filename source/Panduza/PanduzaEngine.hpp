@@ -20,7 +20,7 @@ class PanduzaEngine : public QObject
         const std::unordered_map<QString, Machine *> &machines(void) {return _machineMap;}
 
         template<typename N>
-        static Interface *createInterface(Group *group, const QString &name)
+        static Interface *CreateInterface(Group *group, const QString &name)
         {
             return new N(group, name);
         }
@@ -42,7 +42,7 @@ class PanduzaEngine : public QObject
 
         bool isValidInterfaceType(const QString &name)
         {
-            return PzaUtils::isInStdMap<t_createInterface>(_interfaceTypeMap, name);
+            return PzaUtils::IsInStdMap<t_createInterface>(_interfaceTypeMap, name);
         }
 
     public slots:

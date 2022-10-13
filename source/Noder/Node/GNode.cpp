@@ -128,8 +128,8 @@ QByteArray GNode::loadColorValue(const PinProperty::Type &type, bool linked)
     QString xml;
     QColor color;
 
-    color = NBD_INST->plugColor(type);
-    color = NBD_INST->plugColor(type);
+    color = NBD_INST.plugColor(type);
+    color = NBD_INST.plugColor(type);
     if (linked)
         xml = _mapPlugFiles[PlugType::Value].plugC.data;
     else
@@ -392,7 +392,7 @@ void GNode::addPintoMultiPin(struct multiPin *s)
     if (size == s->max)
         return ;
     last = s->list->back();
-    index = PzaUtils::indexInVector<Pin *>(_inputPins, last);
+    index = PzaUtils::IndexInVector<Pin *>(_inputPins, last);
     if (index == -1)
         return ;
     pin = addPinFromType(s->type, s->pinName + " " + QString::number(size), PinProperty::Direction::Input, index + 1);
@@ -466,10 +466,10 @@ void GNode::createProxyMultiPin(struct multiPin *s)
         if ((int)s->list->size() == s->min)
             return ;
         last = s->list->back();
-        index = PzaUtils::indexInVector<Pin *>(_inputPins, last);
+        index = PzaUtils::IndexInVector<Pin *>(_inputPins, last);
         if (index == -1)
             return ;
-        PzaUtils::deleteFromVector<Pin *>(*s->list, last);
+        PzaUtils::DeleteFromVector<Pin *>(*s->list, last);
 
         deletePin(last);
     });
@@ -511,7 +511,7 @@ void GNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
     forEachPin([&](Pin *pin) {
         if (pin->isInPlugArea(click)) {
             if (pin->linked() == false || pin->isOutput())
-                pin->createLink(pin, mapToScene(click));
+                Pin::CreateLink(pin, mapToScene(click));
             else
                 pin->disconnectLink(mapToScene(pin->plugCenter()));
             return ;
@@ -764,7 +764,7 @@ void GNode::drawArrayPlug(QPainter *painter, Pin *pin)
     QString xml;
 
     xml = _mapPlugFiles[PlugType::Array].plugC.data;
-    const QColor &color = NBD_INST->plugColor(static_cast<PinDecl::Array *>(pin)->elemType());
+    const QColor &color = NBD_INST.plugColor(static_cast<PinDecl::Array *>(pin)->elemType());
     xml.replace("fill:#ffffff", "fill:" + color.name());
 
     svgr.load(xml.toUtf8());

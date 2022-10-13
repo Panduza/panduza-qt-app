@@ -7,35 +7,35 @@
 class PzaJSON
 {
     public:
-        static QString keyToString(const QJsonDocument &json, const QString &key)
+        static QString KeyToString(const QJsonDocument &json, const QString &key)
         {
             return PzaJSON::_keyToValue<QString>(json, key);
         }
-        static int keyToInt(const QJsonDocument &json, const QString &key)
+        static int KeyToInt(const QJsonDocument &json, const QString &key)
         {
             return PzaJSON::_keyToValue<int>(json, key);
         }
-        static double keyToDouble(const QJsonDocument &json, const QString &key)
+        static double KeyToDouble(const QJsonDocument &json, const QString &key)
         {
             return PzaJSON::_keyToValue<double>(json, key);
         }
 
-        static QByteArray fromString(const QString &key, const QString &value)
+        static QByteArray FromString(const QString &key, const QString &value)
         {
             return PzaJSON::_fromValue<QString>(key, "\"" + value + "\"");
         }
 
-        static QByteArray fromInt(const QString &key, const int &value)
+        static QByteArray FromInt(const QString &key, const int &value)
         {
             return PzaJSON::_fromValue<int>(key, value);
         }
 
-        static QByteArray fromDouble(const QString &key, const double &value)
+        static QByteArray FromDouble(const QString &key, const double &value)
         {
             return PzaJSON::_fromValue<double>(key, value);
         }
 
-        static QByteArray fromBool(const QString &key, const bool &value)
+        static QByteArray FromBool(const QString &key, const bool &value)
         {
             return PzaJSON::_fromValue<QString>(key, (value) ? "true" : "false");
         }

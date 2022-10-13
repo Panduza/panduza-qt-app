@@ -8,7 +8,7 @@
 #include <QSplitter>
 #include <QLabel>
 
-#include <NoderView.hpp>
+#include "NoderView.hpp"
 #include <PanduzaEngine.hpp>
 #include <PzaMenuBar.hpp>
 #include <PzaMenu.hpp>

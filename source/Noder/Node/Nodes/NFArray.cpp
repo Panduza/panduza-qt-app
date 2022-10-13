@@ -37,7 +37,7 @@ void Array::onEventConnect()
         return ;
 
     listSize = _list.size();
-    index = PzaUtils::indexInVector<Pin *>(_list, to);
+    index = PzaUtils::IndexInVector<Pin *>(_list, to);
     for (auto pin: _list) {
         deletePin(pin);
     }
@@ -50,7 +50,7 @@ void Array::onEventConnect()
 
         pin = addPinFromType(from->type(), " " + QString::number(i), PinProperty::Direction::Input);
         if (i == index)
-            Pin::createLink(from, pin);
+            Pin::CreateLink(from, pin);
         _list.push_back(pin);
     }
    

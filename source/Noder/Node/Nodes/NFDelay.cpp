@@ -1,6 +1,5 @@
 
-#include <NFDelay.hpp>
-#include <QThread>
+#include "NFDelay.hpp"
 
 Delay::Delay()
     : GNodeExec("Delay")

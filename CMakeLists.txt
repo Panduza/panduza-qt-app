@@ -21,13 +21,14 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Mqtt REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Svg REQUIRED)
 
-set(SOURCE "")
 FILE(GLOB_RECURSE INCLUDE *.hpp)
 
+add_executable(${PROG})
 
+add_subdirectory("${PROJECT_SOURCE_DIR}/source")
 
-add_executable(${PROG}
-	${SOURCE}
+target_sources(${PROG}
+	PRIVATE
 	${INCLUDE}
 	resources.qrc
 )
@@ -38,8 +39,5 @@ target_link_libraries(${PROG}
 	Qt${QT_VERSION_MAJOR}::Mqtt
 	Qt${QT_VERSION_MAJOR}::Svg
 )
-
-add_subdirectory("${PROJECT_SOURCE_DIR}/include")
-add_subdirectory("${PROJECT_SOURCE_DIR}/source")
 
 install(TARGETS ${PROG})

@@ -8,8 +8,8 @@
 #include <QTreeWidget>
 #include <QHeaderView>
 
-#include <NoderStyle.hpp>
-#include <NoderScene.hpp>
+#include "NoderStyle.hpp"
+#include "NoderScene.hpp"
 #include <PzaMenu.hpp>
 
 class NoderView : public QGraphicsView

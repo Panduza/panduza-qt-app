@@ -61,9 +61,9 @@ class Pin : public QWidget
         bool isInPlugArea(const QPointF &pos) const { return _plugzone.contains(pos); }
         const QPointF &plugCenter(void) const { return _plugcenter; }
         bool linked(void) const { return (_links.size() > 0); }
-        static void createLink(Pin *from);
-        static void createLink(Pin *from, Pin *to);
-        static void createLink(Pin *from, const QPointF &pos);
+        static void CreateLink(Pin *from);
+        static void CreateLink(Pin *from, Pin *to);
+        static void CreateLink(Pin *from, const QPointF &pos);
         void connectLink(Link *link);
         void moveLinks(void);
         void disconnectLink(const QPointF &pos);
@@ -72,14 +72,14 @@ class Pin : public QWidget
         void forEachLinkedPin(std::function<void(Pin *pin)> func);
         void forEachLinkedNode(std::function<void(GNode *node)> func);
         const QColor &plugColor(void) {return _plugColor;}
-        virtual void setPlugColor(void) {_plugColor = NBD_INST->plugColor(_type);}
+        virtual void setPlugColor(void) {_plugColor = NBD_INST.plugColor(_type);}
         void setNode(GNode *node) {_node = node;}
         void removeLink(Link *link);
         void removeLinks(void);
         bool isInput(void) {return _direction == PinProperty::Direction::Input;}
         bool isOutput(void) {return _direction == PinProperty::Direction::Output;}
 
-        static PinProperty::Direction oppositeDirection(PinProperty::Direction direction)
+        static PinProperty::Direction OppositeDirection(PinProperty::Direction direction)
         {
             if (direction == PinProperty::Direction::Input)
                 return PinProperty::Direction::Output;
@@ -352,7 +352,7 @@ class Array : public Pin
 
         void onEventConnect(void) override;
         void onEventDisconnect(void) override;
-        virtual void setPlugColor(void) {_plugColor = NBD_INST->plugColor(_elemType);}
+        virtual void setPlugColor(void) {_plugColor = NBD_INST.plugColor(_elemType);}
 
     private:
         COMPATIBLE_TYPES

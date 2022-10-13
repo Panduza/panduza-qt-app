@@ -1,7 +1,7 @@
 #pragma once
 
 #include <PzaUtils.hpp>
-#include <Interface.hpp>
+#include <Interface/Interface.hpp>
 
 class Machine;
 
@@ -15,7 +15,7 @@ class Group
 
         Interface *findInterface(const QString &name)
         {
-            return (PzaUtils::isInStdMap<Interface *>(_interfaceMap, name)) ?_interfaceMap[name] : nullptr;
+            return (PzaUtils::IsInStdMap<Interface *>(_interfaceMap, name)) ?_interfaceMap[name] : nullptr;
         }
 
         void addInterface(Interface *interface)

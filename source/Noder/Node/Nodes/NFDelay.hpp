@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QThread>
+
 #include <GNodeExec.hpp>
 
 class Delay : public GNodeExec
