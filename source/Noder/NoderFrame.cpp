@@ -2,6 +2,9 @@
 
 QWidget *sidePanel(QWidget *parent);
 
+#include <QScrollArea>
+#include <QScrollBar>
+
 NoderFrame::NoderFrame(PanduzaEngine *engine)
     : QWidget(),
     _engine(engine)
@@ -25,11 +28,22 @@ NoderFrame::NoderFrame(PanduzaEngine *engine)
     graphFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
     graphFrame->setStyleSheet("background-color: #181818;");
 
-    graphFrame->addWidget(sidePanel(this));
+    QScrollArea *scroll = new QScrollArea;
+    //scroll->horizontalScrollBar()->setEnabled(false);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setWidgetResizable(true);
+
+    QWidget *lol = sidePanel(this);
+
+    scroll->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    scroll->setWidget(lol);
+
+    graphFrame->addWidget(scroll);
     graphFrame->addWidget(tabBar);
     graphFrame->addWidget(new QFrame());
 
-    graphFrame->setSizes(QList<int>({30, 500, 30}));
+    graphFrame->setSizes(QList<int>({20, 500, 20}));
 
     _mainLayout->addWidget(menuBar);
     _mainLayout->addWidget(graphFrame);
@@ -72,7 +86,7 @@ QWidget *varTab(QWidget *parent)
     Lol *main = new Lol(parent);
     QHBoxLayout *layout = new QHBoxLayout(main);
     QLabel *name = new QLabel("Name", main);
-    QLabel *VarColor = new QLabel(main);
+    QFrame *VarColor = new QFrame(main);
     
     name->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     VarColor->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -107,8 +121,9 @@ QWidget *varTab(QWidget *parent)
     return main;
 }
 
-QWidget *sidePanel(QWidget *parent)
+QWidget *NoderFrame::sidePanel(QWidget *parent)
 {
+    
     QWidget *sidePanel = new QWidget(parent);
     QVBoxLayout *sidePanelLayout = new QVBoxLayout(sidePanel);
 
@@ -128,7 +143,23 @@ QWidget *sidePanel(QWidget *parent)
     varContainerLayout->addWidget(varTab(varContainerTitle));
     varContainerLayout->addWidget(varTab(varContainerTitle));
     varContainerLayout->addWidget(varTab(varContainerTitle));
-
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
+    varContainerLayout->addWidget(varTab(varContainerTitle));
     varContainerLayout->addStretch(1);
 
     sidePanelLayout->addWidget(varContainer);

@@ -8,4 +8,5 @@ target_sources(${PROG}
 	PRIVATE
     main.cpp
 	MainWindow.cpp
+	Widgets/PzaSpoiler.cpp
 )

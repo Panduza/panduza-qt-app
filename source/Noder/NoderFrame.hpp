@@ -25,4 +25,6 @@ class NoderFrame : public QWidget
         QVBoxLayout *_mainLayout;
         PanduzaEngine *_engine;
         QVBoxLayout *_sidePanelLayout;
+
+        QWidget *sidePanel(QWidget *parent);
 };
