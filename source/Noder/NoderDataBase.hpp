@@ -49,11 +49,20 @@ struct NodeProperty
     };
 };
 
+struct NoderPanel
+{
+    enum class Type
+    {
+        Bool,
+        Int,
+        Float,
+        String,
+        Enum
+    };
+};
+
 class NoderDataBase
 {
-    protected:
-        NoderDataBase();
-
     public:
         typedef std::function<GNode *(void)> t_CreateNode;
 
@@ -64,6 +73,8 @@ class NoderDataBase
         const QString &pinTypeToStr(const PinProperty::Type type);
         const QString &pinTypeToDir(const PinProperty::Direction direction);
         const QColor &plugColor(const PinProperty::Type type);
+        const QColor &varColor(const NoderPanel::Type type);
+        const QString &varTypeName(const NoderPanel::Type type);
         const std::vector<QString> &enumMap(const QString &name);
         const t_CreateNode &CreateNode(const QString &name);
         void initNodeMenuList(void);
@@ -77,6 +88,17 @@ class NoderDataBase
             return _database;
         }
 
+        void forEachVarType(std::function<void(NoderPanel::Type type)> func);
+
+        std::unordered_map<NoderPanel::Type, QString> _varTypeMap = {
+            {NoderPanel::Type::Bool, "Boolean"},
+            {NoderPanel::Type::Int,  "Integer"},
+            {NoderPanel::Type::Float, "Float"},
+            {NoderPanel::Type::String, "String"},
+            {NoderPanel::Type::Enum,  "Enum"},
+        };
+
     private:
+        NoderDataBase();
         std::vector<PzaMenu *> _nodeMenuList;
 };

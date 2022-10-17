@@ -4,7 +4,6 @@
 #include <QMouseEvent>
 #include <QMenu>
 #include <QWidgetAction>
-#include <QLineEdit>
 #include <QTreeWidget>
 #include <QHeaderView>
 

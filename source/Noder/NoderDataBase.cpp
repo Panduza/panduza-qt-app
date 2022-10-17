@@ -96,7 +96,6 @@ const std::vector<QString> &NoderDataBase::enumMap(const QString &name)
             }
         }
     };
-
     return map[name];
 }
 
@@ -127,7 +126,6 @@ const QString &NoderDataBase::pinTypeToStr(const PinProperty::Type type)
         {PinProperty::Type::Array, "Wildcard"},
         {PinProperty::Type::Interface, "Interface"}
     };
-
     return map[type];
 }
 
@@ -137,7 +135,6 @@ const QString &NoderDataBase::pinTypeToDir(const PinProperty::Direction directio
         {PinProperty::Direction::Input, "Input"},
         {PinProperty::Direction::Output, "Output"}
     };
-
     return map[direction];
 }
 
@@ -152,6 +149,29 @@ const QColor &NoderDataBase::plugColor(const PinProperty::Type type)
         {PinProperty::Type::Enum, QColor("#CE6135")},
         {PinProperty::Type::Interface, QColor("#C8B623")},
     };
-
     return map[type];
+}
+
+const QColor &NoderDataBase::varColor(const NoderPanel::Type type)
+{
+    static std::unordered_map<NoderPanel::Type, QColor> map = {
+        {NoderPanel::Type::Bool, plugColor(PinProperty::Type::Bool)},
+        {NoderPanel::Type::Int,  plugColor(PinProperty::Type::Int)},
+        {NoderPanel::Type::Float, plugColor(PinProperty::Type::Float)},
+        {NoderPanel::Type::String, plugColor(PinProperty::Type::String)},
+        {NoderPanel::Type::Enum,  plugColor(PinProperty::Type::Enum)},
+    };
+    return map[type];
+}
+
+const QString &NoderDataBase::varTypeName(const NoderPanel::Type type)
+{
+    return _varTypeMap[type];
+}
+
+void NoderDataBase::forEachVarType(std::function<void(NoderPanel::Type type)> func)
+{
+    for (auto var : _varTypeMap) {
+        func(var.first);
+    }
 }

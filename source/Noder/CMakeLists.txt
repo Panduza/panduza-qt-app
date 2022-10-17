@@ -25,4 +25,6 @@ target_sources(${PROG}
 	Node/Link.cpp
 	NoderScene.cpp
 	NoderDataBase.cpp
+	NoderSidePanel.cpp
+	NoderVariable.cpp
 )

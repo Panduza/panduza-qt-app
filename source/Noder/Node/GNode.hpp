@@ -2,7 +2,6 @@
 
 #include <QGraphicsObject>
 #include <QGraphicsProxyWidget>
-#include <QLabel>
 #include <QFontMetrics>
 #include <QPainter>
 #include <QGridLayout>
@@ -10,15 +9,16 @@
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QPoint>
-#include <QLineEdit>
-#include <QComboBox>
 #include <QSvgRenderer>
 #include <QFile>
 #include <QPushButton>
 
 #include <Node/Pin.hpp>
 #include <PzaComboBox.hpp>
+#include <PzaLabel.hpp>
 #include <PzaUtils.hpp>
+#include <PzaLineEdit.hpp>
+#include <PzaMoreLess.hpp>
 
 class NoderScene;
 
@@ -217,6 +217,7 @@ class GNode : public QGraphicsObject
             pin->setDirection(direction);
             pin->setPlugColor();
             pin->setNode(this);
+            //pin->setParent(nullptr);
 
             switch (direction) {
                 case PinProperty::Direction::Input:

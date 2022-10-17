@@ -14,8 +14,8 @@ void Print::exec(void)
 Cat::Cat()
     : GNodeOp("Concatenate String")
 {
-    _spacer = addInput<PinDecl::String>("Spacer");
     _result = addOutput<PinDecl::String>("Result");
+    _spacer = addInput<PinDecl::String>("Spacer");
     addMultiInput<PinDecl::String>("String", &_list);
 }
 

@@ -143,13 +143,13 @@ void NoderView::mouseReleaseEvent(QMouseEvent *event)
 
 void NoderView::initViewMenu(void)
 {
-    QLabel *label;
+    PzaLabel *label;
     QWidgetAction *ALabel;
     
     std::vector<PzaMenu *> &menus = NBD_INST.nodeMenuList();
     _viewMenu = new PzaMenu(this);
 
-    label = new QLabel("Add node");
+    label = new PzaLabel("Add node");
     ALabel = new QWidgetAction(label);
     ALabel->setDefaultWidget(label);
 

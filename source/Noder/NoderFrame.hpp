@@ -6,9 +6,9 @@
 #include <QTabWidget>
 #include <QDockWidget>
 #include <QSplitter>
-#include <QLabel>
 
 #include "NoderView.hpp"
+#include "NoderSidePanel.hpp"
 #include <PanduzaEngine.hpp>
 #include <PzaMenuBar.hpp>
 #include <PzaMenu.hpp>

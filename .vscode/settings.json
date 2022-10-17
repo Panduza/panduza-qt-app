@@ -6,6 +6,25 @@
         "qhboxlayout": "cpp",
         "qvboxlayout": "cpp",
         "qfile": "cpp",
-        "qscrollarea": "cpp"
-    }
+        "qscrollarea": "cpp",
+        "qwidget": "cpp",
+        "qmqttclient": "cpp",
+        "qsslconfiguration": "cpp",
+        "type_traits": "cpp",
+        "qgraphicsobject": "cpp",
+        "qstring": "cpp",
+        "utility": "cpp",
+        "initializer_list": "cpp",
+        "typeinfo": "cpp",
+        "qtoolbutton": "cpp",
+        "qdebug": "cpp",
+        "qlabel": "cpp",
+        "qfontmetrics": "cpp",
+        "qcombobox": "cpp",
+        "qsvgrenderer": "cpp",
+        "qabstractitemview": "cpp",
+        "qlineedit": "cpp",
+        "qgridlayout": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -208,7 +208,7 @@ Pin *GNode::addPinFromType(PinProperty::Type type, const QString &name, PinPrope
 
 void GNode::createProxyWidget(Pin *pin)
 {
-    QLabel *label;
+    PzaLabel *label;
 
     if (!_hasWidgets)
         return ;
@@ -221,9 +221,9 @@ void GNode::createProxyWidget(Pin *pin)
     
     pin->proxy()->setWidget(pin);
 
-    label = new QLabel(pin->name(), pin);
-    label->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    pin->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    label = new PzaLabel(pin->name(), pin);
+    label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    pin->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     if (pin->isOutput())
         pin->grid()->addWidget(label, 0, 0, Qt::AlignRight);
     else
@@ -232,32 +232,6 @@ void GNode::createProxyWidget(Pin *pin)
     pin->setStyleSheet(
         "QWidget {"
         "   background-color: transparent;"
-        "}"
-        "QLabel {"
-        "   color: #DCDCDC;"
-        "   background-color: transparent;"
-        "   font: 14px;"
-        "}"
-        "QComboBox {"
-        "   border: 1px solid gray;"
-        "   border-radius: 2px;"
-        "   font: 14px;"
-        "   color: #DCDCDC;"
-        "   background-color: #242424;"
-        "   padding: 3px 30px 1px 3px;"
-        "}"
-        "QComboBox::drop-down {"
-            "subcontrol-origin: padding;"
-            "subcontrol-position: top right;"
-            "border-top-right-radius: 3px;"
-            "border-bottom-right-radius: 3px;"
-        "}"
-        "QComboBox::hover {"
-        "   color: #EFEFEF;"
-        "   background-color: #474747;"
-        "}"
-        "QListView {"
-        "   background-color: #474747;"
         "}"
         "QDoubleSpinBox {"
         "   color: #DCDCDC;"
@@ -275,14 +249,7 @@ void GNode::createProxyWidget(Pin *pin)
         "   color: #EFEFEF;"
         "   background-color: #474747;"
         "}"
-        "QLineEdit {"
-        "   color: #DCDCDC;"
-        "   background-color: #242424;"
-        "}"
-        "QLineEdit::hover {"
-        "   color: #EFEFEF;"
-        "   background-color: #474747;"
-        "}"
+        
         "QCheckBox::indicator {"
         "   width: 14px;"
         "   height: 14px;"
@@ -343,7 +310,7 @@ void GNode::createProxyWidget(Pin *pin)
         }
         case PinProperty::Type::String:
         {
-            QLineEdit *txtbox = new QLineEdit(pin);
+            PzaLineEdit *txtbox = new PzaLineEdit(pin);
             txtbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
             txtbox->setFixedWidth(100);
             pin->grid()->addWidget(txtbox, 0, 1);
@@ -402,64 +369,18 @@ void GNode::addPintoMultiPin(struct multiPin *s)
 void GNode::createProxyMultiPin(struct multiPin *s)
 {
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
-    QWidget *w = new QWidget();
-    QHBoxLayout *layout = new QHBoxLayout(w);
-    QPushButton *add = new QPushButton(w);
-    QPushButton *rm = new QPushButton(w);
-    QLabel *label = new QLabel(s->name);
+    PzaMoreLess *moreLess = new PzaMoreLess(s->name, PzaStyle::Stretch::Left);
 
-    add->setObjectName("add");
-    rm->setObjectName("rm");
-
-    label->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    add->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    rm->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    w->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-
-    w->setStyleSheet(
-    "QWidget {"
-    "   background-color: transparent;"
-    "}"
-    "QLabel {"
-    "   color: #DCDCDC;"
-    "   background-color: transparent;"
-    "   font: 14px;"
-    "}"
-    "QPushButton {"
-    "   max-width: 16px;"
-    "   max-height: 16px;"
-    "}"
-    "QPushButton#add {"
-        "   border-image: url(:/images/noder/plus.png) 0 0 0 0 stretch;"
-        "}"
-        "QPushButton#rm {"
-        "    border-image: url(:/images/noder/minus.png) 0 0 0 0 stretch;"
-        "}"
-        "QPushButton#add::hover {"
-        "   border-image: url(:/images/noder/plus_hover.png) 0 0 0 0 stretch;"
-        "}"
-        "QPushButton#rm::hover {"
-        "    border-image: url(:/images/noder/minus_hover.png) 0 0 0 0 stretch;"
-        "}"
-    );
-
-    layout->addStretch(1);
-    layout->addWidget(label);
-    layout->addWidget(add);
-    layout->addWidget(rm);
-
-    layout->setSpacing(5);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    proxy->setWidget(w);
     s->proxy = proxy;
-    s->w = w;
+    s->w = moreLess;
 
-    connect(add, &QPushButton::clicked, this, [&, s]{
+    proxy->setWidget(s->w);
+
+    connect(moreLess, &PzaMoreLess::more, this, [&, s]{
         addPintoMultiPin(s);
     });
 
-    connect(rm, &QPushButton::clicked, this, [&, s]{
+    connect(moreLess, &PzaMoreLess::less, this, [&, s]{
         int index;
         Pin *last;
 
