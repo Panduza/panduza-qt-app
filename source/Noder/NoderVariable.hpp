@@ -7,6 +7,7 @@
 #include "NoderDataBase.hpp"
 #include <PzaLineEdit.hpp>
 #include <PzaLabel.hpp>
+#include <PzaPropertyTable.hpp>
 
 class NoderVariable : public QWidget
 {
@@ -19,7 +20,11 @@ class NoderVariable : public QWidget
 
         void setSelected(bool state);
         const QString &name() {return _name;}
+        void setName(const QString &name);
+        void setType(const NoderPanel::Type type);
         NoderPanel::Type varType(void) {return _type;}
+        PzaPropertyTable *propTable(void) {return _propTable;}
+        QString propName(void) {return _propName->text();}
 
         void mousePressEvent(QMouseEvent *event) override;
 
@@ -28,12 +33,14 @@ class NoderVariable : public QWidget
         PzaLineEdit *_varLabel;
         QHBoxLayout *_layout;
         QFrame *_colorFrame;
-        QColor _varColor;
         NoderPanel::Type _type;
+        PzaPropertyTable *_propTable;
+        PzaLabel *_propName = nullptr;
+        PzaLabel *_typeName = nullptr;
+        PzaComboBox *_propType;
 
         signals:
             void activate(void);
-            void nameChanged(void);
 };
 
 /*

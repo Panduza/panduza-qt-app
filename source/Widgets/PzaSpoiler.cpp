@@ -7,12 +7,18 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
 
     _layout = new QVBoxLayout(this);
     _header = new QToolButton(this);
+    _content = new QStackedWidget(this);
+
+    _header->setAutoRaise(true);
 
     setStyleSheet(
-        "QToolButton {"
-            "border: none;"
-            "background-color:pink;"
-        "}"
+        "background-color: #1F1F1F;"
+    );
+
+    _header->setStyleSheet(
+        "color: #DCDCDC;"
+        "background-color: transparent;"
+        "font: 14px;"
     );
 
     _layout->setContentsMargins(0, 0, 0, 0);
@@ -24,9 +30,11 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
     _header->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     _layout->addWidget(_header);
+    _content->setVisible(false);
+    _layout->addWidget(_content);
 
     connect(_header, &QToolButton::clicked, this, &PzaSpoiler::headerClicked);
-    setFold(true);
+    //setFold(true);
 }
 
 PzaSpoiler::PzaSpoiler(const QString &name, QWidget *parent)
@@ -35,34 +43,40 @@ PzaSpoiler::PzaSpoiler(const QString &name, QWidget *parent)
     _header->setText(name);
 }
 
-void PzaSpoiler::setContentWidget(QWidget *w)
+void PzaSpoiler::addWidget(QWidget *w)
 {
-    if (_content)
-        _layout->removeWidget(_content);
-    _content = w;
-    _layout->addWidget(_content);
-    setFold(_fold);
+    _content->addWidget(w);
+    setCurrentWidget(w);
+}
+
+void PzaSpoiler::removeWidget(QWidget *w)
+{
+    _content->removeWidget(w);
+}
+
+void PzaSpoiler::setCurrentWidget(QWidget *w)
+{
+    _content->setCurrentWidget(w);
 }
 
 void PzaSpoiler::updateSpoiler()
 {
-    if (_content == nullptr)
-        return ;
     if (_fold) {
-        _content->setVisible(false);
+        _header->setArrowType(Qt::ArrowType::RightArrow);
+        if (_content)
+            _content->setVisible(false);
     }
     else {
-        _content->setVisible(true);
-    }
-    if (_fold)
-        _header->setArrowType(Qt::ArrowType::RightArrow);
-    else
         _header->setArrowType(Qt::ArrowType::DownArrow);
+        if (_content)
+            _content->setVisible(true);
+    }
+    update();
 }
 
 void PzaSpoiler::headerClicked(void)
 {
-    setFold(!_fold);
+    (_fold) ? setFold(false) : setFold(true);
 }
 
 void PzaSpoiler::setFold(bool state)

@@ -29,7 +29,9 @@ class NoderVarArea : public PzaSpoiler
         NoderVariable *_selectedVar = nullptr;
 
     signals:
-        void updated(NoderVariable *var);
+        void varUpdated(NoderVariable *var);
+        void varAdded(NoderVariable *var);
+        void varRemoved(NoderVariable *var);
 };
 
 class NoderPropertyArea : public PzaSpoiler
@@ -40,13 +42,10 @@ class NoderPropertyArea : public PzaSpoiler
         NoderPropertyArea(QWidget *parent = nullptr);
         ~NoderPropertyArea() = default;
 
-    private:
-        PzaPropertyTable *_propertyTable;
-        PzaLabel *_propName = nullptr;
-        PzaComboBox *_propType;
-
     public slots:
         void updateProperties(NoderVariable *var);
+        void addProperties(NoderVariable *var);
+        void deleteProperties(NoderVariable *var);
 };
 
 class NoderSidePanel : public QScrollArea

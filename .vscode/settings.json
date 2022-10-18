@@ -24,7 +24,8 @@
         "qsvgrenderer": "cpp",
         "qabstractitemview": "cpp",
         "qlineedit": "cpp",
-        "qgridlayout": "cpp"
+        "qgridlayout": "cpp",
+        "qstackedwidget": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

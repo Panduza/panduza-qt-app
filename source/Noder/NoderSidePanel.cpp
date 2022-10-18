@@ -9,13 +9,15 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     
     _main = new QWidget(this);
-
+    
     _layout = new QVBoxLayout(_main);
 
     _varArea = new NoderVarArea(_main);
     _propertyArea = new NoderPropertyArea(_main);
 
-    connect(_varArea, &NoderVarArea::updated, _propertyArea, &NoderPropertyArea::updateProperties);
+    connect(_varArea, &NoderVarArea::varUpdated, _propertyArea, &NoderPropertyArea::updateProperties);
+    connect(_varArea, &NoderVarArea::varAdded, _propertyArea, &NoderPropertyArea::addProperties);
+    connect(_varArea, &NoderVarArea::varRemoved, _propertyArea, &NoderPropertyArea::deleteProperties);
 
     _layout->addWidget(_varArea);
     _layout->addWidget(_propertyArea);
@@ -28,7 +30,7 @@ NoderVarArea::NoderVarArea(QWidget *parent)
     : PzaSpoiler("Variables", parent)
 {
     setFold(false);
-
+    
     _main = new PzaWidget(this);
     connect(_main, &PzaWidget::clicked, this, [&](){
         selectVar(nullptr);
@@ -38,8 +40,6 @@ NoderVarArea::NoderVarArea(QWidget *parent)
 
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
-    setContentWidget(_main);
-
     _layout->addWidget(_moreLess);
 
     connect(_moreLess, &PzaMoreLess::more, this, [&]() {
@@ -48,6 +48,8 @@ NoderVarArea::NoderVarArea(QWidget *parent)
     connect(_moreLess, &PzaMoreLess::less, this, [&]() {
         removeVariable(_selectedVar);
     });
+   
+    addWidget(_main);
 }
 
 void NoderVarArea::selectVar(NoderVariable *target)
@@ -56,10 +58,9 @@ void NoderVarArea::selectVar(NoderVariable *target)
         var->setSelected(false);
     }
     _selectedVar = target;
-    if (target) {
+    if (target)
         target->setSelected(true);
-        updated(_selectedVar);
-    }
+    varUpdated(_selectedVar);
 }
 
 void NoderVarArea::addVariable(void)
@@ -71,14 +72,15 @@ void NoderVarArea::addVariable(void)
     connect(newVar, &NoderVariable::activate, this, [&, newVar]() {
         selectVar(newVar);
     });
-    connect(newVar, &NoderVariable::nameChanged, this, [&, newVar]() {
-        updated(_selectedVar);
-    });
-   // selectVar(newVar);
+    varAdded(newVar);
+    selectVar(newVar);
 }
 
 void NoderVarArea::removeVariable(NoderVariable *target)
 {
+    unsigned long index;
+    NoderVariable *next = nullptr;
+
     if (target == nullptr)
         return ;
         
@@ -87,30 +89,39 @@ void NoderVarArea::removeVariable(NoderVariable *target)
     }
 
     _layout->removeWidget(target);
+    index = PzaUtils::IndexInVector<NoderVariable *>(_varList, target);
     PzaUtils::DeleteFromVector<NoderVariable *>(_varList, target);
-    delete target;
+    varRemoved(target);
+    target->deleteLater();
+
+    if (index != _varList.size()) {
+        next = _varList.at(index);
+    }
+    else if (_varList.size() > 0) {
+        next = _varList.at(index - 1);
+    }
+    selectVar(next);
 }
 
 NoderPropertyArea::NoderPropertyArea(QWidget *parent)
     : PzaSpoiler("Properties", parent)
 {
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
-
-    _propertyTable = new PzaPropertyTable(this);
-    _propName = _propertyTable->addProperty<PzaLabel>("Name");
-    _propType = _propertyTable->addProperty<PzaComboBox>("Type");
-
-    NBD_INST.forEachVarType([&](NoderPanel::Type type) {
-        _propType->insertItem(0, NBD_INST.varTypeName(type));
-    });
-    _propType->setCurrentIndex(0);
-
-    setContentWidget(_propertyTable);
+    setFold(false);
 }
 
 void NoderPropertyArea::updateProperties(NoderVariable *var)
 {
-    if (folded())
-        setFold(false);
-    _propName->setText(var->name());
+    if (var) {
+        setCurrentWidget(var->propTable());
+    }
+}
+
+void NoderPropertyArea::addProperties(NoderVariable *var)
+{
+    addWidget(var->propTable());
+}
+
+void NoderPropertyArea::deleteProperties(NoderVariable *var)
+{
+    removeWidget(var->propTable());
 }

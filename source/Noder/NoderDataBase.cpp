@@ -169,6 +169,15 @@ const QString &NoderDataBase::varTypeName(const NoderPanel::Type type)
     return _varTypeMap[type];
 }
 
+NoderPanel::Type NoderDataBase::varTypeFromName(const QString &name)
+{
+    for (const auto& [key, value] : _varTypeMap)
+        if (value == name)
+            return key;
+    // Should not be possible
+    return NoderPanel::Type::Bool;
+}
+
 void NoderDataBase::forEachVarType(std::function<void(NoderPanel::Type type)> func)
 {
     for (auto var : _varTypeMap) {

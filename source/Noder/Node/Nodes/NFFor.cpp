@@ -50,7 +50,6 @@ GNode *ForEachInArray::branch(void)
     GNode *ret = nullptr;
 
     end = _array->list().size();
-    qDebug() << end;
     for (unsigned int i = 0; i < end; i++) {
         switch(_array->elemType()) {
             case PinProperty::Type::Bool:

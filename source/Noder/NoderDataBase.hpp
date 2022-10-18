@@ -89,6 +89,7 @@ class NoderDataBase
         }
 
         void forEachVarType(std::function<void(NoderPanel::Type type)> func);
+        NoderPanel::Type varTypeFromName(const QString &name);
 
         std::unordered_map<NoderPanel::Type, QString> _varTypeMap = {
             {NoderPanel::Type::Bool, "Boolean"},
