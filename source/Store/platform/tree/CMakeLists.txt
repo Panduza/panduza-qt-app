@@ -2,8 +2,9 @@ target_include_directories(${PROG} PRIVATE "./")
 
 target_sources(${PROG}
 	PRIVATE
-	Group.cpp
-	Machine.cpp
-	Broker.cpp
-	Interface/Interface.cpp
+    
+    Tree.cpp
+    BrokerDeclaration.cpp
+    InterfaceDeclaration.cpp
 )
+

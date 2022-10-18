@@ -1,0 +1,9 @@
+doxygen:
+  ignore_path:
+  - setup.py
+  - .github/*
+  - .git/*
+  - .gitignore
+  - documentation/*
+  - '*/features/*'
+  - 'build/*'

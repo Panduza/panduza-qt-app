@@ -1,13 +1,20 @@
-add_subdirectory("Panduza")
 add_subdirectory("Noder")
+add_subdirectory("Store")
+add_subdirectory("StoreBar")
+add_subdirectory("Admin")
 
+target_include_directories(${PROG} PRIVATE ".")
 target_include_directories(${PROG} PRIVATE "Utils")
 target_include_directories(${PROG} PRIVATE "Widgets")
+target_include_directories(${PROG} PRIVATE "StoreBar")
 
 target_sources(${PROG}
 	PRIVATE
 	main.cpp
+
 	MainWindow.cpp
+	MainStatusBar.cpp
+	CentralWidget.cpp
 
 	Widgets/PzaWidget.cpp
 	Widgets/PzaSpoiler.cpp

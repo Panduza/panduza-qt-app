@@ -20,6 +20,9 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Mqtt REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Svg REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Concurrent REQUIRED)
+
+find_library(HAVE_SSH NAMES ssh)
 
 FILE(GLOB_RECURSE INCLUDE *.hpp)
 
@@ -38,6 +41,8 @@ target_link_libraries(${PROG}
 	Qt${QT_VERSION_MAJOR}::Widgets
 	Qt${QT_VERSION_MAJOR}::Mqtt
 	Qt${QT_VERSION_MAJOR}::Svg
+	Qt${QT_VERSION_MAJOR}::Concurrent
+	ssh
 )
 
 install(TARGETS ${PROG})

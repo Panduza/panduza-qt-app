@@ -1,5 +1,8 @@
+// Panduza
 #include "MainWindow.hpp"
 #include <NoderFrame.hpp>
+
+#include "StatusBar.hpp"
 
 MainWindow::MainWindow()
     : QMainWindow(),

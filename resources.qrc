@@ -15,5 +15,8 @@
         <file>images/noder/plug_exec_c.svg</file>
         <file>images/noder/plug_exec_nc.svg</file>
         <file>images/noder/plug_array.svg</file>
+
+
+        <file>rsc/files/panduza.service</file>
     </qresource>
 </RCC>

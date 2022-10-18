@@ -1,0 +1,8 @@
+/**
+
+@defgroup StoreConnectionModule Store Connection Module
+
+The connection module provides background connections to communicate with servers.
+
+
+*/
