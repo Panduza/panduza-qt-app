@@ -9,6 +9,28 @@
 #include <PzaComboBox.hpp>
 #include <PzaPropertyTable.hpp>
 
+class NoderPropertyArea : public PzaSpoiler
+{
+    public:
+        NoderPropertyArea(QWidget *parent = nullptr);
+        ~NoderPropertyArea() = default;
+
+        void updateProperty(NoderVariable *var);
+        void addProperty(NoderVariable *var);
+        void deleteProperty(NoderVariable *var);
+};
+
+class NoderDefValArea : public PzaSpoiler
+{
+    public:
+        NoderDefValArea(QWidget *parent = nullptr);
+        ~NoderDefValArea() = default;
+
+        void updateValArea(NoderVariable *var);
+        void add(NoderVariable *var);
+        void del(NoderVariable *var);
+};
+
 class NoderVarArea : public PzaSpoiler
 {
     Q_OBJECT
@@ -24,28 +46,18 @@ class NoderVarArea : public PzaSpoiler
     private:
         PzaWidget *_main;
         QVBoxLayout *_layout;
+        PzaWidget *_varTable;
+        QVBoxLayout *_varTableLayout;
         PzaMoreLess *_moreLess;
         std::vector<NoderVariable *> _varList;
         NoderVariable *_selectedVar = nullptr;
+        NoderPropertyArea *_propertyArea;
+        NoderDefValArea *_defValArea;
 
     signals:
         void varUpdated(NoderVariable *var);
         void varAdded(NoderVariable *var);
         void varRemoved(NoderVariable *var);
-};
-
-class NoderPropertyArea : public PzaSpoiler
-{
-    Q_OBJECT
-
-    public:
-        NoderPropertyArea(QWidget *parent = nullptr);
-        ~NoderPropertyArea() = default;
-
-    public slots:
-        void updateProperties(NoderVariable *var);
-        void addProperties(NoderVariable *var);
-        void deleteProperties(NoderVariable *var);
 };
 
 class NoderSidePanel : public QScrollArea

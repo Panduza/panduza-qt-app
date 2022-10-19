@@ -75,7 +75,7 @@ class NoderDataBase
         const QColor &plugColor(const PinProperty::Type type);
         const QColor &varColor(const NoderPanel::Type type);
         const QString &varTypeName(const NoderPanel::Type type);
-        const std::vector<QString> &enumMap(const QString &name);
+        const std::vector<QString> &enumValues(const QString &name);
         const t_CreateNode &CreateNode(const QString &name);
         void initNodeMenuList(void);
 
@@ -88,6 +88,10 @@ class NoderDataBase
             return _database;
         }
 
+        void forEachEnum(std::function<void(const QString &name, const std::vector<QString> &list)> func);
+        void forEachEnumName(std::function<void(const QString &name)>);
+        void forEachEnumValues(const QString &name, std::function<void(const QString &name)>);
+
         void forEachVarType(std::function<void(NoderPanel::Type type)> func);
         NoderPanel::Type varTypeFromName(const QString &name);
 
@@ -98,6 +102,23 @@ class NoderDataBase
             {NoderPanel::Type::String, "String"},
             {NoderPanel::Type::Enum,  "Enum"},
         };
+
+        std::unordered_map<QString, std::vector<QString>> _enumMap = {
+        {
+            "I/O direction",
+            {
+                "Input",
+                "Output"
+            }
+        },
+        {
+            "I/O value",
+            {
+                "Low",
+                "High"
+            }
+        }
+    };
 
     private:
         NoderDataBase();

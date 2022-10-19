@@ -78,25 +78,30 @@ void NoderDataBase::initNodeMenuList(void)
     AddNodeToMenu(IoMenu, "Set I/O Direction", GNode::CreateNode<Addition>);
 }
 
-const std::vector<QString> &NoderDataBase::enumMap(const QString &name)
+void NoderDataBase::forEachEnum(std::function<void(const QString &name, const std::vector<QString> &list)> func)
 {
-    static std::unordered_map<QString, std::vector<QString>> map = {
-        {
-            "I/O direction",
-            {
-                "Input",
-                "Output"
-            }
-        },
-        {
-            "I/O value",
-            {
-                "Low",
-                "High"
-            }
-        }
-    };
-    return map[name];
+    for (auto var : _enumMap) {
+        func(var.first, var.second);
+    }
+}
+
+void NoderDataBase::forEachEnumName(std::function<void(const QString &name)> func)
+{
+    for (auto var : _enumMap) {
+        func(var.first);
+    }
+}
+
+void NoderDataBase::forEachEnumValues(const QString &name, std::function<void(const QString &name)> func)
+{
+    for (auto var : _enumMap[name]) {
+        func(var);
+    }
+}
+
+const std::vector<QString> &NoderDataBase::enumValues(const QString &name)
+{
+    return _enumMap[name];
 }
 
 Pin *NoderDataBase::pinTypeToObj(const PinProperty::Type type)

@@ -20,7 +20,7 @@ PzaMoreLess::PzaMoreLess(const QString &name, PzaStyle::Stretch stretch, QWidget
     _more->setObjectName("more");
     _less->setObjectName("less");
 
-    _layout->setSpacing(5);
+    _layout->setSpacing(7);
     _layout->setContentsMargins(0, 0, 0, 0);
 
     setStyleSheet(
@@ -33,8 +33,8 @@ PzaMoreLess::PzaMoreLess(const QString &name, PzaStyle::Stretch stretch, QWidget
         "   font: 14px;"
         "}"
         "QPushButton {"
-        "   max-width: 16px;"
-        "   max-height: 16px;"
+        "   max-width: 14px;"
+        "   max-height: 14px;"
         "}"
         "QPushButton#more {"
             "   border-image: url(:/images/noder/plus.png) 0 0 0 0 stretch;"

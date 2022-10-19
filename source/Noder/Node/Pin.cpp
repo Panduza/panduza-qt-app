@@ -291,7 +291,7 @@ Enum::Enum()
 
 void Enum::initialize(const QString &name)
 {
-    _list = NBD_INST.enumMap(name);
+    _list = NBD_INST.enumValues(name);
     _enumName = name;
     initialized();
 }

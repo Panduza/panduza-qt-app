@@ -8,6 +8,9 @@
 #include <PzaLineEdit.hpp>
 #include <PzaLabel.hpp>
 #include <PzaPropertyTable.hpp>
+#include <QCheckBox>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 
 class NoderVariable : public QWidget
 {
@@ -15,60 +18,83 @@ class NoderVariable : public QWidget
 
     public:
         NoderVariable(NoderPanel::Type type, QWidget *parent = nullptr);
-        NoderVariable(QWidget *parent = nullptr);
         ~NoderVariable() = default;
-
         void setSelected(bool state);
         const QString &name() {return _name;}
         void setName(const QString &name);
         void setType(const NoderPanel::Type type);
         NoderPanel::Type varType(void) {return _type;}
         PzaPropertyTable *propTable(void) {return _propTable;}
-        QString propName(void) {return _propName->text();}
+        PzaPropertyTable *defValTable(void) {return _defValTable;}
+        void createDefValTable(void);
 
         void mousePressEvent(QMouseEvent *event) override;
-
+    
     private:
         QString _name;
         PzaLineEdit *_varLabel;
         QHBoxLayout *_layout;
         QFrame *_colorFrame;
         NoderPanel::Type _type;
+
         PzaPropertyTable *_propTable;
         PzaLabel *_propName = nullptr;
         PzaLabel *_typeName = nullptr;
         PzaComboBox *_propType;
 
-        signals:
-            void activate(void);
+        PzaPropertyTable *_defValTable = nullptr;
+
+    signals:
+        void activate(void);
+        void typeChanged(void);
 };
 
-/*
-class NoderVarBool : public NoderVar
+class NoderValBool : public PzaPropertyTable
 {
-    protected:
-        NoderVarBool(QWidget *parent = nullptr);
-        ~NoderVarBool() = default;
+    public:
+        NoderValBool(QWidget *parent = nullptr);
+        ~NoderValBool() = default;
+
+    private:
+        QCheckBox *_default;
 };
 
-class NoderVarFloat : public NoderVar
+class NoderValInt : public PzaPropertyTable
 {
-    protected:
-        NoderVarFloat(QWidget *parent = nullptr);
-        ~NoderVarFloat() = default;
+    public:
+        NoderValInt(QWidget *parent = nullptr);
+        ~NoderValInt() = default;
+
+    private:
+        QSpinBox *_default;
 };
 
-class NoderVarString : public NoderVar
+class NoderValFloat : public PzaPropertyTable
 {
-    protected:
-        NoderVarString(QWidget *parent = nullptr);
-        ~NoderVarString() = default;
+    public:
+        NoderValFloat(QWidget *parent = nullptr);
+        ~NoderValFloat() = default;
+
+    private:
+        QDoubleSpinBox *_default;
 };
 
-class NoderVarEnum : public NoderVar
+class NoderValString : public PzaPropertyTable
 {
-    protected:
-        NoderVarEnum(QWidget *parent = nullptr);
-        ~NoderVarEnum() = default;
+    public:
+        NoderValString(QWidget *parent = nullptr);
+        ~NoderValString() = default;
+
+    private:
+        PzaLineEdit *_default;
 };
-*/
+
+class NoderValEnum : public PzaPropertyTable
+{
+    public:
+        NoderValEnum(QWidget *parent = nullptr);
+        ~NoderValEnum() = default;
+    
+    private:
+        PzaComboBox *_enumName;
+};

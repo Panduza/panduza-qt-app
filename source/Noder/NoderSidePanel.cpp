@@ -13,14 +13,8 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
     _layout = new QVBoxLayout(_main);
 
     _varArea = new NoderVarArea(_main);
-    _propertyArea = new NoderPropertyArea(_main);
-
-    connect(_varArea, &NoderVarArea::varUpdated, _propertyArea, &NoderPropertyArea::updateProperties);
-    connect(_varArea, &NoderVarArea::varAdded, _propertyArea, &NoderPropertyArea::addProperties);
-    connect(_varArea, &NoderVarArea::varRemoved, _propertyArea, &NoderPropertyArea::deleteProperties);
 
     _layout->addWidget(_varArea);
-    _layout->addWidget(_propertyArea);
     _layout->addStretch(1);
 
     setWidget(_main);
@@ -29,9 +23,14 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
 NoderVarArea::NoderVarArea(QWidget *parent)
     : PzaSpoiler("Variables", parent)
 {
-    setFold(false);
-    
     _main = new PzaWidget(this);
+    _varTable = new PzaWidget(_main);
+    _varTableLayout = new QVBoxLayout(_varTable);
+    _propertyArea = new NoderPropertyArea(_main);
+    _defValArea = new NoderDefValArea(_main);
+
+    _varTable->setStyleSheet("background-color: #303030");
+
     connect(_main, &PzaWidget::clicked, this, [&](){
         selectVar(nullptr);
     });
@@ -41,6 +40,9 @@ NoderVarArea::NoderVarArea(QWidget *parent)
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
     _layout->addWidget(_moreLess);
+    _layout->addWidget(_varTable);
+    _layout->addWidget(_propertyArea);
+    _layout->addWidget(_defValArea);
 
     connect(_moreLess, &PzaMoreLess::more, this, [&]() {
         addVariable();
@@ -60,19 +62,27 @@ void NoderVarArea::selectVar(NoderVariable *target)
     _selectedVar = target;
     if (target)
         target->setSelected(true);
-    varUpdated(_selectedVar);
+    _propertyArea->updateProperty(_selectedVar);
+    _defValArea->updateValArea(_selectedVar);
 }
 
 void NoderVarArea::addVariable(void)
 {
-    NoderVariable *newVar = new NoderVariable(_main);
+    NoderVariable *newVar = new NoderVariable(NoderPanel::Type::Bool, _main);
 
-    _layout->addWidget(newVar);
+    _varTableLayout->addWidget(newVar);
     _varList.push_back(newVar);
     connect(newVar, &NoderVariable::activate, this, [&, newVar]() {
         selectVar(newVar);
     });
-    varAdded(newVar);
+    connect(newVar, &NoderVariable::typeChanged, this, [&, newVar]() {
+        if (newVar->defValTable())
+            _defValArea->del(newVar);
+        newVar->createDefValTable();
+        _defValArea->add(newVar);
+    });
+    _propertyArea->addProperty(newVar);
+    _defValArea->add(newVar);
     selectVar(newVar);
 }
 
@@ -88,10 +98,11 @@ void NoderVarArea::removeVariable(NoderVariable *target)
         _selectedVar = nullptr;
     }
 
-    _layout->removeWidget(target);
+    _varTableLayout->removeWidget(target);
     index = PzaUtils::IndexInVector<NoderVariable *>(_varList, target);
     PzaUtils::DeleteFromVector<NoderVariable *>(_varList, target);
-    varRemoved(target);
+    _propertyArea->deleteProperty(target);
+    _defValArea->del(target);
     target->deleteLater();
 
     if (index != _varList.size()) {
@@ -106,22 +117,43 @@ void NoderVarArea::removeVariable(NoderVariable *target)
 NoderPropertyArea::NoderPropertyArea(QWidget *parent)
     : PzaSpoiler("Properties", parent)
 {
-    setFold(false);
+
 }
 
-void NoderPropertyArea::updateProperties(NoderVariable *var)
+void NoderPropertyArea::updateProperty(NoderVariable *var)
 {
-    if (var) {
+    if (var)
         setCurrentWidget(var->propTable());
-    }
 }
 
-void NoderPropertyArea::addProperties(NoderVariable *var)
+void NoderPropertyArea::addProperty(NoderVariable *var)
 {
     addWidget(var->propTable());
 }
 
-void NoderPropertyArea::deleteProperties(NoderVariable *var)
+void NoderPropertyArea::deleteProperty(NoderVariable *var)
 {
     removeWidget(var->propTable());
+}
+
+NoderDefValArea::NoderDefValArea(QWidget *parent)
+    : PzaSpoiler("Values", parent)
+{
+
+}
+
+void NoderDefValArea::updateValArea(NoderVariable *var)
+{
+    if (var)
+        setCurrentWidget(var->defValTable());
+}
+
+void NoderDefValArea::add(NoderVariable *var)
+{
+    addWidget(var->defValTable());
+}
+
+void NoderDefValArea::del(NoderVariable *var)
+{
+    removeWidget(var->defValTable());
 }

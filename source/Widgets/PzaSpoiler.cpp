@@ -34,7 +34,7 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
     _layout->addWidget(_content);
 
     connect(_header, &QToolButton::clicked, this, &PzaSpoiler::headerClicked);
-    //setFold(true);
+    setFold(false);
 }
 
 PzaSpoiler::PzaSpoiler(const QString &name, QWidget *parent)
