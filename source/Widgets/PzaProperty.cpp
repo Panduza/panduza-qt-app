@@ -1,7 +1,7 @@
 #include "PzaProperty.hpp"
 
 PzaProperty::PzaProperty(const QString &name, QWidget *parent)
-    : QWidget(parent)
+    : PzaWidget(parent)
 {
     setAttribute(Qt::WA_StyledBackground, true);
 

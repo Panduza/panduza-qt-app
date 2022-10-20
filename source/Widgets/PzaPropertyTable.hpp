@@ -5,7 +5,7 @@
 #include <PzaProperty.hpp>
 #include <PzaLineEdit.hpp>
 
-class PzaPropertyTable : public QWidget
+class PzaPropertyTable : public PzaWidget
 {
     public:
         PzaPropertyTable(QWidget *parent = nullptr);

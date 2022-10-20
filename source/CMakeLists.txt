@@ -16,4 +16,10 @@ target_sources(${PROG}
 	Widgets/PzaProperty.cpp
 	Widgets/PzaLabel.cpp
 	Widgets/PzaPropertyTable.cpp
+	Widgets/PzaCheckBox.cpp
+	Widgets/PzaSpinBox.cpp
+	Widgets/PzaDoubleSpinBox.cpp
+	Widgets/PzaMenu.cpp
+	Widgets/PzaMenuBar.cpp
+	Widgets/PzaComboBox.cpp
 )

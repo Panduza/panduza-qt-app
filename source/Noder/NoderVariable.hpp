@@ -1,18 +1,21 @@
 #pragma once
 
-#include <QWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QMouseEvent>
+#include <QDrag>
+
 #include "NoderDataBase.hpp"
+#include <PzaWidget.hpp>
 #include <PzaLineEdit.hpp>
 #include <PzaLabel.hpp>
 #include <PzaPropertyTable.hpp>
-#include <QCheckBox>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
+#include <PzaCheckBox.hpp>
+#include <PzaSpinBox.hpp>
+#include <PzaDoubleSpinBox.hpp>
+#include <PzaMimeData.hpp>
 
-class NoderVariable : public QWidget
+class NoderVariable : public PzaWidget
 {
     Q_OBJECT
 
@@ -21,14 +24,15 @@ class NoderVariable : public QWidget
         ~NoderVariable() = default;
         void setSelected(bool state);
         const QString &name() {return _name;}
+        NoderPanel::Type type(void) {return _type;}
         void setName(const QString &name);
         void setType(const NoderPanel::Type type);
-        NoderPanel::Type varType(void) {return _type;}
         PzaPropertyTable *propTable(void) {return _propTable;}
         PzaPropertyTable *defValTable(void) {return _defValTable;}
         void createDefValTable(void);
 
         void mousePressEvent(QMouseEvent *event) override;
+        void mouseMoveEvent(QMouseEvent *event) override;
     
     private:
         QString _name;
@@ -47,6 +51,7 @@ class NoderVariable : public QWidget
     signals:
         void activate(void);
         void typeChanged(void);
+        void nameChanged(void);
 };
 
 class NoderValBool : public PzaPropertyTable
@@ -56,7 +61,7 @@ class NoderValBool : public PzaPropertyTable
         ~NoderValBool() = default;
 
     private:
-        QCheckBox *_default;
+        PzaCheckBox *_default;
 };
 
 class NoderValInt : public PzaPropertyTable
@@ -66,7 +71,7 @@ class NoderValInt : public PzaPropertyTable
         ~NoderValInt() = default;
 
     private:
-        QSpinBox *_default;
+        PzaSpinBox *_default;
 };
 
 class NoderValFloat : public PzaPropertyTable
@@ -76,7 +81,7 @@ class NoderValFloat : public PzaPropertyTable
         ~NoderValFloat() = default;
 
     private:
-        QDoubleSpinBox *_default;
+        PzaDoubleSpinBox *_default;
 };
 
 class NoderValString : public PzaPropertyTable
@@ -97,4 +102,5 @@ class NoderValEnum : public PzaPropertyTable
     
     private:
         PzaComboBox *_enumName;
+        PzaComboBox *_enumValues;
 };

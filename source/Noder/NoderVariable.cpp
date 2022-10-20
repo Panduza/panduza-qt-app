@@ -1,12 +1,11 @@
 #include "NoderVariable.hpp"
 
 NoderVariable::NoderVariable(NoderPanel::Type type, QWidget *parent)
-    : QWidget(parent)
+    : PzaWidget(parent)
 {
     int index = 0;
 
     setAttribute(Qt::WA_StyledBackground, true);
-
 
     _layout = new QHBoxLayout(this);
     _propTable = new PzaPropertyTable(this);
@@ -46,7 +45,6 @@ NoderVariable::NoderVariable(NoderPanel::Type type, QWidget *parent)
     index = _propType->findText(NBD_INST.varTypeName(_type));
 
     _propType->setCurrentIndex(index);
-    _type = type;
 
     createDefValTable();
 
@@ -60,6 +58,7 @@ void NoderVariable::setName(const QString &name)
 {
     _name = name;
     _propName->setText(name);
+    nameChanged();
 }
 
 void NoderVariable::setType(const NoderPanel::Type type)
@@ -72,6 +71,18 @@ void NoderVariable::setType(const NoderPanel::Type type)
     _typeName->setText(NBD_INST.varTypeName(type));
     
     typeChanged();
+}
+
+void NoderVariable::mouseMoveEvent(QMouseEvent *event)
+{
+    (void)event;
+    QDrag *drag = new QDrag(this);
+    PzaMimeData *mimeData = new PzaMimeData;
+
+    mimeData->setData("noder/variable", "");
+    mimeData->setDataPtr(this);
+    drag->setMimeData(mimeData);
+    drag->exec();
 }
 
 void NoderVariable::createDefValTable(void)
@@ -110,34 +121,45 @@ void NoderVariable::mousePressEvent(QMouseEvent *event)
 NoderValBool::NoderValBool(QWidget *parent)
     : PzaPropertyTable(parent)
 {
-    _default = addProperty<QCheckBox>("Booll");
+    _default = addProperty<PzaCheckBox>("Default value");
 }
 
 NoderValInt::NoderValInt(QWidget *parent)
     : PzaPropertyTable(parent)
 {
-    _default = addProperty<QSpinBox>("Intt");
+    _default = addProperty<PzaSpinBox>("Default value");
 }
 
 NoderValFloat::NoderValFloat(QWidget *parent)
     : PzaPropertyTable(parent)
 {
-    _default = addProperty<QDoubleSpinBox>("Floatt");
+    _default = addProperty<PzaDoubleSpinBox>("Default value");
 }
 
 NoderValString::NoderValString(QWidget *parent)
     : PzaPropertyTable(parent)
 {
-    _default = addProperty<PzaLineEdit>("Stringg");
+    _default = addProperty<PzaLineEdit>("Default value");
 }
 
 NoderValEnum::NoderValEnum(QWidget *parent)
     : PzaPropertyTable(parent)
 {
-    NBD_INST.forEachEnumName([](const QString &name) {
-        qDebug() << "Name: " << name;
-        NBD_INST.forEachEnumValues(name, [](const QString &name) {
-            qDebug() << "\tValues: " << name;
+    _enumName = addProperty<PzaComboBox>("Enum");
+    _enumValues = addProperty<PzaComboBox>("Default value");
+ connect(_enumName, &PzaComboBox::currentIndexChanged, this, [&](){
+        _enumValues->clear();
+        NBD_INST.forEachEnumValues(_enumName->currentText(), [&](const QString &value) {
+            _enumValues->addItem(value);
         });
     });
+
+
+    NBD_INST.forEachEnumName([&](const QString &name) {
+        _enumName->addItem(name);
+    });
+
+   
+
+    _enumName->setCurrentIndex(0);
 }

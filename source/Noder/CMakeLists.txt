@@ -15,6 +15,7 @@ target_sources(${PROG}
 	Node/Nodes/NFEvent.cpp
 	Node/Nodes/NFMath.cpp
 	Node/Nodes/NFIO.cpp
+	Node/Nodes/NInstance.cpp
 	Node/GNodeInstance.cpp
 	Node/Pin.cpp
 	Node/GNodeBranch.cpp

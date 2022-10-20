@@ -81,7 +81,10 @@
         "stop_token": "cpp",
         "streambuf": "cpp",
         "thread": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "qspinbox": "cpp",
+        "qmenu": "cpp",
+        "qmimedata": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -5,7 +5,7 @@
 #include <PzaComboBox.hpp>
 #include <PzaLabel.hpp>
 
-class PzaProperty : public QWidget
+class PzaProperty : public PzaWidget
 {
     Q_OBJECT
 

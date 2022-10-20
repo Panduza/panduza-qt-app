@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QLineEdit>
+#include <PzaWidget.hpp>
 
 class PzaLineEdit : public QLineEdit
 {

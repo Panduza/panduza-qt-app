@@ -5,14 +5,15 @@
 #include <QPushButton>
 
 #include <PzaLabel.hpp>
-#include <PzaStyle.hpp>
+#include <PzaWidget.hpp>
 
-class PzaMoreLess : public QWidget
+class PzaMoreLess : public PzaWidget
 {
     Q_OBJECT
 
     public:
-        PzaMoreLess(const QString &name = "", PzaStyle::Stretch stretch = PzaStyle::Stretch::Left, QWidget *parent = nullptr);
+        PzaMoreLess(QWidget *parent = nullptr);
+        PzaMoreLess(const QString &name, QWidget *parent = nullptr);
         ~PzaMoreLess() = default;
 
     private:

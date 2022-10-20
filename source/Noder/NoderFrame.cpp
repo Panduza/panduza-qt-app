@@ -1,7 +1,7 @@
 #include "NoderFrame.hpp"
 
 NoderFrame::NoderFrame(PanduzaEngine *engine)
-    : QWidget(),
+    : PzaWidget(),
     _engine(engine)
 {
     setAttribute(Qt::WA_StyledBackground, true);
@@ -36,18 +36,6 @@ NoderFrame::NoderFrame(PanduzaEngine *engine)
     _mainLayout->addWidget(graphFrame);
 }
 
-/*
-void Lol::mouseMoveEvent(QMouseEvent *event)
-{
-    QDrag *drag = new QDrag(this);
-
-     QMimeData *mimeData = new QMimeData;
-
-    drag->setMimeData(mimeData);
-
-    Qt::DropAction dropAction = drag->exec();
-}
-*/
 PzaMenuBar *NoderFrame::mainMenuBar(void)
 {
     PzaMenuBar *menuBar = new PzaMenuBar();

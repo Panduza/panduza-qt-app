@@ -3,6 +3,7 @@
 #include "NoderDataBase.hpp"
 
 #include <GNode.hpp>
+#include <Nodes/NInstance.hpp>
 
 NoderView::NoderView(PanduzaEngine *engine)
     : QGraphicsView(),
@@ -33,6 +34,7 @@ NoderView::NoderView(PanduzaEngine *engine)
 
 void NoderView::dragEnterEvent(QDragEnterEvent *event)
 {
+    QGraphicsView::dragEnterEvent(event);
     event->accept();
 }
 
@@ -40,12 +42,30 @@ void NoderView::dragEnterEvent(QDragEnterEvent *event)
 
 void NoderView::dragMoveEvent(QDragMoveEvent *event)
 {
-    event->accept();
+    QGraphicsView::dragMoveEvent(event);
+    if (event->mimeData()->hasFormat("noder/variable") == true)
+        event->accept();
+    else
+        event->ignore();
 }
 
 void NoderView::dropEvent(QDropEvent *event)
 {
-    qDebug() << "lol" << event->mimeData()->text();
+    const PzaMimeData *mime;
+    NoderVariable *variable;
+
+    QGraphicsView::dropEvent(event);
+   // PzaMimeData
+    if (event->mimeData()->hasFormat("noder/variable") == false)
+        return ;
+
+    mime = static_cast<const PzaMimeData *>(event->mimeData());
+    variable = static_cast<NoderVariable *>(mime->dataPtr());
+    if (variable) {
+        Instance *node = new Instance(variable);
+        node->setScene(_scene);
+        //node->setPos(mapToScene(event->position().toPoint()));
+    }
 }
 
 void NoderView::wheelEvent(QWheelEvent *event)

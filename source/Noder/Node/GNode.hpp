@@ -5,13 +5,9 @@
 #include <QFontMetrics>
 #include <QPainter>
 #include <QGridLayout>
-#include <QWidget>
-#include <QCheckBox>
-#include <QDoubleSpinBox>
 #include <QPoint>
 #include <QSvgRenderer>
 #include <QFile>
-#include <QPushButton>
 
 #include <Node/Pin.hpp>
 #include <PzaComboBox.hpp>
@@ -19,6 +15,9 @@
 #include <PzaUtils.hpp>
 #include <PzaLineEdit.hpp>
 #include <PzaMoreLess.hpp>
+#include <PzaCheckBox.hpp>
+#include <PzaSpinBox.hpp>
+#include <PzaDoubleSpinBox.hpp>
 
 class NoderScene;
 
@@ -35,7 +34,7 @@ class GNode : public QGraphicsObject
             PinProperty::Type type;
             std::vector<Pin *> *list;
             QGraphicsProxyWidget *proxy;
-            QWidget *w;
+            PzaWidget *w;
             QString name;
             QString pinName;
         };
@@ -217,7 +216,6 @@ class GNode : public QGraphicsObject
             pin->setDirection(direction);
             pin->setPlugColor();
             pin->setNode(this);
-            //pin->setParent(nullptr);
 
             switch (direction) {
                 case PinProperty::Direction::Input:

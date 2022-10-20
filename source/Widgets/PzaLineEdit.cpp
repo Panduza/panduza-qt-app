@@ -1,19 +1,19 @@
 #include "PzaLineEdit.hpp"
 
-PzaLineEdit::PzaLineEdit(const QString &name, QWidget *parent)
-    : QLineEdit(name, parent)
+PzaLineEdit::PzaLineEdit(QWidget *parent)
+    : QLineEdit(parent)
 {
     setStyleSheet(
         "QLineEdit {"
         "   border: 1px solid #3C3C3C;"
         "   border-radius: 2px;"
         "   color: #DCDCDC;"
-        "   background-color: #242424;"
+        "   background-color: #191919;"
         "   padding: 3px;"
         "}"
         "QLineEdit::hover {"
         "   color: #EFEFEF;"
-        "   background-color: #474747;"
+        "   background-color: #282828;"
         "}"
     );
     connect(this, &QLineEdit::editingFinished, this, [&](){
@@ -21,10 +21,10 @@ PzaLineEdit::PzaLineEdit(const QString &name, QWidget *parent)
     });
 }
 
-PzaLineEdit::PzaLineEdit(QWidget *parent)
-    : PzaLineEdit("", parent)
+PzaLineEdit::PzaLineEdit(const QString &name, QWidget *parent)
+    : PzaLineEdit(parent)
 {
-
+    setText(name);    
 }
 
 void PzaLineEdit::focusInEvent(QFocusEvent *e)

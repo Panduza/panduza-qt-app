@@ -119,6 +119,18 @@ Pin *NoderDataBase::pinTypeToObj(const PinProperty::Type type)
     }
 }
 
+PinProperty::Type NoderDataBase::panelTypeToPinType(const NoderPanel::Type type)
+{
+    switch (type) {
+        case NoderPanel::Type::Bool:    return PinProperty::Type::Bool;
+        case NoderPanel::Type::Int:     return PinProperty::Type::Int;
+        case NoderPanel::Type::Float:   return PinProperty::Type::Float;
+        case NoderPanel::Type::String:  return PinProperty::Type::String;
+        case NoderPanel::Type::Enum:    return PinProperty::Type::Enum;
+        default:                        return PinProperty::Type::Bool;
+    }
+}
+
 const QString &NoderDataBase::pinTypeToStr(const PinProperty::Type type)
 {
     static std::unordered_map<PinProperty::Type, QString> map = {

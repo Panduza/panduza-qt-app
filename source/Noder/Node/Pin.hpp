@@ -2,7 +2,7 @@
 
 #include <QString>
 #include <QGraphicsProxyWidget>
-#include <QWidget>
+#include <PzaWidget.hpp>
 #include <QGridLayout>
 
 #include <PzaLimits.hpp>
@@ -18,7 +18,7 @@ const inline std::vector<PinProperty::Type> &compatibles() override \
     return map; \
 }
 
-class Pin : public QWidget
+class Pin : public PzaWidget
 {
     Q_OBJECT
 
@@ -114,7 +114,7 @@ class Pin : public QWidget
         ~Pin();
 
     protected:
-        Pin() = default;
+        Pin();
 
         PinProperty::Type _type;
         QString _name;

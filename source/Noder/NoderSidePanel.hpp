@@ -67,7 +67,7 @@ class NoderSidePanel : public QScrollArea
         ~NoderSidePanel() = default;
 
     private:
-        QWidget *_main;
+        PzaWidget *_main;
         QVBoxLayout *_layout;
         PzaSpoiler *_varSp;
         NoderVarArea *_varArea;

@@ -8,7 +8,9 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
 
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     
-    _main = new QWidget(this);
+    _main = new PzaWidget(this);
+    
+    _main->setStyleSheet("background-color: #1D1D1D");
     
     _layout = new QVBoxLayout(_main);
 
@@ -29,13 +31,16 @@ NoderVarArea::NoderVarArea(QWidget *parent)
     _propertyArea = new NoderPropertyArea(_main);
     _defValArea = new NoderDefValArea(_main);
 
-    _varTable->setStyleSheet("background-color: #303030");
+    setStyleSheet("background-color: #303030");
+
+    _varTableLayout->setContentsMargins(3, 3, 3, 3);
+    _varTableLayout->setSpacing(0);
 
     connect(_main, &PzaWidget::clicked, this, [&](){
         selectVar(nullptr);
     });
     _layout = new QVBoxLayout(_main);
-    _moreLess = new PzaMoreLess("Add variable", PzaStyle::Stretch::Right, _main);
+    _moreLess = new PzaMoreLess("Add variable", _main);
 
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
@@ -68,7 +73,12 @@ void NoderVarArea::selectVar(NoderVariable *target)
 
 void NoderVarArea::addVariable(void)
 {
-    NoderVariable *newVar = new NoderVariable(NoderPanel::Type::Bool, _main);
+    NoderVariable *newVar;
+    NoderPanel::Type fromType;
+
+    fromType = (_selectedVar) ? _selectedVar->type() : NoderPanel::Type::Bool;
+
+    newVar = new NoderVariable(fromType, _main);
 
     _varTableLayout->addWidget(newVar);
     _varList.push_back(newVar);

@@ -1,7 +1,7 @@
 #include "PzaPropertyTable.hpp"
 
 PzaPropertyTable::PzaPropertyTable(QWidget *parent)
-    : QWidget(parent)
+    : PzaWidget(parent)
 {
     setAttribute(Qt::WA_StyledBackground, true);
 

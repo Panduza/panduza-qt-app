@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QLabel>
+#include <PzaWidget.hpp>
 
 class PzaLabel : public QLabel
 {

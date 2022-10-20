@@ -10,6 +10,8 @@
 #include "NoderStyle.hpp"
 #include "NoderScene.hpp"
 #include <PzaMenu.hpp>
+#include <PzaMimeData.hpp>
+#include "NoderVariable.hpp"
 
 class NoderView : public QGraphicsView
 {

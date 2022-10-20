@@ -6,6 +6,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QVBoxLayout>
+#include <PzaWidget.hpp>
 
 class MainWindow : public QMainWindow
 {
@@ -14,7 +15,7 @@ class MainWindow : public QMainWindow
         ~MainWindow();
 
     private:
-        QWidget _mainWidget;
+        PzaWidget _mainWidget;
         QVBoxLayout _mainLayout;
         QColor _backgroundcol;
 

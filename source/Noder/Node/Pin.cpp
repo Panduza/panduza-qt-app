@@ -4,6 +4,11 @@
 
 using namespace PinDecl;
 
+Pin::Pin()
+{
+    setStyleSheet("background-color: transparent");
+}
+
 void Pin::hideWidgets(void)
 {
     QWidget *w;

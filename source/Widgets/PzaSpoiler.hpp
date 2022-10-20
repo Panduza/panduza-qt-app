@@ -1,12 +1,12 @@
 #pragma once
 
 #include <QDebug>
-#include <QWidget>
+#include <PzaWidget.hpp>
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QStackedWidget>
 
-class PzaSpoiler : public QWidget
+class PzaSpoiler : public PzaWidget
 {
     public:
         PzaSpoiler(QWidget *parent = nullptr);
@@ -16,9 +16,9 @@ class PzaSpoiler : public QWidget
         void setFold(bool state);
         bool folded(void) const {return _fold;}
         void updateSpoiler(void);
-        void addWidget(QWidget *w);
-        void removeWidget(QWidget *w);
-        void setCurrentWidget(QWidget *w);
+        void addWidget(PzaWidget *w);
+        void removeWidget(PzaWidget *w);
+        void setCurrentWidget(PzaWidget *w);
 
         const QStackedWidget *content(void) {return _content;}
 

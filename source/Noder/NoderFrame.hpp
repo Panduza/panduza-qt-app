@@ -13,7 +13,7 @@
 #include <PzaMenuBar.hpp>
 #include <PzaMenu.hpp>
 
-class NoderFrame : public QWidget
+class NoderFrame : public PzaWidget
 {
     public:
         NoderFrame(PanduzaEngine *engine);
@@ -26,5 +26,5 @@ class NoderFrame : public QWidget
         PanduzaEngine *_engine;
         QVBoxLayout *_sidePanelLayout;
 
-        QWidget *sidePanel(QWidget *parent);
+        PzaWidget *sidePanel(QWidget *parent);
 };

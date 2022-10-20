@@ -229,49 +229,13 @@ void GNode::createProxyWidget(Pin *pin)
     else
         pin->grid()->addWidget(label, 0, 0, Qt::AlignLeft);
 
-    pin->setStyleSheet(
-        "QWidget {"
-        "   background-color: transparent;"
-        "}"
-        "QDoubleSpinBox {"
-        "   color: #DCDCDC;"
-        "   background-color: #242424;"
-        "}"
-        "QDoubleSpinBox::hover {"
-        "   color: #EFEFEF;"
-        "   background-color: #474747;"
-        "}"
-        "QSpinBox {"
-        "   color: #DCDCDC;"
-        "   background-color: #242424;"
-        "}"
-        "QSpinBox::hover {"
-        "   color: #EFEFEF;"
-        "   background-color: #474747;"
-        "}"
-        
-        "QCheckBox::indicator {"
-        "   width: 14px;"
-        "   height: 14px;"
-        "}"
-        "QCheckBox::indicator:unchecked {"
-        "   border-image: url(:/images/noder/checkbox/unchecked.png) 0 0 0 0 stretch;"
-        "}"
-        "QCheckBox::indicator:unchecked:hover {"
-        "   border-image: url(:/images/noder/checkbox/hover.png) 0 0 0 0 stretch;"
-        "}"
-        "QCheckBox::indicator:checked {"
-        "   border-image: url(:/images/noder/checkbox/checked.png) 0 0 0 0 stretch;"
-        "}"
-    );
-
     if (pin->isOutput())
         return ;
 
     switch (pin->type()) {
         case PinProperty::Type::Bool:
         {
-            QCheckBox *checkbox = new QCheckBox(pin);
+            PzaCheckBox *checkbox = new PzaCheckBox(pin);
             checkbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
             pin->grid()->setColumnStretch(1, 1);
             pin->grid()->addWidget(checkbox, 0, 1);
@@ -282,7 +246,7 @@ void GNode::createProxyWidget(Pin *pin)
         }
         case PinProperty::Type::Int:
         {
-            QSpinBox *valuebox = new QSpinBox(pin);
+            PzaSpinBox *valuebox = new PzaSpinBox(pin);
             PinDecl::Int *iPin = static_cast<PinDecl::Int*>(pin);
             valuebox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
             valuebox->setMinimum(iPin->min());
@@ -296,7 +260,7 @@ void GNode::createProxyWidget(Pin *pin)
         }
         case PinProperty::Type::Float:
         {
-            QDoubleSpinBox *valuebox = new QDoubleSpinBox(pin);
+            PzaDoubleSpinBox *valuebox = new PzaDoubleSpinBox(pin);
             PinDecl::Float *fPin = static_cast<PinDecl::Float*>(pin);
             valuebox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
             valuebox->setMinimum(fPin->min());
@@ -369,7 +333,7 @@ void GNode::addPintoMultiPin(struct multiPin *s)
 void GNode::createProxyMultiPin(struct multiPin *s)
 {
     QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
-    PzaMoreLess *moreLess = new PzaMoreLess(s->name, PzaStyle::Stretch::Left);
+    PzaMoreLess *moreLess = new PzaMoreLess(s->name);
 
     s->proxy = proxy;
     s->w = moreLess;
@@ -649,7 +613,7 @@ void GNode::drawBoxes(QPainter *painter)
 {
     painter->setPen(Qt::NoPen);
     
-    painter->setBrush(QColor("#373737"));
+    painter->setBrush(QColor("#353535"));
     painter->drawRoundedRect(_nodebox, 3, 3);
 
     if (_hasTitle) {

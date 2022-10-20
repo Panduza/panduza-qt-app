@@ -1,7 +1,7 @@
 #include "PzaSpoiler.hpp"
 
 PzaSpoiler::PzaSpoiler(QWidget *parent)
-    : QWidget(parent)
+    : PzaWidget(parent)
 {
     setAttribute(Qt::WA_StyledBackground, true);
 
@@ -10,10 +10,6 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
     _content = new QStackedWidget(this);
 
     _header->setAutoRaise(true);
-
-    setStyleSheet(
-        "background-color: #1F1F1F;"
-    );
 
     _header->setStyleSheet(
         "color: #DCDCDC;"
@@ -43,18 +39,18 @@ PzaSpoiler::PzaSpoiler(const QString &name, QWidget *parent)
     _header->setText(name);
 }
 
-void PzaSpoiler::addWidget(QWidget *w)
+void PzaSpoiler::addWidget(PzaWidget *w)
 {
     _content->addWidget(w);
     setCurrentWidget(w);
 }
 
-void PzaSpoiler::removeWidget(QWidget *w)
+void PzaSpoiler::removeWidget(PzaWidget *w)
 {
     _content->removeWidget(w);
 }
 
-void PzaSpoiler::setCurrentWidget(QWidget *w)
+void PzaSpoiler::setCurrentWidget(PzaWidget *w)
 {
     _content->setCurrentWidget(w);
 }
