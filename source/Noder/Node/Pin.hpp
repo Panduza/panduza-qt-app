@@ -37,6 +37,8 @@ class Pin : public PzaWidget
         const QPointF &scenePos() const {return _scenePos;}
         const QSize &size() const {return _size;}
 
+        void mousePressEvent(QMouseEvent *event) override;
+
         bool dead(void) {return _dead;}
 
         void setPos(const QPoint &pos) {_pos = pos;}
@@ -89,7 +91,7 @@ class Pin : public PzaWidget
 
         void hideWidgets(void);
         void showWidgets(void);
-        void setName(const QString &name) {_name = name;}
+        void setName(const QString &name);
         void setDirection(PinProperty::Direction direction) {_direction = direction;}
 
         virtual bool isCompatible(Pin *to);
@@ -133,13 +135,14 @@ class Pin : public PzaWidget
         std::vector<Pin *> _linkedPins;
         QColor _plugColor;
 
-    private:
         void forEachLink(std::function<void(Link *link)> func);
 
+    private:
         bool _dead = false;
 
     signals:
         void askWidget(void);
+        void nameChanged(const QString &name);
 };
 
 namespace PinDecl {
@@ -317,6 +320,9 @@ class Enum : public Pin
 
         QString _enumName;
         std::vector<QString> _list;
+
+    public slots:
+        void modifyEnumName(const QString &name);
 
     signals:
         void initialized(void);

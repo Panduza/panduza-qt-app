@@ -104,7 +104,7 @@ class NoderDataBase
             {NoderPanel::Type::Enum,  "Enum"},
         };
 
-        std::unordered_map<QString, std::vector<QString>> _enumMap = {
+        std::map<QString, std::vector<QString>> _enumMap = {
         {
             "I/O direction",
             {

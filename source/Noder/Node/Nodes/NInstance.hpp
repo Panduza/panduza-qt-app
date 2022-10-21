@@ -5,6 +5,8 @@
 
 class Instance : public GNodeInstance
 {
+    Q_OBJECT
+
     public:
         Instance(NoderVariable *var);
         ~Instance() = default;
@@ -14,5 +16,8 @@ class Instance : public GNodeInstance
 
     private:
         Pin *_pin = nullptr;
-        NoderVariable *_ref;
+        NoderVariable *_var;
+    
+    private slots:
+        void updatePin(void);
 };

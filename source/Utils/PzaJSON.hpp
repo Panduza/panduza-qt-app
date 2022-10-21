@@ -57,9 +57,7 @@ class PzaJSON
         template<typename R>
         static QByteArray _fromValue(const QString &key, const R &value)
         {
-            QString mdr = QString("{\"%1\" : %2}").arg(key).arg(value);
-
-            return mdr.toUtf8();
+            return QString("{\"%1\" : %2}").arg(key).arg(value).toUtf8();
         }
         PzaJSON() = default;
         ~PzaJSON() = default;

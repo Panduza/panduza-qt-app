@@ -193,25 +193,25 @@ void GNode::setScene(NoderScene *scene)
 
 Pin *GNode::addPinFromType(PinProperty::Type type, const QString &name, PinProperty::Direction direction, int index)
 {
+    Pin *pin = nullptr;
+
     switch (type) {
-        case PinProperty::Type::Bool:       return addPin<PinDecl::Bool>(name, direction, index);
-        case PinProperty::Type::Float:      return addPin<PinDecl::Float>(name, direction, index);
-        case PinProperty::Type::Int:        return addPin<PinDecl::Int>(name, direction, index);
-        case PinProperty::Type::String:     return addPin<PinDecl::String>(name, direction, index);
-        case PinProperty::Type::Wildcard:   return addPin<PinDecl::Wildcard>(name, direction, index);
-        case PinProperty::Type::Enum:       return addPin<PinDecl::Enum>(name, direction, index);
-        case PinProperty::Type::Array:      return addPin<PinDecl::Array>(name, direction, index);
-        case PinProperty::Type::Interface:  return addPin<PinDecl::Interface>(name, direction, index);
-        default:                            return nullptr;
+        case PinProperty::Type::Bool:       pin = addPin<PinDecl::Bool>(name, direction, index); break ;
+        case PinProperty::Type::Float:      pin = addPin<PinDecl::Float>(name, direction, index); break ;
+        case PinProperty::Type::Int:        pin = addPin<PinDecl::Int>(name, direction, index); break ;
+        case PinProperty::Type::String:     pin = addPin<PinDecl::String>(name, direction, index); break ;
+        case PinProperty::Type::Wildcard:   pin = addPin<PinDecl::Wildcard>(name, direction, index); break ;
+        case PinProperty::Type::Enum:       pin = addPin<PinDecl::Enum>(name, direction, index); break ;
+        case PinProperty::Type::Array:      pin = addPin<PinDecl::Array>(name, direction, index); break ;
+        case PinProperty::Type::Interface:  pin = addPin<PinDecl::Interface>(name, direction, index); break ;
+        default:                            pin = nullptr; break ;
     }
+    return pin;
 }
 
 void GNode::createProxyWidget(Pin *pin)
 {
     PzaLabel *label;
-
-    if (!_hasWidgets)
-        return ;
 
     pin->setProxy(new QGraphicsProxyWidget(this));
     pin->setGrid(new QGridLayout(pin));
@@ -222,6 +222,14 @@ void GNode::createProxyWidget(Pin *pin)
     pin->proxy()->setWidget(pin);
 
     label = new PzaLabel(pin->name(), pin);
+    if (_type == NodeProperty::Type::Instance) {
+        label->setProperty("pzalabel", "instance");
+        QFont font = label->font();
+        font.setItalic(true);
+        label->setFont(font);
+    }
+    connect(pin, &Pin::nameChanged, label, &PzaLabel::setText);
+    
     label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     pin->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     if (pin->isOutput())
@@ -373,6 +381,15 @@ void GNode::deletePin(Pin *pin)
         removeFromList(pin, _outputPins);
 }
 
+void GNode::replacePin(Pin *oldPin, Pin *newPin)
+{
+    std::vector<Pin *> oldLinkedPins = oldPin->linkedPins();
+    deletePin(oldPin);
+    for (const auto pin : oldLinkedPins) {
+        Pin::CreateLink(newPin, pin);
+    }
+}
+
 QVariant GNode::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     return QGraphicsItem::itemChange(change, value);
@@ -493,7 +510,8 @@ void GNode::resizeBoxes()
 {
     QSize max(0, 0);
 
-    max.setWidth(std::max(max.width(), _title->box.width()));
+    if (_hasTitle)
+        max.setWidth(std::max(max.width(), _title->box.width()));
     max.setWidth(std::max(max.width(), _pinBox.width()));
 
     if (_hasTitle)
@@ -586,6 +604,7 @@ void GNode::refreshNode(void)
     resizeBoxes();
     setWidgetSize();
     positionEntries();
+    updateLinks();
 
     update();
 }

@@ -9,6 +9,12 @@ Pin::Pin()
     setStyleSheet("background-color: transparent");
 }
 
+void Pin::setName(const QString &name)
+{
+    _name = name;
+    nameChanged(_name);
+}
+
 void Pin::hideWidgets(void)
 {
     QWidget *w;
@@ -31,6 +37,15 @@ void Pin::showWidgets()
     adjustSize();
 }
 
+void Pin::mousePressEvent(QMouseEvent *event)
+{
+    // Clicking on a pin should send a signal to the node (for select ect..).
+    // We need to catch a press event and send an ignore event to let the node receive this signal.
+    // If we click an a widget that supports it, like a button, the event will be catched.
+    // But, if the click happens on a label for example, we should notify the node.
+    event->ignore();
+}
+
 bool Pin::isCompatible(Pin *to)
 {
     return PzaUtils::IsInVector<PinProperty::Type>(compatibles(), to->type());
@@ -49,9 +64,11 @@ void Pin::CreateLink(Pin *from, Pin *to)
 {
     Link *link;
 
-    link = new Link(from, to);
-    from->connectLink(link);
-    to->connectLink(link);
+    if (from->isCompatible(to)) {
+        link = new Link(from, to);
+        from->connectLink(link);
+        to->connectLink(link);
+    }
 }
 
 void Pin::CreateLink(Pin *from, const QPointF &pos)
@@ -292,6 +309,16 @@ void String::setValue(const bool value)
 Enum::Enum()
 {
     _type = PinProperty::Type::Enum;
+}
+
+void Enum::modifyEnumName(const QString &name)
+{
+    initialize(name);
+    forEachLink([&](Link *link) {
+        Pin *opposite = link->oppositePin(this);
+        if (!isCompatible(opposite))
+            delete link;            
+    });
 }
 
 void Enum::initialize(const QString &name)

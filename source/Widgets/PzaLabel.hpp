@@ -9,4 +9,6 @@ class PzaLabel : public QLabel
         PzaLabel(const QString &name, QWidget *parent = nullptr);
         PzaLabel(QWidget *parent = nullptr);
         ~PzaLabel() = default;
+
+        void mousePressEvent(QMouseEvent *event) override;
 };

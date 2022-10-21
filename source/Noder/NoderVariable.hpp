@@ -51,56 +51,102 @@ class NoderVariable : public PzaWidget
     signals:
         void activate(void);
         void typeChanged(void);
-        void nameChanged(void);
+        void nameChanged(const QString &name);
 };
 
 class NoderValBool : public PzaPropertyTable
 {
+    Q_OBJECT
+
     public:
         NoderValBool(QWidget *parent = nullptr);
         ~NoderValBool() = default;
 
+        bool value(void) const {return _value;}
+
     private:
-        PzaCheckBox *_default;
+        bool _value;
+        PzaCheckBox *_valueBox;
+
+    private slots:
+        void updateValue(int state);
 };
 
 class NoderValInt : public PzaPropertyTable
 {
+    Q_OBJECT
+
     public:
         NoderValInt(QWidget *parent = nullptr);
         ~NoderValInt() = default;
 
+        int value(void) const {return _value;}
+    
     private:
-        PzaSpinBox *_default;
+        int _value;
+        PzaSpinBox *_valueBox;
+
+    private slots:
+        void updateValue(int value);
 };
 
 class NoderValFloat : public PzaPropertyTable
 {
+    Q_OBJECT
+    
     public:
         NoderValFloat(QWidget *parent = nullptr);
         ~NoderValFloat() = default;
+        
+        double value(void) const {return _value;}
 
     private:
-        PzaDoubleSpinBox *_default;
+        double _value;
+        PzaDoubleSpinBox *_valueBox;
+
+    private slots:
+        void updateValue(double value);
 };
 
 class NoderValString : public PzaPropertyTable
 {
+    Q_OBJECT
+    
     public:
         NoderValString(QWidget *parent = nullptr);
         ~NoderValString() = default;
 
+        const QString &text(void) const {return _text;}
+
     private:
-        PzaLineEdit *_default;
+        QString _text;
+        PzaLineEdit *_textBox;
+
+    private slots:
+        void updateText(void);
 };
 
 class NoderValEnum : public PzaPropertyTable
 {
+    Q_OBJECT
+
     public:
         NoderValEnum(QWidget *parent = nullptr);
         ~NoderValEnum() = default;
+
+        const QString &enumName(void) {return _enumName;}
+        const QString &enumValue(void) {return _enumValue;}
     
     private:
-        PzaComboBox *_enumName;
-        PzaComboBox *_enumValues;
+        QString _enumName;
+        QString _enumValue;
+        PzaComboBox *_enumNameBox;
+        PzaComboBox *_enumValuesBox;
+    
+    private slots:
+        void updateNameBox(void);
+        void updateValuesBox(void);
+    
+    signals:
+        void enumNameChanged(const QString &name);
 };

@@ -64,7 +64,7 @@ void NoderView::dropEvent(QDropEvent *event)
     if (variable) {
         Instance *node = new Instance(variable);
         node->setScene(_scene);
-        //node->setPos(mapToScene(event->position().toPoint()));
+        node->setPos(mapToScene(event->position().toPoint()));
     }
 }
 

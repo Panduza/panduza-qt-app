@@ -8,6 +8,7 @@
 #include <QPoint>
 #include <QSvgRenderer>
 #include <QFile>
+#include <QFont>
 
 #include <Node/Pin.hpp>
 #include <PzaComboBox.hpp>
@@ -41,7 +42,7 @@ class GNode : public QGraphicsObject
 
         GNode(const QString &name);
 
-        inline const QString &name() const {return _name;}
+        const QString &name() const {return _name;}
 
         void process(void);
         virtual void exec(void) {};
@@ -97,7 +98,7 @@ class GNode : public QGraphicsObject
         
         struct multiPin *findMultiPinFromList(std::vector<Pin *> *list);
         void deletePin(Pin *pin);
-        void createLink(Pin *from, Pin *to);
+        void replacePin(Pin *oldPin, Pin *newPin);
         inline const NodeProperty::Type &nodeType(void) const {return _type;}
         const QColor &titleColor(const NodeProperty::Type &type);
         const QColor &plugColor(PinProperty::Type type);
@@ -174,7 +175,6 @@ class GNode : public QGraphicsObject
         Pin *addPinFromType(PinProperty::Type type, const QString &name, PinProperty::Direction direction, int index = -1);
 
         bool _hasTitle = true;
-        bool _hasWidgets = true;
         NodeProperty::Type _type;
 
     private:
@@ -212,10 +212,6 @@ class GNode : public QGraphicsObject
             N *pin;
 
             pin = new N();
-            pin->setName(name);
-            pin->setDirection(direction);
-            pin->setPlugColor();
-            pin->setNode(this);
 
             switch (direction) {
                 case PinProperty::Direction::Input:
@@ -227,10 +223,15 @@ class GNode : public QGraphicsObject
                 case PinProperty::Direction::Output:
                     if (index != -1)
                         _outputPins.insert(_outputPins.begin() + index, pin);
-                    else
+                    else {
                         _outputPins.push_back(pin);
+                    }
                     break;
             }
+            pin->setNode(this);
+            pin->setDirection(direction);
+            pin->setPlugColor();
+            pin->setName(name);
             return pin;
         }
 
