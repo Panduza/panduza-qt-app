@@ -18,7 +18,9 @@
 #include <PzaMoreLess.hpp>
 #include <PzaCheckBox.hpp>
 #include <PzaSpinBox.hpp>
+#include <PzaPropertyTable.hpp>
 #include <PzaDoubleSpinBox.hpp>
+#include <PzaColorBox.hpp>
 
 class NoderScene;
 
@@ -49,10 +51,10 @@ class GNode : public QGraphicsObject
         virtual void exec(void) {};
         virtual GNode *branch(void) = 0;
 
-        inline NoderScene *scene() const {return _scene;}
+        NoderScene *scene() const {return _scene;}
         void setScene(NoderScene *scene);
-        void setUserName(const QString &name) {_userName = name;}
         void refreshNode(void);
+        PzaPropertyTable *propTable(void) const {return _propTable;}
         bool isInPlugzone(const QPoint &pos);
         void forEachInputPin(std::function<void(Pin *pin)> func);
         void forEachOutputPin(std::function<void(Pin *pin)> func);
@@ -101,7 +103,7 @@ class GNode : public QGraphicsObject
         struct multiPin *findMultiPinFromList(std::vector<Pin *> *list);
         void deletePin(Pin *pin);
         void replacePin(Pin *oldPin, Pin *newPin);
-        inline const NodeProperty::Type &nodeType(void) const {return _type;}
+        const NodeProperty::Type &nodeType(void) const {return _type;}
         const QColor &titleColor(const NodeProperty::Type &type);
         const QColor &plugColor(PinProperty::Type type);
 
@@ -269,4 +271,17 @@ class GNode : public QGraphicsObject
         QString _name;
         QString _userName;
         int _boxRadius;
+        QColor _boxColor;
+
+        PzaPropertyTable *_propTable = nullptr;
+        PzaLabel *_propName = nullptr;
+        PzaLabel *_propType = nullptr;
+        PzaColorBox *_propBoxColor = nullptr;
+        PzaLineEdit *_propUserName = nullptr;
+
+    private slots:
+        void setUserName(const QString &name) {_userName = name;}
+
+    signals:
+        void selected(void);
 };

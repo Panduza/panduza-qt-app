@@ -24,4 +24,6 @@ target_sources(${PROG}
 	Widgets/PzaComboBox.cpp
 	Widgets/PzaTable.cpp
 	Widgets/PzaSplitter.cpp
+	Widgets/PzaScrollArea.cpp
+	Widgets/PzaColorBox.cpp
 )

@@ -17,8 +17,12 @@ PzaLabel::PzaLabel(const QString &name, QWidget *parent)
     );
 }
 
+#include <QColorDialog>
+
 void PzaLabel::mousePressEvent(QMouseEvent *event)
 {
+    QColorDialog *lol = new QColorDialog();
+    lol->exec();
     // Makes no sense in our case to click on a label.
     // event->ignore() allows to notify the parent about the press event.
     event->ignore();

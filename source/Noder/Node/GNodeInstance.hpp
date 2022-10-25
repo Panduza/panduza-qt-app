@@ -5,7 +5,7 @@
 class GNodeInstance : public GNode
 {
     protected:
-        GNodeInstance(const QString &name);
+        GNodeInstance();
         ~GNodeInstance() = default;
         
         GNode *branch(void) override {return nullptr;}

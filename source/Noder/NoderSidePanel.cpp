@@ -1,13 +1,8 @@
 #include "NoderSidePanel.hpp"
 
 NoderSidePanel::NoderSidePanel(QWidget *parent)
-    : QScrollArea(parent)
+    : PzaScrollArea(parent)
 {
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setWidgetResizable(true);
-
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-    
     _main = new PzaWidget(this);
     _layout = new QVBoxLayout(_main);
     _scenarioArea = new NoderScenarioArea(_main);
@@ -16,6 +11,8 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
     _layout->addWidget(_scenarioArea);
     _layout->addWidget(_varArea);
     _layout->addStretch(1);
+
+    setStyleSheet("background-color: #252525");
 
     setWidget(_main);
 }

@@ -8,7 +8,7 @@ class Instance : public GNodeInstance
     Q_OBJECT
 
     public:
-        Instance(NoderVariable *var);
+        Instance();
         ~Instance() = default;
 
         void exec() override;

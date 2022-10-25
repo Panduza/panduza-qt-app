@@ -1,11 +1,12 @@
 #pragma once
 
 #include <QVBoxLayout>
-#include <QScrollArea>
+
+#include "NoderVariable.hpp"
+#include <PzaScrollArea.hpp>
 #include <PzaWidget.hpp>
 #include <PzaSpoiler.hpp>
 #include <PzaMoreLess.hpp>
-#include "NoderVariable.hpp"
 #include <PzaComboBox.hpp>
 #include <PzaPropertyTable.hpp>
 
@@ -73,7 +74,7 @@ class NoderScenarioArea : public PzaSpoiler
         QVBoxLayout *_layout;
 };
 
-class NoderSidePanel : public QScrollArea
+class NoderSidePanel : public PzaScrollArea
 {
     public:
         NoderSidePanel(QWidget *parent = nullptr);

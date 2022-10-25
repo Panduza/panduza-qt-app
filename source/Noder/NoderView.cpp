@@ -18,6 +18,7 @@ NoderGraphicsView::NoderGraphicsView(QWidget *parent)
     _style = NoderStyle("DefaultTheme.json");
 
     setBackgroundBrush(QBrush(_style.backgroundCol()));
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
     setRenderHint(QPainter::Antialiasing);
     setCacheMode(QGraphicsView::CacheBackground);
@@ -37,8 +38,6 @@ void NoderGraphicsView::dragEnterEvent(QDragEnterEvent *event)
     event->accept();
 }
 
-#include <QMimeData>
-
 void NoderGraphicsView::dragMoveEvent(QDragMoveEvent *event)
 {
     QGraphicsView::dragMoveEvent(event);
@@ -54,16 +53,17 @@ void NoderGraphicsView::dropEvent(QDropEvent *event)
     NoderVariable *variable;
 
     QGraphicsView::dropEvent(event);
-   // PzaMimeData
     if (event->mimeData()->hasFormat("noder/variable") == false)
         return ;
 
     mime = static_cast<const PzaMimeData *>(event->mimeData());
     variable = static_cast<NoderVariable *>(mime->dataPtr());
     if (variable) {
-        Instance *node = new Instance(variable);
-        node->setScene(_scene);
-        node->setPos(mapToScene(event->position().toPoint()));
+        GNode *node;
+        QPointF pos = mapToScene(event->position().toPoint());
+        
+        node = createNode(GNode::CreateNode<Instance>, pos);
+        static_cast<Instance *>(node)->setVariable(variable);
     }
 }
 
@@ -103,6 +103,12 @@ void NoderGraphicsView::keyPressEvent(QKeyEvent *event)
 
             items = _scene->selectedItems();
             for (auto item: items) {
+                GNode *node = dynamic_cast<GNode *>(item);
+                if (node) {
+                    if (_selectedNode == node)
+                        _selectedNode = nullptr;
+                    nodeRemoved(node);
+                }
                 _scene->removeItem(item);
                 delete item;
             }
@@ -132,9 +138,14 @@ void NoderGraphicsView::contextMenuEvent(QContextMenuEvent *event)
     _viewMenu->popup(event->globalPos());
 }
 
+#include <QColorDialog>
+
 void NoderGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-    QGraphicsView::mousePressEvent(event);
+   // QGraphicsView::mousePressEvent(event);
+
+    QColorDialog *lol = new QColorDialog();
+    lol->exec();
 
     _clickpos = mapToScene(event->pos());
 }
@@ -180,6 +191,29 @@ void NoderGraphicsView::initViewMenu(void)
     }
 }
 
+void NoderGraphicsView::selectNode(GNode *node)
+{
+    qDebug() << "New node selected" << node->name();
+    _selectedNode = node;
+    nodeSelected(node);
+}
+
+#include <QColorDialog>
+
+GNode *NoderGraphicsView::createNode(const NoderDataBase::t_CreateNode &f, const QPointF &pos)
+{
+    GNode *node;
+    
+    node = f();
+    node->setScene(_scene);
+    node->setPos(pos);
+    nodeCreated(node);
+    connect(node, &GNode::selected, this, [&, node]() {
+        selectNode(node);
+    });
+    return node;
+}
+
 void NoderGraphicsView::setViewMenuCallback(QMenu *menu)
 {
     foreach(QAction *action, menu->actions()) {
@@ -192,11 +226,7 @@ void NoderGraphicsView::setViewMenuCallback(QMenu *menu)
                 QAction *action = static_cast<QAction *>(sender());
                 action->data();
                 NoderDataBase::t_CreateNode f = action->data().value<NoderDataBase::t_CreateNode>();
-                if (f) {
-                    GNode *node = f();
-                    node->setScene(_scene);
-                    node->setPos(_clickpos);
-                }
+                createNode(f, _clickpos);
             });
         }
     }
@@ -331,10 +361,56 @@ void NoderGraphicsView::drawBackground(QPainter *painter, const QRectF &r)
     }
 }
 
+NoderNodeArea::NoderNodeArea(QWidget *parent)
+    : PzaSpoiler("Node properties", parent)
+{
+
+}
+
+
+void NoderNodeArea::addNode(GNode *node)
+{
+    addWidget(node->propTable());
+}
+
+void NoderNodeArea::removedNode(GNode *node)
+{
+    removeWidget(node->propTable());
+}
+
+void NoderNodeArea::setCurrentNode(GNode *node)
+{
+    setCurrentWidget(node->propTable());
+}
+
+#include <QColorDialog>
+
+NoderViewPanel::NoderViewPanel(NoderGraphicsView *view, QWidget *parent)
+    : PzaScrollArea(parent)
+{
+    _main = new PzaWidget(this);
+    _layout = new QVBoxLayout(_main);
+    _nodeArea = new NoderNodeArea(_main);
+
+    _main->setStyleSheet("background-color: #252525");
+
+    connect(view, &NoderGraphicsView::nodeCreated, _nodeArea, &NoderNodeArea::addNode);
+    connect(view, &NoderGraphicsView::nodeRemoved, _nodeArea, &NoderNodeArea::removedNode);
+    connect(view, &NoderGraphicsView::nodeSelected, _nodeArea, &NoderNodeArea::setCurrentNode);
+
+    _layout->addWidget(_nodeArea);
+    _layout->addStretch(1);
+    setWidget(_main);
+}
+
 NoderView::NoderView(QWidget *parent)
     : PzaSplitter(parent)
 {
     _view = new NoderGraphicsView(this);
+    _viewPanel = new NoderViewPanel(_view, this);
+
+    setStretchFactor(0, 1);
 
     addWidget(_view);
+    addWidget(_viewPanel);
 }

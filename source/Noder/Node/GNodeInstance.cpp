@@ -1,7 +1,7 @@
 #include <GNodeInstance.hpp>
 
-GNodeInstance::GNodeInstance(const QString &name)
-    : GNode(name)
+GNodeInstance::GNodeInstance()
+    : GNode("Instance")
 {
     _type = NodeProperty::Type::Instance;
     _hasTitle = false;

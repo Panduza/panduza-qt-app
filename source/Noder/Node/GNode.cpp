@@ -15,9 +15,21 @@ GNode::GNode(const QString &name)
     _pinBoxIn(0, 0, 0, 0),
     _pinBoxOut(0, 0, 0, 0),
     _name(name),
-    _boxRadius(6)
+    _userName(name),
+    _boxRadius(6),
+    _boxColor("#353535")
 {
-
+    _propTable = new PzaPropertyTable();
+    if (_type != NodeProperty::Type::Instance) {
+        _propUserName = _propTable->addProperty<PzaLineEdit>("Custom Name");
+        _propUserName->setText(_userName);
+        _propName = _propTable->addProperty<PzaLabel>("Name");
+        _propName->setText(_userName);
+        connect(_propUserName, &PzaLineEdit::textChanged, this, &GNode::setUserName);
+    }
+    _propType = _propTable->addProperty<PzaLabel>("Node Type");
+    _propType->setText(NBD_INST.nodeTypeName(_type));
+    _propBoxColor = _propTable->addProperty<PzaColorBox>("Box color");
 }
 
 void GNode::setup(void)
@@ -38,7 +50,6 @@ void GNode::setup(void)
         _title->box = QRect(0, 0, 0, 0);
         _title->size = QSize(0, 20);
         _title->font.setPixelSize(14);
-        _title->fontbox = QFontMetrics(_title->font).boundingRect(_name);
         _title->fontcolor = QColor("#DEDEDE");
         _title->offset = QSize(20, 5);
         _title->boxcolor = titleColor(_type);
@@ -402,17 +413,16 @@ void GNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     wasSelected = isSelected();
 
-    QGraphicsItem::mousePressEvent(event);
-
     click = mapFromScene(event->scenePos()).toPoint();
 
     setOnTop();
 
-    if (!isInPlugzone(click))
+    if (!isInPlugzone(click)) {
+        QGraphicsItem::mousePressEvent(event);
+        if (isSelected() && wasSelected == false)
+            selected();
         return ;
-
-    if (wasSelected == false)
-        setSelected(false);
+    }
 
     forEachPin([&](Pin *pin) {
         if (pin->isInPlugArea(click)) {
@@ -506,6 +516,7 @@ void GNode::pinBoxSize()
 
 void GNode::titleboxSize()
 {
+    _title->fontbox = QFontMetrics(_title->font).boundingRect(_userName);
     _title->box.setWidth(_title->fontbox.width());
     _title->box.setHeight(_title->fontbox.height() + _title->offset.height() * 2);
 
@@ -639,7 +650,7 @@ void GNode::drawBoxes(QPainter *painter)
 {
     painter->setPen(Qt::NoPen);
     
-    painter->setBrush(QColor("#353535"));
+    painter->setBrush(_boxColor);
     painter->drawRoundedRect(_nodebox, _boxRadius, _boxRadius);
     if (_hasTitle) {
         painter->setBrush(_title->boxcolor);
@@ -694,6 +705,8 @@ void GNode::drawExecPlug(QPainter *painter, Pin *pin)
 
 void GNode::process(void)
 {
+    _propBoxColor->setColor(_boxColor);
+
     forEachInputPin([&](Pin *pin) {
         if (pin->linked() && pin->type() != PinProperty::Type::Exec) {
             pin->forEachLinkedNode([](GNode *node) {
@@ -721,7 +734,7 @@ void GNode::paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWi
 
         painter->setPen(pen);
         painter->setFont(_title->font);
-        painter->drawText(_title->fontpos, _name);
+        painter->drawText(_title->fontpos, _userName);
     }
 
     forEachPin([&](Pin *pin) {
@@ -741,6 +754,7 @@ void GNode::paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWi
 
 GNode::~GNode()
 {
+    _propTable->deleteLater();
     if (_hasTitle)
         delete _title;
 }

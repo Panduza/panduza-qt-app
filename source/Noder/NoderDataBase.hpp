@@ -75,8 +75,8 @@ class NoderDataBase
         const QColor &plugColor(const PinProperty::Type type);
         const QColor &varColor(const NoderPanel::Type type);
         const QString &varTypeName(const NoderPanel::Type type);
+        const QString &nodeTypeName(const NodeProperty::Type type);
         const std::vector<QString> &enumValues(const QString &name);
-        const t_CreateNode &CreateNode(const QString &name);
         void initNodeMenuList(void);
 
         std::vector<PzaMenu *> &nodeMenuList(void) {return _nodeMenuList;}

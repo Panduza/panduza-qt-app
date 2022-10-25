@@ -15,7 +15,7 @@ class PzaPropertyTable : public PzaWidget
         T *addProperty(const QString &name = "")
         {
             int row = _layout->rowCount();
-            T *widget = new T(this);
+            T *widget = new T();
 
             if (name != "") {
                 PzaLabel *label = new PzaLabel(name, this);

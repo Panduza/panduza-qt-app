@@ -1,10 +1,9 @@
 #include "NInstance.hpp"
 
-Instance::Instance(NoderVariable *var)
-    : GNodeInstance("")
+Instance::Instance()
+    : GNodeInstance()
 {
-      setVariable(var);
-      updatePin();
+
 }
 
 void Instance::exec(void)
@@ -77,4 +76,5 @@ void Instance::setVariable(NoderVariable *var)
 {
     _var = var;
     connect(var, &NoderVariable::typeChanged, this, &Instance::updatePin);
+    updatePin();
 }

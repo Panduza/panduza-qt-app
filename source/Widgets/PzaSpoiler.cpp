@@ -5,6 +5,8 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
 {
     setAttribute(Qt::WA_StyledBackground, true);
 
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+    
     _layout = new QVBoxLayout(this);
     _header = new QToolButton(this);
     _content = new QStackedWidget(this);
@@ -13,7 +15,6 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
 
     _header->setStyleSheet(
         "color: #DCDCDC;"
-        "background-color: #232323;"
         "font: 14px;"
     );
 
@@ -23,7 +24,7 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
     _header->setArrowType(Qt::ArrowType::RightArrow);
     _header->setCheckable(true);
     _header->setChecked(false);
-    _header->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    _header->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
     _layout->addWidget(_header);
     _content->setVisible(false);

@@ -12,10 +12,14 @@
 #include <PzaMenu.hpp>
 #include <PzaSplitter.hpp>
 #include <PzaMimeData.hpp>
+#include <PzaScrollArea.hpp>
+#include <PzaSpoiler.hpp>
 #include "NoderVariable.hpp"
 
 class NoderGraphicsView : public QGraphicsView
 {
+    Q_OBJECT
+
     public:
         NoderGraphicsView(QWidget *parent = nullptr);
         ~NoderGraphicsView() = default;
@@ -40,13 +44,48 @@ class NoderGraphicsView : public QGraphicsView
         NoderStyle _style;
         QPointF _curpos;
         PzaMenu *_viewMenu;
+        GNode *_selectedNode = nullptr;
 
+        GNode *createNode(const NoderDataBase::t_CreateNode &f, const QPointF &pos = QPointF(0, 0));
+
+        void selectNode(GNode *node);
         void initViewMenu(void);
         void setViewMenuCallback(QMenu *menu);
         bool isInEllipse(QRectF &rect, QPointF &point);
         double inline calcRadius(double a, double b, double theta);
         double ellispeDistance(QRectF &rect, QPointF &point);
         QColor distanceColor(double distance);
+
+    signals:
+        void nodeSelected(GNode *);
+        void nodeCreated(GNode *);
+        void nodeRemoved(GNode *);
+};
+
+class NoderNodeArea : public PzaSpoiler
+{
+    Q_OBJECT
+
+    public:
+        NoderNodeArea(QWidget *parent = nullptr);
+        ~NoderNodeArea() = default;
+
+    public slots:
+        void addNode(GNode *node);
+        void removedNode(GNode *node);
+        void setCurrentNode(GNode *node);
+};
+
+class NoderViewPanel : public PzaScrollArea
+{
+    public:
+        NoderViewPanel(NoderGraphicsView *view, QWidget *parent = nullptr);
+        ~NoderViewPanel() = default;
+
+    private:
+        PzaWidget *_main;
+        QVBoxLayout *_layout;
+        NoderNodeArea *_nodeArea;
 };
 
 class NoderView : public PzaSplitter
@@ -57,5 +96,6 @@ class NoderView : public PzaSplitter
 
     private:
         NoderGraphicsView *_view;
+        NoderViewPanel *_viewPanel;
         QHBoxLayout *_layout;
 };

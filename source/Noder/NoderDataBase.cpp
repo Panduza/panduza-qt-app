@@ -181,6 +181,18 @@ const QColor &NoderDataBase::varColor(const NoderPanel::Type type)
     return map[type];
 }
 
+const QString &NoderDataBase::nodeTypeName(const NodeProperty::Type type)
+{
+    static std::unordered_map<NodeProperty::Type, QString> map = {
+        {NodeProperty::Type::Operation, "Operation"},
+        {NodeProperty::Type::Exec, "Execution"},
+        {NodeProperty::Type::Branch, "Branch"},
+        {NodeProperty::Type::Instance, "Instance"},
+        {NodeProperty::Type::Event , "Event"}
+    };
+    return map[type];
+}
+
 const QString &NoderDataBase::varTypeName(const NoderPanel::Type type)
 {
     return _varTypeMap[type];

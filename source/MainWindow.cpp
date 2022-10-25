@@ -20,7 +20,6 @@ MainWindow::MainWindow()
     _mainLayout.addWidget(frame);
     
     setCentralWidget(&_mainWidget);
-    show();
 }
 
 void MainWindow::loadTheme(QString filename)

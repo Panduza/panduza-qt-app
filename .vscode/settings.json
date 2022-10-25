@@ -86,7 +86,11 @@
         "qmenu": "cpp",
         "qmimedata": "cpp",
         "qtablewidget": "cpp",
-        "qsplitter": "cpp"
+        "qsplitter": "cpp",
+        "qcolordialog": "cpp",
+        "qfiledialog": "cpp",
+        "qtimer": "cpp",
+        "qdialog": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
