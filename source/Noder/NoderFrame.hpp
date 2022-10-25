@@ -12,12 +12,13 @@
 #include <PanduzaEngine.hpp>
 #include <PzaMenuBar.hpp>
 #include <PzaMenu.hpp>
+#include <PzaSplitter.hpp>
 
 class NoderFrame : public PzaWidget
 {
     public:
         NoderFrame(PanduzaEngine *engine);
-        ~NoderFrame();
+        ~NoderFrame() = default;
 
         PzaMenuBar *mainMenuBar(void);
 

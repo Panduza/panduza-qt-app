@@ -2,9 +2,8 @@
 #include <GNode.hpp>
 #include <GNodeEvent.hpp>
 
-NoderScene::NoderScene(PanduzaEngine *engine)
-    : QGraphicsScene(),
-    _engine(engine)
+NoderScene::NoderScene(QWidget *parent)
+    : QGraphicsScene(parent)
 {
 
 }
@@ -51,8 +50,6 @@ void NoderScene::executeSection(GNode *start)
 void NoderScene::executeScene(void)
 {
     std::vector<GNode *> inputs;
-
-    _engine->showTree();
 
     inputs = findInputEventNodes();
 

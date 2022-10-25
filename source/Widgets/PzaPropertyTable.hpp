@@ -19,9 +19,9 @@ class PzaPropertyTable : public PzaWidget
 
             if (name != "") {
                 PzaLabel *label = new PzaLabel(name, this);
-                _layout->addWidget(label, row, 0);
+                _layout->addWidget(label, row, 0, Qt::AlignLeft);
             }
-            _layout->addWidget(widget, row, 1);
+            _layout->addWidget(widget, row, 1, Qt::AlignLeft);
             return widget;
         }
 

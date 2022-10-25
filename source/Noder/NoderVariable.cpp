@@ -81,6 +81,7 @@ void NoderVariable::mouseMoveEvent(QMouseEvent *event)
     mimeData->setData("noder/variable", "");
     mimeData->setDataPtr(this);
     drag->setMimeData(mimeData);
+    drag->setPixmap(_propName->grab());
     drag->exec();
 }
 

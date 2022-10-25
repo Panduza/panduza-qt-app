@@ -22,4 +22,6 @@ target_sources(${PROG}
 	Widgets/PzaMenu.cpp
 	Widgets/PzaMenuBar.cpp
 	Widgets/PzaComboBox.cpp
+	Widgets/PzaTable.cpp
+	Widgets/PzaSplitter.cpp
 )

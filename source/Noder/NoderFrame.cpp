@@ -9,7 +9,7 @@ NoderFrame::NoderFrame(PanduzaEngine *engine)
 
     PzaMenuBar *menuBar = mainMenuBar();
 
-    NoderView *view = new NoderView(engine);
+    NoderView *view = new NoderView(this);
 
     //connect(engine, &PanduzaEngine::interfaceRegistered, this, &NoderFrame::newInterface);
 
@@ -21,7 +21,7 @@ NoderFrame::NoderFrame(PanduzaEngine *engine)
 
     tabBar->addTab(view, "Scenario 1");
 
-    QSplitter *graphFrame = new QSplitter(Qt::Horizontal, this);
+    PzaSplitter *graphFrame = new PzaSplitter(Qt::Horizontal, this);
     graphFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     graphFrame->setContentsMargins(0, 0, 0, 0);
     graphFrame->setStyleSheet("background-color: #181818;");
@@ -94,9 +94,4 @@ PzaMenuBar *NoderFrame::mainMenuBar(void)
     menuBar->addMenu(menuNode);
 
     return menuBar;
-}
-
-NoderFrame::~NoderFrame()
-{
-    
 }

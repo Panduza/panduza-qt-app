@@ -16,9 +16,9 @@ class PzaSpoiler : public PzaWidget
         void setFold(bool state);
         bool folded(void) const {return _fold;}
         void updateSpoiler(void);
-        void addWidget(PzaWidget *w);
-        void removeWidget(PzaWidget *w);
-        void setCurrentWidget(PzaWidget *w);
+        void addWidget(QWidget *w);
+        void removeWidget(QWidget *w);
+        void setCurrentWidget(QWidget *w);
 
         const QStackedWidget *content(void) {return _content;}
 

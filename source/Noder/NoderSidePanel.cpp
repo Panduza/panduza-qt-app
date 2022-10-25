@@ -9,20 +9,18 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     
     _main = new PzaWidget(this);
-    
-    _main->setStyleSheet("background-color: #1D1D1D");
-    
     _layout = new QVBoxLayout(_main);
+    _scenarioArea = new NoderScenarioArea(_main);
+    _varArea = new NoderVariableArea(_main);
 
-    _varArea = new NoderVarArea(_main);
-
+    _layout->addWidget(_scenarioArea);
     _layout->addWidget(_varArea);
     _layout->addStretch(1);
 
     setWidget(_main);
 }
 
-NoderVarArea::NoderVarArea(QWidget *parent)
+NoderVariableArea::NoderVariableArea(QWidget *parent)
     : PzaSpoiler("Variables", parent)
 {
     _main = new PzaWidget(this);
@@ -30,8 +28,6 @@ NoderVarArea::NoderVarArea(QWidget *parent)
     _varTableLayout = new QVBoxLayout(_varTable);
     _propertyArea = new NoderPropertyArea(_main);
     _defValArea = new NoderDefValArea(_main);
-
-    setStyleSheet("background-color: #303030");
 
     _varTableLayout->setContentsMargins(3, 3, 3, 3);
     _varTableLayout->setSpacing(0);
@@ -49,17 +45,13 @@ NoderVarArea::NoderVarArea(QWidget *parent)
     _layout->addWidget(_propertyArea);
     _layout->addWidget(_defValArea);
 
-    connect(_moreLess, &PzaMoreLess::more, this, [&]() {
-        addVariable();
-    });
-    connect(_moreLess, &PzaMoreLess::less, this, [&]() {
-        removeVariable(_selectedVar);
-    });
+    connect(_moreLess, &PzaMoreLess::more, this, &NoderVariableArea::addVariable);
+    connect(_moreLess, &PzaMoreLess::less, this, &NoderVariableArea::removeVariable);
    
     addWidget(_main);
 }
 
-void NoderVarArea::selectVar(NoderVariable *target)
+void NoderVariableArea::selectVar(NoderVariable *target)
 {
     for (auto var : _varList) {
         var->setSelected(false);
@@ -71,7 +63,7 @@ void NoderVarArea::selectVar(NoderVariable *target)
     _defValArea->updateValArea(_selectedVar);
 }
 
-void NoderVarArea::addVariable(void)
+void NoderVariableArea::addVariable(void)
 {
     NoderVariable *newVar;
     NoderPanel::Type fromType;
@@ -96,24 +88,20 @@ void NoderVarArea::addVariable(void)
     selectVar(newVar);
 }
 
-void NoderVarArea::removeVariable(NoderVariable *target)
+void NoderVariableArea::removeVariable(void)
 {
     unsigned long index;
     NoderVariable *next = nullptr;
 
-    if (target == nullptr)
+    if (_selectedVar == nullptr)
         return ;
         
-    if (_selectedVar == target) {
-        _selectedVar = nullptr;
-    }
-
-    _varTableLayout->removeWidget(target);
-    index = PzaUtils::IndexInVector<NoderVariable *>(_varList, target);
-    PzaUtils::DeleteFromVector<NoderVariable *>(_varList, target);
-    _propertyArea->deleteProperty(target);
-    _defValArea->del(target);
-    target->deleteLater();
+    _varTableLayout->removeWidget(_selectedVar);
+    index = PzaUtils::IndexInVector<NoderVariable *>(_varList, _selectedVar);
+    PzaUtils::DeleteFromVector<NoderVariable *>(_varList, _selectedVar);
+    _propertyArea->deleteProperty(_selectedVar);
+    _defValArea->del(_selectedVar);
+    _selectedVar->deleteLater();
 
     if (index != _varList.size()) {
         next = _varList.at(index);
@@ -127,7 +115,7 @@ void NoderVarArea::removeVariable(NoderVariable *target)
 NoderPropertyArea::NoderPropertyArea(QWidget *parent)
     : PzaSpoiler("Properties", parent)
 {
-
+    
 }
 
 void NoderPropertyArea::updateProperty(NoderVariable *var)
@@ -166,4 +154,13 @@ void NoderDefValArea::add(NoderVariable *var)
 void NoderDefValArea::del(NoderVariable *var)
 {
     removeWidget(var->defValTable());
+}
+
+NoderScenarioArea::NoderScenarioArea(QWidget *parent)
+    : PzaSpoiler("Scenarios", parent)
+{
+    _main = new PzaWidget(this);
+    _layout = new QVBoxLayout(_main);
+
+    addWidget(_main);
 }

@@ -6,16 +6,16 @@
 
 GNode::GNode(const QString &name)
     : QGraphicsObject(),
-    _spacing_y(5),
-    _spacing_mid(10),
+    _spacingY(2),
+    _spacingMid(10),
     _plugzone(20),
-    _plug_radius(4),
-    _entry_miny(25),
-    _pinBox_offsety(10),
+    _entryMiny(25),
+    _pinBoxOffsetY(10),
     _pinBox(0, 0, 0, 0),
-    _pinBox_in(0, 0, 0, 0),
-    _pinBox_out(0, 0, 0, 0),
-    _name(name)
+    _pinBoxIn(0, 0, 0, 0),
+    _pinBoxOut(0, 0, 0, 0),
+    _name(name),
+    _boxRadius(6)
 {
 
 }
@@ -398,6 +398,9 @@ QVariant GNode::itemChange(GraphicsItemChange change, const QVariant &value)
 void GNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QPoint click;
+    bool wasSelected;
+
+    wasSelected = isSelected();
 
     QGraphicsItem::mousePressEvent(event);
 
@@ -408,7 +411,8 @@ void GNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (!isInPlugzone(click))
         return ;
 
-    setSelected(false);
+    if (wasSelected == false)
+        setSelected(false);
 
     forEachPin([&](Pin *pin) {
         if (pin->isInPlugArea(click)) {
@@ -462,39 +466,42 @@ void GNode::updateLinks()
 void GNode::pinBoxSize()
 {
     _pinBox.setWidth(0);
-    _pinBox.setHeight(_pinBox_offsety);
+    _pinBox.setHeight(0);
 
-    _pinBox_in.setWidth(0);
-    _pinBox_in.setHeight(0);
+    _pinBoxIn.setWidth(0);
+    _pinBoxIn.setHeight(0);
     forEachInputPin([&](Pin *pin) {
-        _pinBox_in.setWidth(std::max(_pinBox_in.width(), pin->sizeHint().width()));
-        _pinBox_in.setHeight(_pinBox_in.height() + std::max(pin->sizeHint().height(), _entry_miny) + _spacing_y);
+        _pinBoxIn.setWidth(std::max(_pinBoxIn.width(), pin->sizeHint().width()));
+        _pinBoxIn.setHeight(_pinBoxIn.height() + std::max(pin->sizeHint().height(), _entryMiny) + _spacingY);
     });
 
-    _pinBox_out.setWidth(0);
-    _pinBox_out.setHeight(0);
+    _pinBoxOut.setWidth(0);
+    _pinBoxOut.setHeight(0);
     forEachOutputPin([&](Pin *pin) {
-        _pinBox_out.setWidth(std::max(_pinBox_out.width(), pin->sizeHint().width()));
-        _pinBox_out.setHeight(_pinBox_out.height() + std::max(pin->sizeHint().height(), _entry_miny) + _spacing_y);
+        _pinBoxOut.setWidth(std::max(_pinBoxOut.width(), pin->sizeHint().width()));
+        if (_hasTitle)
+            _pinBoxOut.setHeight(_pinBoxOut.height() + std::max(pin->sizeHint().height(), _entryMiny) + _spacingY);
+        else
+            _pinBoxOut.setHeight(_pinBoxOut.height() + std::max(pin->sizeHint().height(), _entryMiny));
     });
     
     if (_multiPinStructs.size() > 0)
-        _pinBox_out.setHeight(_pinBox_out.height() + 10);
+        _pinBoxOut.setHeight(_pinBoxOut.height() + 10);
 
     for (auto s: _multiPinStructs) {
-        _pinBox_out.setWidth(std::max(_pinBox_out.width(), s->w->sizeHint().width()));
-        _pinBox_out.setHeight(_pinBox_out.height() + std::max(s->w->sizeHint().height(), _entry_miny) + _spacing_y);
+        _pinBoxOut.setWidth(std::max(_pinBoxOut.width(), s->w->sizeHint().width()));
+        _pinBoxOut.setHeight(_pinBoxOut.height() + std::max(s->w->sizeHint().height(), _entryMiny) + _spacingY);
     }
 
     if (needSpacing())
-        _pinBox.setWidth(_pinBox_in.width() + _pinBox_out.width() + _spacing_mid);
+        _pinBox.setWidth(_pinBoxIn.width() + _pinBoxOut.width() + _spacingMid);
     else
-        _pinBox.setWidth(_pinBox_in.width() + _pinBox_out.width());
+        _pinBox.setWidth(_pinBoxIn.width() + _pinBoxOut.width());
 
-    if (_pinBox_in.height() < _pinBox_out.height())
-        _pinBox.setHeight(_pinBox_out.height());
+    if (_pinBoxIn.height() < _pinBoxOut.height())
+        _pinBox.setHeight(_pinBoxOut.height());
     else
-        _pinBox.setHeight(_pinBox_in.height());
+        _pinBox.setHeight(_pinBoxIn.height());
 }
 
 void GNode::titleboxSize()
@@ -519,15 +526,15 @@ void GNode::resizeBoxes()
     _pinBox.setWidth(max.width());
 
     if (needSpacing())
-        _pinBox_in.setWidth(_pinBox.width() - _pinBox_out.width() - _spacing_mid);
+        _pinBoxIn.setWidth(_pinBox.width() - _pinBoxOut.width() - _spacingMid);
     else
-        _pinBox_in.setWidth(_pinBox.width() - _pinBox_out.width());
+        _pinBoxIn.setWidth(_pinBox.width() - _pinBoxOut.width());
 
     _nodebox.setWidth(max.width() + _plugzone * 2);
     if (_hasTitle)
-        _nodebox.setHeight(_title->box.height() + _pinBox.height() + _pinBox_offsety);
+        _nodebox.setHeight(_title->box.height() + _pinBox.height() + _pinBoxOffsetY);
     else
-        _nodebox.setHeight(_pinBox.height() + _pinBox_offsety);
+        _nodebox.setHeight(_pinBox.height());
 }
 
 void GNode::positionEntries(void)
@@ -537,9 +544,9 @@ void GNode::positionEntries(void)
     int posMaxY = 0;
 
     if (_hasTitle)
-        origin.setY(_title->box.height() + _pinBox_offsety);
+        origin.setY(_title->box.height() + _pinBoxOffsetY);
     else
-        origin.setY(_pinBox_offsety);
+        origin.setY(0);
     origin.setX(_plugzone);
     pos = origin;
 
@@ -551,22 +558,22 @@ void GNode::positionEntries(void)
             pin->proxy()->setGeometry(QRect(pos, pin->size()));
             pin->setPos(pos);
             pin->setScenePos(mapFromScene(pos));
-            pos.setY(pos.y() + pin->size().height() + _spacing_y);
+            pos.setY(pos.y() + pin->size().height() + _spacingY);
             posMaxY = std::max(posMaxY, pos.y());
         }
     });
 
     pos = origin;
-    pos.setX(_plugzone + _pinBox_in.width());
+    pos.setX(_plugzone + _pinBoxIn.width());
     if (needSpacing())
-        pos.setX(pos.x() + _spacing_mid);
+        pos.setX(pos.x() + _spacingMid);
 
     forEachOutputPin([&](Pin *pin) {
         if (pin->proxy()) {
             setPinPlugzone(pin, pos);
             pin->proxy()->setGeometry(QRect(pos, pin->size()));
             pin->setScenePos(mapToScene(pos));
-            pos.setY(pos.y() + pin->size().height() + _spacing_y);
+            pos.setY(pos.y() + pin->size().height() + _spacingY);
             posMaxY = std::max(posMaxY, pos.y());
         }
     });
@@ -576,7 +583,7 @@ void GNode::positionEntries(void)
 
     for (auto s: _multiPinStructs) {
         s->proxy->setGeometry(QRect(pos, s->w->size()));
-        pos.setY(pos.y() + s->w->size().height() + _spacing_y);
+        pos.setY(pos.y() + s->w->size().height() + _spacingY);
         posMaxY = std::max(posMaxY, pos.y());
     }
 }
@@ -614,17 +621,17 @@ void GNode::setWidgetSize(void)
     QSize size(0, 0);
     
     forEachInputPin([&](Pin *pin) {
-        size.setWidth(_pinBox_in.width());
-        size.setHeight(std::max(pin->sizeHint().height(), _entry_miny));
+        size.setWidth(_pinBoxIn.width());
+        size.setHeight(std::max(pin->sizeHint().height(), _entryMiny));
         pin->setSize(size);
     });
     forEachOutputPin([&](Pin *pin) {
-        size.setWidth(_pinBox_out.width());
-        size.setHeight(std::max(pin->sizeHint().height(), _entry_miny));
+        size.setWidth(_pinBoxOut.width());
+        size.setHeight(std::max(pin->sizeHint().height(), _entryMiny));
         pin->setSize(size);
     });
     for (auto s: _multiPinStructs) {
-        s->w->setFixedSize(_pinBox_out.width(), std::max(s->w->sizeHint().height(), _entry_miny));
+        s->w->setFixedSize(_pinBoxOut.width(), std::max(s->w->sizeHint().height(), _entryMiny));
     }
 }
 
@@ -633,21 +640,20 @@ void GNode::drawBoxes(QPainter *painter)
     painter->setPen(Qt::NoPen);
     
     painter->setBrush(QColor("#353535"));
-    painter->drawRoundedRect(_nodebox, 3, 3);
-
+    painter->drawRoundedRect(_nodebox, _boxRadius, _boxRadius);
     if (_hasTitle) {
         painter->setBrush(_title->boxcolor);
-        painter->drawRoundedRect(_title->box, 3, 3);
+        painter->drawRoundedRect(_title->box, _boxRadius, _boxRadius);
     }
     if (isSelected()) {
         painter->setBrush(Qt::NoBrush);
         painter->setPen(QPen("#00E7FF"));
-        painter->drawRoundedRect(_nodebox, 3, 3);
+        painter->drawRoundedRect(_nodebox, _boxRadius, _boxRadius);
     }
     else {
         painter->setBrush(Qt::NoBrush);
         painter->setPen(QPen("#BBBBBB"));
-        painter->drawRoundedRect(_nodebox, 2, 2);
+        painter->drawRoundedRect(_nodebox, _boxRadius, _boxRadius);
     }
 }
 

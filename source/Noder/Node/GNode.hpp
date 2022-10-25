@@ -43,6 +43,7 @@ class GNode : public QGraphicsObject
         GNode(const QString &name);
 
         const QString &name() const {return _name;}
+        const QString &userName() const {return _userName;}
 
         void process(void);
         virtual void exec(void) {};
@@ -50,6 +51,7 @@ class GNode : public QGraphicsObject
 
         inline NoderScene *scene() const {return _scene;}
         void setScene(NoderScene *scene);
+        void setUserName(const QString &name) {_userName = name;}
         void refreshNode(void);
         bool isInPlugzone(const QPoint &pos);
         void forEachInputPin(std::function<void(Pin *pin)> func);
@@ -254,15 +256,17 @@ class GNode : public QGraphicsObject
 
         struct title *_title = nullptr;
 
-        int _spacing_y;
-        int _spacing_mid;
+        int _spacingY;
+        int _spacingMid;
         int _plugzone;
-        int _plug_radius;
-        int _entry_miny;
-        int _pinBox_offsety;
+        int _plugRadius;
+        int _entryMiny;
+        int _pinBoxOffsetY;
         QRect _nodebox;
         QRect _pinBox;
-        QRect _pinBox_in;
-        QRect _pinBox_out;
+        QRect _pinBoxIn;
+        QRect _pinBoxOut;
         QString _name;
+        QString _userName;
+        int _boxRadius;
 };

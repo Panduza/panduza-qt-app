@@ -14,6 +14,7 @@
 #include <PzaSpinBox.hpp>
 #include <PzaDoubleSpinBox.hpp>
 #include <PzaMimeData.hpp>
+#include <PzaComboBox.hpp>
 
 class NoderVariable : public PzaWidget
 {

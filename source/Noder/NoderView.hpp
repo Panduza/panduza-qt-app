@@ -10,14 +10,15 @@
 #include "NoderStyle.hpp"
 #include "NoderScene.hpp"
 #include <PzaMenu.hpp>
+#include <PzaSplitter.hpp>
 #include <PzaMimeData.hpp>
 #include "NoderVariable.hpp"
 
-class NoderView : public QGraphicsView
+class NoderGraphicsView : public QGraphicsView
 {
     public:
-        NoderView(PanduzaEngine *engine);
-        ~NoderView() = default;
+        NoderGraphicsView(QWidget *parent = nullptr);
+        ~NoderGraphicsView() = default;
 
     protected:
         void mouseMoveEvent(QMouseEvent *event) override;
@@ -35,7 +36,6 @@ class NoderView : public QGraphicsView
 
     private:
         QPointF _clickpos;
-        PanduzaEngine *_engine;
         NoderScene *_scene;
         NoderStyle _style;
         QPointF _curpos;
@@ -47,4 +47,15 @@ class NoderView : public QGraphicsView
         double inline calcRadius(double a, double b, double theta);
         double ellispeDistance(QRectF &rect, QPointF &point);
         QColor distanceColor(double distance);
+};
+
+class NoderView : public PzaSplitter
+{
+    public:
+        NoderView(QWidget *parent = nullptr);
+        ~NoderView() = default;
+
+    private:
+        NoderGraphicsView *_view;
+        QHBoxLayout *_layout;
 };

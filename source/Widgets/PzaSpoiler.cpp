@@ -13,7 +13,7 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
 
     _header->setStyleSheet(
         "color: #DCDCDC;"
-        "background-color: transparent;"
+        "background-color: #232323;"
         "font: 14px;"
     );
 
@@ -39,18 +39,18 @@ PzaSpoiler::PzaSpoiler(const QString &name, QWidget *parent)
     _header->setText(name);
 }
 
-void PzaSpoiler::addWidget(PzaWidget *w)
+void PzaSpoiler::addWidget(QWidget *w)
 {
     _content->addWidget(w);
     setCurrentWidget(w);
 }
 
-void PzaSpoiler::removeWidget(PzaWidget *w)
+void PzaSpoiler::removeWidget(QWidget *w)
 {
     _content->removeWidget(w);
 }
 
-void PzaSpoiler::setCurrentWidget(PzaWidget *w)
+void PzaSpoiler::setCurrentWidget(QWidget *w)
 {
     _content->setCurrentWidget(w);
 }

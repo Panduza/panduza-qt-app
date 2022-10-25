@@ -84,7 +84,9 @@
         "variant": "cpp",
         "qspinbox": "cpp",
         "qmenu": "cpp",
-        "qmimedata": "cpp"
+        "qmimedata": "cpp",
+        "qtablewidget": "cpp",
+        "qsplitter": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

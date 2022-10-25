@@ -5,12 +5,11 @@
 #include <GNode.hpp>
 #include <Nodes/NInstance.hpp>
 
-NoderView::NoderView(PanduzaEngine *engine)
-    : QGraphicsView(),
-    _clickpos(0, 0),
-    _engine(engine)
+NoderGraphicsView::NoderGraphicsView(QWidget *parent)
+    : QGraphicsView(parent),
+    _clickpos(0, 0)
 {
-    NoderScene *scene = new NoderScene(engine);
+    NoderScene *scene = new NoderScene(this);
     setScene(scene);
     _scene = scene;
 
@@ -32,7 +31,7 @@ NoderView::NoderView(PanduzaEngine *engine)
     initViewMenu();
 }
 
-void NoderView::dragEnterEvent(QDragEnterEvent *event)
+void NoderGraphicsView::dragEnterEvent(QDragEnterEvent *event)
 {
     QGraphicsView::dragEnterEvent(event);
     event->accept();
@@ -40,7 +39,7 @@ void NoderView::dragEnterEvent(QDragEnterEvent *event)
 
 #include <QMimeData>
 
-void NoderView::dragMoveEvent(QDragMoveEvent *event)
+void NoderGraphicsView::dragMoveEvent(QDragMoveEvent *event)
 {
     QGraphicsView::dragMoveEvent(event);
     if (event->mimeData()->hasFormat("noder/variable") == true)
@@ -49,7 +48,7 @@ void NoderView::dragMoveEvent(QDragMoveEvent *event)
         event->ignore();
 }
 
-void NoderView::dropEvent(QDropEvent *event)
+void NoderGraphicsView::dropEvent(QDropEvent *event)
 {
     const PzaMimeData *mime;
     NoderVariable *variable;
@@ -68,7 +67,7 @@ void NoderView::dropEvent(QDropEvent *event)
     }
 }
 
-void NoderView::wheelEvent(QWheelEvent *event)
+void NoderGraphicsView::wheelEvent(QWheelEvent *event)
 {
     QPoint delta;
     int direction;
@@ -91,7 +90,7 @@ void NoderView::wheelEvent(QWheelEvent *event)
         scale(0.9, 0.9);
 }
 
-void NoderView::keyPressEvent(QKeyEvent *event)
+void NoderGraphicsView::keyPressEvent(QKeyEvent *event)
 {
     QGraphicsView::keyPressEvent(event);
 
@@ -112,7 +111,7 @@ void NoderView::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void NoderView::keyReleaseEvent(QKeyEvent *event)
+void NoderGraphicsView::keyReleaseEvent(QKeyEvent *event)
 {
     QGraphicsView::keyReleaseEvent(event);
 
@@ -126,21 +125,21 @@ void NoderView::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
-void NoderView::contextMenuEvent(QContextMenuEvent *event)
+void NoderGraphicsView::contextMenuEvent(QContextMenuEvent *event)
 {
     QGraphicsView::contextMenuEvent(event);
 
     _viewMenu->popup(event->globalPos());
 }
 
-void NoderView::mousePressEvent(QMouseEvent *event)
+void NoderGraphicsView::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsView::mousePressEvent(event);
 
     _clickpos = mapToScene(event->pos());
 }
 
-void NoderView::mouseMoveEvent(QMouseEvent *event)
+void NoderGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     QPointF diff;
 
@@ -156,12 +155,12 @@ void NoderView::mouseMoveEvent(QMouseEvent *event)
     QGraphicsView::mouseMoveEvent(event);
 }
 
-void NoderView::mouseReleaseEvent(QMouseEvent *event)
+void NoderGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseReleaseEvent(event);
 }
 
-void NoderView::initViewMenu(void)
+void NoderGraphicsView::initViewMenu(void)
 {
     PzaLabel *label;
     QWidgetAction *ALabel;
@@ -181,7 +180,7 @@ void NoderView::initViewMenu(void)
     }
 }
 
-void NoderView::setViewMenuCallback(QMenu *menu)
+void NoderGraphicsView::setViewMenuCallback(QMenu *menu)
 {
     foreach(QAction *action, menu->actions()) {
         if (action->menu()) {
@@ -203,13 +202,13 @@ void NoderView::setViewMenuCallback(QMenu *menu)
     }
 }
 
-void NoderView::showEvent(QShowEvent *event)
+void NoderGraphicsView::showEvent(QShowEvent *event)
 {
     scene()->setSceneRect(rect());
     QGraphicsView::showEvent(event);
 }
 
-bool NoderView::isInEllipse(QRectF &rect, QPointF &point)
+bool NoderGraphicsView::isInEllipse(QRectF &rect, QPointF &point)
 {
   double h, k, a, b, x, y;
 
@@ -225,12 +224,12 @@ bool NoderView::isInEllipse(QRectF &rect, QPointF &point)
   return ((pow(x - h, 2) / pow(a, 2) + pow(y - k, 2) / pow(b, 2)) <= 1.0);
 }
 
-double inline NoderView::calcRadius(double a, double b, double theta)
+double inline NoderGraphicsView::calcRadius(double a, double b, double theta)
 {
   return (1 / (sqrt(pow(cos(theta), 2) / pow(a, 2) + pow(sin(theta), 2) / pow(b, 2))));
 }
 
-double NoderView::ellispeDistance(QRectF &rect, QPointF &point)
+double NoderGraphicsView::ellispeDistance(QRectF &rect, QPointF &point)
 {
     double h, k, a, b, x, y;
     QPointF dist;
@@ -269,7 +268,7 @@ double NoderView::ellispeDistance(QRectF &rect, QPointF &point)
     return perc;
 }
 
-QColor NoderView::distanceColor(double distance)
+QColor NoderGraphicsView::distanceColor(double distance)
 {
     QColor color;
 
@@ -278,7 +277,7 @@ QColor NoderView::distanceColor(double distance)
     return color;
 }
 
-void NoderView::drawBackground(QPainter *painter, const QRectF &r)
+void NoderGraphicsView::drawBackground(QPainter *painter, const QRectF &r)
 {
     QGraphicsView::drawBackground(painter, r);
 
@@ -330,4 +329,12 @@ void NoderView::drawBackground(QPainter *painter, const QRectF &r)
             painter->drawPoint(dot);
         }
     }
+}
+
+NoderView::NoderView(QWidget *parent)
+    : PzaSplitter(parent)
+{
+    _view = new NoderGraphicsView(this);
+
+    addWidget(_view);
 }

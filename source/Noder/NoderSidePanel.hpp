@@ -31,16 +31,16 @@ class NoderDefValArea : public PzaSpoiler
         void del(NoderVariable *var);
 };
 
-class NoderVarArea : public PzaSpoiler
+class NoderVariableArea : public PzaSpoiler
 {
     Q_OBJECT
 
     public:
-        NoderVarArea(QWidget *parent = nullptr);
-        ~NoderVarArea() = default;
+        NoderVariableArea(QWidget *parent = nullptr);
+        ~NoderVariableArea() = default;
 
         void addVariable(void);
-        void removeVariable(NoderVariable *target);
+        void removeVariable(void);
         void selectVar(NoderVariable *target);
 
     private:
@@ -60,6 +60,19 @@ class NoderVarArea : public PzaSpoiler
         void varRemoved(NoderVariable *var);
 };
 
+class NoderScenarioArea : public PzaSpoiler
+{
+    Q_OBJECT
+
+    public:
+        NoderScenarioArea(QWidget *parent = nullptr);
+        ~NoderScenarioArea() = default;
+
+    private:
+        PzaWidget *_main;
+        QVBoxLayout *_layout;
+};
+
 class NoderSidePanel : public QScrollArea
 {
     public:
@@ -70,6 +83,6 @@ class NoderSidePanel : public QScrollArea
         PzaWidget *_main;
         QVBoxLayout *_layout;
         PzaSpoiler *_varSp;
-        NoderVarArea *_varArea;
-        NoderPropertyArea *_propertyArea;
+        NoderVariableArea *_varArea;
+        NoderScenarioArea *_scenarioArea;
 };
