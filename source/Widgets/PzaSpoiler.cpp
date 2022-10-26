@@ -9,7 +9,7 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
     
     _layout = new QVBoxLayout(this);
     _header = new QToolButton(this);
-    _content = new QStackedWidget(this);
+    _content = new PzaStackedWidget(this);
 
     _header->setAutoRaise(true);
 

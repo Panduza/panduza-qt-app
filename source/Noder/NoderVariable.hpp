@@ -53,6 +53,7 @@ class NoderVariable : public PzaWidget
         void activate(void);
         void typeChanged(void);
         void nameChanged(const QString &name);
+        void dead(void);
 };
 
 class NoderValBool : public PzaPropertyTable

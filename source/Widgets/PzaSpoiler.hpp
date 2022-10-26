@@ -4,7 +4,7 @@
 #include <PzaWidget.hpp>
 #include <QVBoxLayout>
 #include <QToolButton>
-#include <QStackedWidget>
+#include <PzaStackedWidget.hpp>
 
 class PzaSpoiler : public PzaWidget
 {
@@ -20,11 +20,11 @@ class PzaSpoiler : public PzaWidget
         void removeWidget(QWidget *w);
         void setCurrentWidget(QWidget *w);
 
-        const QStackedWidget *content(void) {return _content;}
+        const PzaStackedWidget *content(void) {return _content;}
 
     private:
         bool _fold;
-        QStackedWidget *_content;
+        PzaStackedWidget *_content;
         QToolButton *_header;
         QVBoxLayout *_layout;
 

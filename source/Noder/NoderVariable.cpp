@@ -122,6 +122,7 @@ NoderValBool::NoderValBool(QWidget *parent)
     : PzaPropertyTable(parent)
 {
     _valueBox = addProperty<PzaCheckBox>("Default value");
+    updateValue(_valueBox->checkState());
     connect(_valueBox, &PzaCheckBox::stateChanged, this, &NoderValBool::updateValue);
 }
 
@@ -134,6 +135,7 @@ NoderValInt::NoderValInt(QWidget *parent)
     : PzaPropertyTable(parent)
 {
     _valueBox = addProperty<PzaSpinBox>("Default value");
+    updateValue(_valueBox->value());
     connect(_valueBox, &PzaSpinBox::valueChanged, this, &NoderValInt::updateValue);
 }
 
@@ -146,6 +148,7 @@ NoderValFloat::NoderValFloat(QWidget *parent)
     : PzaPropertyTable(parent)
 {
     _valueBox = addProperty<PzaDoubleSpinBox>("Default value");
+    updateValue(_valueBox->value());
     connect(_valueBox, &PzaDoubleSpinBox::valueChanged, this, &NoderValFloat::updateValue);
 }
 
@@ -158,6 +161,7 @@ NoderValString::NoderValString(QWidget *parent)
     : PzaPropertyTable(parent)
 {
     _textBox = addProperty<PzaLineEdit>("Default value");
+    updateText();
     connect(_textBox, &PzaLineEdit::editingFinished, this, &NoderValString::updateText);
 }
 

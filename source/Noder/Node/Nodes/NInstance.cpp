@@ -70,6 +70,9 @@ void Instance::updatePin(void)
     _pin = newPin;
 
     connect(_var, &NoderVariable::nameChanged, _pin, &Pin::setName);
+    connect(_var, &NoderVariable::dead, this, [&]() {
+        deleteLater();
+    });
 }
 
 void Instance::setVariable(NoderVariable *var)

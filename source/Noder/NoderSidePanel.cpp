@@ -98,6 +98,7 @@ void NoderVariableArea::removeVariable(void)
     PzaUtils::DeleteFromVector<NoderVariable *>(_varList, _selectedVar);
     _propertyArea->deleteProperty(_selectedVar);
     _defValArea->del(_selectedVar);
+    _selectedVar->dead();
     _selectedVar->deleteLater();
 
     if (index != _varList.size()) {
