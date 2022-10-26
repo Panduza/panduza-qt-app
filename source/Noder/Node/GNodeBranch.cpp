@@ -3,7 +3,5 @@
 GNodeBranch::GNodeBranch(const QString &name)
     : GNodeExec(name, 1, 0)
 {
-    _type = NodeProperty::Type::Branch;
-
-    setup();
+    setType(NodeProperty::Type::Branch);
 }

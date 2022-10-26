@@ -99,15 +99,13 @@ void Pin::connectLink(Link *link)
     onEventConnect();
     _node->onEventConnect();
     _node->refreshNode();
-    _node->update();
-    _node->updateLinks();
 }
 
 void Pin::removeLink(Link *link)
 {
     GNode *otherNode = nullptr;
     Pin *otherPin = nullptr;
-
+    
     otherPin = link->oppositePin(this);
     if (!otherPin)
         return ;
@@ -117,13 +115,12 @@ void Pin::removeLink(Link *link)
     PzaUtils::DeleteFromVector<GNode *>(_linkedNodes, otherNode);
     PzaUtils::DeleteFromVector<Pin *>(_linkedPins, otherPin);
 
-    showWidgets();
+    if (!linked())
+        showWidgets();
 
     onEventDisconnect();
     _node->refreshNode();
     _node->onEventDisconnect();
-    _node->update();
-    _node->updateLinks();
 }
 
 void Pin::removeLinks(void)

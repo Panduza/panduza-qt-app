@@ -24,7 +24,6 @@ class NoderGraphicsView : public QGraphicsView
         NoderGraphicsView(QWidget *parent = nullptr);
         ~NoderGraphicsView() = default;
 
-    protected:
         void mouseMoveEvent(QMouseEvent *event) override;
         void mousePressEvent(QMouseEvent *event) override;
         void mouseReleaseEvent(QMouseEvent *event) override;
@@ -51,10 +50,6 @@ class NoderGraphicsView : public QGraphicsView
         void selectNode(GNode *node);
         void initViewMenu(void);
         void setViewMenuCallback(QMenu *menu);
-        bool isInEllipse(QRectF &rect, QPointF &point);
-        double inline calcRadius(double a, double b, double theta);
-        double ellispeDistance(QRectF &rect, QPointF &point);
-        QColor distanceColor(double distance);
 
     signals:
         void nodeSelected(GNode *);

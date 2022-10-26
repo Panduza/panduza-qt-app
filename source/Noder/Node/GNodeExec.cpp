@@ -1,16 +1,14 @@
 #include <GNodeExec.hpp>
 
 GNodeExec::GNodeExec(const QString &name, bool in, bool out)
-    : GNode(name)
+    : GNodeBasic(name)
 {
-    _type = NodeProperty::Type::Exec;
+    setType(NodeProperty::Type::Exec);
 
     if (in)
         _execIn = addInput<PinDecl::Exec>("");
     if (out)
         _execOut = addOutput<PinDecl::Exec>("");
-
-    setup();
 }
 
 GNodeExec::GNodeExec(const QString &name)

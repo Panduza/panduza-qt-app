@@ -1,9 +1,7 @@
 #include <GNodeOp.hpp>
 
 GNodeOp::GNodeOp(const QString &name)
-    : GNode(name)
+    : GNodeBasic(name)
 {
-    _type = NodeProperty::Type::Operation;
-
-    setup();
+    setType(NodeProperty::Type::Operation);
 }

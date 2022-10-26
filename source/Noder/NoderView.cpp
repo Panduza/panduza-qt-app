@@ -4,6 +4,7 @@
 
 #include <GNode.hpp>
 #include <Nodes/NInstance.hpp>
+#include <Nodes/NFMath.hpp>
 
 NoderGraphicsView::NoderGraphicsView(QWidget *parent)
     : QGraphicsView(parent),
@@ -22,7 +23,6 @@ NoderGraphicsView::NoderGraphicsView(QWidget *parent)
 
     setRenderHint(QPainter::Antialiasing);
     setCacheMode(QGraphicsView::CacheBackground);
-    setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setDragMode(QGraphicsView::NoDrag);
 
@@ -138,14 +138,9 @@ void NoderGraphicsView::contextMenuEvent(QContextMenuEvent *event)
     _viewMenu->popup(event->globalPos());
 }
 
-#include <QColorDialog>
-
 void NoderGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-   // QGraphicsView::mousePressEvent(event);
-
-    QColorDialog *lol = new QColorDialog();
-    lol->exec();
+    QGraphicsView::mousePressEvent(event);
 
     _clickpos = mapToScene(event->pos());
 }
@@ -193,12 +188,9 @@ void NoderGraphicsView::initViewMenu(void)
 
 void NoderGraphicsView::selectNode(GNode *node)
 {
-    qDebug() << "New node selected" << node->name();
     _selectedNode = node;
     nodeSelected(node);
 }
-
-#include <QColorDialog>
 
 GNode *NoderGraphicsView::createNode(const NoderDataBase::t_CreateNode &f, const QPointF &pos)
 {
@@ -238,75 +230,6 @@ void NoderGraphicsView::showEvent(QShowEvent *event)
     QGraphicsView::showEvent(event);
 }
 
-bool NoderGraphicsView::isInEllipse(QRectF &rect, QPointF &point)
-{
-  double h, k, a, b, x, y;
-
-  h = rect.center().x();
-  k = rect.center().y();
-
-  a = rect.size().width() / 2;
-  b = rect.size().height() / 2;
-
-  x = point.x();
-  y = point.y();
-
-  return ((pow(x - h, 2) / pow(a, 2) + pow(y - k, 2) / pow(b, 2)) <= 1.0);
-}
-
-double inline NoderGraphicsView::calcRadius(double a, double b, double theta)
-{
-  return (1 / (sqrt(pow(cos(theta), 2) / pow(a, 2) + pow(sin(theta), 2) / pow(b, 2))));
-}
-
-double NoderGraphicsView::ellispeDistance(QRectF &rect, QPointF &point)
-{
-    double h, k, a, b, x, y;
-    QPointF dist;
-    double theta, thetamax;
-    double r, rmax;
-    QPointF border, maxborder;
-    QLineF line;
-    QLineF linemax;
-    double perc;
-
-    h = rect.center().x();
-    k = rect.center().y();  
-    
-    a = rect.size().width() / 2;
-    b = rect.size().height() / 2;   
-    
-    x = point.x();
-    y = point.y();
-
-    dist = QPointF(x - h, y - k);
-
-    theta = qAtan(dist.y() / dist.x());
-    thetamax = qAtan((rect.bottomRight().y() - k) / (rect.bottomRight().x() - h));
-
-    r = calcRadius(a, b, theta);
-    rmax = calcRadius(a, b, thetamax);
-
-    border = QPointF(h + r * cos(theta), k + r * sin(theta));
-    maxborder = QPointF(h + rmax * cos(thetamax),k + rmax * sin(thetamax));
-
-    line = QLineF(border, point);
-    linemax = QLineF(maxborder, rect.bottomRight());
-
-    perc = 100.0 - std::clamp(line.length() * 100.0 / linemax.length(), 0.0, 100.0);
-
-    return perc;
-}
-
-QColor NoderGraphicsView::distanceColor(double distance)
-{
-    QColor color;
-
-    color = _style.gridCol();
-    color.setAlphaF(distance / 100.0 * _style.gridCol().alphaF());
-    return color;
-}
-
 void NoderGraphicsView::drawBackground(QPainter *painter, const QRectF &r)
 {
     QGraphicsView::drawBackground(painter, r);
@@ -317,8 +240,6 @@ void NoderGraphicsView::drawBackground(QPainter *painter, const QRectF &r)
     QPointF dot;
     QRectF ellispe;
     int gridStep;
-    double distance;
-    double realcenterx;
     QPointF mirror;
 
     double scale = transform().m11();
@@ -335,26 +256,16 @@ void NoderGraphicsView::drawBackground(QPainter *painter, const QRectF &r)
 
     realtl = mapToScene(rect().topLeft());
     realbr = mapToScene(rect().bottomRight());
-    realcenterx = (realbr.x() + realtl.x()) / 2.0;
 
     gridtl = QPoint(std::floor(realtl.x() / gridStep - 1), std::floor(realtl.y() / gridStep - 1));
     gridbr = QPoint(std::floor(realbr.x() / gridStep + 1), std::floor(realbr.y() / gridStep + 1));
     ellispe = QRectF(realtl, realbr);
     pen.setWidth(1.0 / transform().m11());
+    pen.setColor(_style.gridCol());
 
     for (int y = gridtl.y(); y <= gridbr.y(); y++) {
         for (int x = gridtl.x(); x <= gridbr.x(); x++) {
             dot = QPoint(x * gridStep, y * gridStep);
-            if (!isInEllipse(ellispe, dot)) {
-                mirror = dot;
-                if (mirror.x() < realcenterx)
-                    mirror.setX(realcenterx + (realcenterx - mirror.x()));
-                distance = ellispeDistance(ellispe, mirror);
-                pen.setColor(distanceColor(distance));
-            }
-            else {
-                pen.setColor(_style.gridCol());
-            }
             painter->setPen(pen);
             painter->drawPoint(dot);
         }
@@ -382,8 +293,6 @@ void NoderNodeArea::setCurrentNode(GNode *node)
 {
     setCurrentWidget(node->propTable());
 }
-
-#include <QColorDialog>
 
 NoderViewPanel::NoderViewPanel(NoderGraphicsView *view, QWidget *parent)
     : PzaScrollArea(parent)

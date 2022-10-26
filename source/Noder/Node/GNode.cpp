@@ -6,54 +6,26 @@
 
 GNode::GNode(const QString &name)
     : QGraphicsObject(),
-    _spacingY(2),
-    _spacingMid(10),
     _plugzone(20),
+    _nodebox(0, 0, 0, 0),
+    _pinBox(0, 0, 0, 0),
     _entryMiny(25),
     _pinBoxOffsetY(10),
-    _pinBox(0, 0, 0, 0),
-    _pinBoxIn(0, 0, 0, 0),
-    _pinBoxOut(0, 0, 0, 0),
     _name(name),
-    _userName(name),
     _boxRadius(6),
     _boxColor("#353535")
-{
-    _propTable = new PzaPropertyTable();
-    if (_type != NodeProperty::Type::Instance) {
-        _propUserName = _propTable->addProperty<PzaLineEdit>("Custom Name");
-        _propUserName->setText(_userName);
-        _propName = _propTable->addProperty<PzaLabel>("Name");
-        _propName->setText(_userName);
-        connect(_propUserName, &PzaLineEdit::textChanged, this, &GNode::setUserName);
-    }
-    _propType = _propTable->addProperty<PzaLabel>("Node Type");
-    _propType->setText(NBD_INST.nodeTypeName(_type));
-    _propBoxColor = _propTable->addProperty<PzaColorBox>("Box color");
-}
-
-void GNode::setup(void)
 {
     setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
+    setCacheMode(QGraphicsItem::NoCache);
     setAcceptHoverEvents(true);
     setOpacity(0.9f);
     setZValue(0);
 
     setOnTop();
-
-    if (_hasTitle) {
-        _title = new struct title;
-        _title->box = QRect(0, 0, 0, 0);
-        _title->size = QSize(0, 20);
-        _title->font.setPixelSize(14);
-        _title->fontcolor = QColor("#DEDEDE");
-        _title->offset = QSize(20, 5);
-        _title->boxcolor = titleColor(_type);
-    }
 
     if (_mapPlugFiles.empty()) {
         _mapPlugFiles[PlugType::Array] = initPlugType(PlugType::Array);
@@ -76,18 +48,20 @@ void GNode::setup(void)
         _mapPlugColoredNcIcon[PinProperty::Type::Enum] = loadColorNcValue(PinProperty::Type::Enum);
         _mapPlugColoredNcIcon[PinProperty::Type::Interface] = loadColorNcValue(PinProperty::Type::Interface);
     }
+
+    _propTable = new PzaPropertyTable();
 }
 
-const QColor &GNode::titleColor(const NodeProperty::Type &type)
+void GNode::setColor(const QColor &color)
 {
-    static std::unordered_map<NodeProperty::Type, QColor> map = {
-        {NodeProperty::Type::Exec, QColor("blue")},
-        {NodeProperty::Type::Operation, QColor("green")},
-        {NodeProperty::Type::Branch, QColor("gray")},
-        {NodeProperty::Type::Event, QColor("red")},
-    };
+    _boxColor = color;
+    refreshNode();
+}
 
-    return map[type];
+void GNode::setType(NodeProperty::Type type)
+{
+    _type = type;
+    _propType->setText(NBD_INST.nodeTypeName(_type));
 }
 
 struct GNode::plugIcon GNode::initPlugType(PlugType type)
@@ -180,22 +154,6 @@ void GNode::forEachPin(std::function<void(Pin *pin)> func)
    forEachOutputPin(func);
 }
 
-void GNode::forEachMultiPin(std::function<void(struct multiPin *s)> func)
-{
-    for (auto s: _multiPinStructs) {
-        func(s);
-    }
-}
-
-struct GNode::multiPin *GNode::findMultiPinFromList(std::vector<Pin *> *list)
-{
-    for (auto s: _multiPinStructs) {
-        if (s->list == list)
-            return s;
-    }
-    return nullptr;
-}
-
 void GNode::setScene(NoderScene *scene)
 {
     scene->addItem(this);
@@ -229,8 +187,6 @@ void GNode::createProxyWidget(Pin *pin)
     pin->grid()->setContentsMargins(0, 0, 0, 0);
     pin->grid()->setHorizontalSpacing(5);
     pin->grid()->setVerticalSpacing(0);
-    
-    pin->proxy()->setWidget(pin);
 
     label = new PzaLabel(pin->name(), pin);
     if (_type == NodeProperty::Type::Instance) {
@@ -239,7 +195,11 @@ void GNode::createProxyWidget(Pin *pin)
         font.setItalic(true);
         label->setFont(font);
     }
-    connect(pin, &Pin::nameChanged, label, &PzaLabel::setText);
+    connect(pin, &Pin::nameChanged, label, [&, label, pin](const QString &name) {
+        label->setText(name);
+        pin->adjustSize();
+        refreshNode();
+    });
     
     label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     pin->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -248,135 +208,87 @@ void GNode::createProxyWidget(Pin *pin)
     else
         pin->grid()->addWidget(label, 0, 0, Qt::AlignLeft);
 
-    if (pin->isOutput())
-        return ;
-
-    switch (pin->type()) {
-        case PinProperty::Type::Bool:
-        {
-            PzaCheckBox *checkbox = new PzaCheckBox(pin);
-            checkbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-            pin->grid()->setColumnStretch(1, 1);
-            pin->grid()->addWidget(checkbox, 0, 1);
-            connect(pin, &Pin::askWidget, this, [pin, checkbox]() {
-                pin->setValue(checkbox->isChecked());
-            });
-            break ;
-        }
-        case PinProperty::Type::Int:
-        {
-            PzaSpinBox *valuebox = new PzaSpinBox(pin);
-            PinDecl::Int *iPin = static_cast<PinDecl::Int*>(pin);
-            valuebox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-            valuebox->setMinimum(iPin->min());
-            valuebox->setMaximum(iPin->max());
-            valuebox->setFixedWidth(100);
-            pin->grid()->addWidget(valuebox, 0, 1);
-            connect(pin, &Pin::askWidget, this, [pin, valuebox]() {
-                pin->setValue(valuebox->value());
-            });
-            break ;
-        }
-        case PinProperty::Type::Float:
-        {
-            PzaDoubleSpinBox *valuebox = new PzaDoubleSpinBox(pin);
-            PinDecl::Float *fPin = static_cast<PinDecl::Float*>(pin);
-            valuebox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-            valuebox->setMinimum(fPin->min());
-            valuebox->setMaximum(fPin->max());
-            valuebox->setFixedWidth(100);
-            pin->grid()->addWidget(valuebox, 0, 1);
-            connect(pin, &Pin::askWidget, this, [pin, valuebox]() {
-                pin->setValue(valuebox->value());
-            });
-            break ;
-        }
-        case PinProperty::Type::String:
-        {
-            PzaLineEdit *txtbox = new PzaLineEdit(pin);
-            txtbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-            txtbox->setFixedWidth(100);
-            pin->grid()->addWidget(txtbox, 0, 1);
-            connect(pin, &Pin::askWidget, this, [pin, txtbox]() {
-                pin->setValue(txtbox->text());
-            });
-            break ;
-        }
-        case PinProperty::Type::Enum:
-        {
-            PzaComboBox *combo = new PzaComboBox(pin);
-            combo->setFixedWidth(100);
-            connect(combo, &PzaComboBox::clicked, this, [&, pin](){
-                forEachInputPin([](Pin *pin)
-                {
-                    if (dynamic_cast<PinDecl::Enum *>(pin)) {
-                        pin->proxy()->setZValue(0);
+    if (pin->isInput()) {
+        switch (pin->type()) {
+            case PinProperty::Type::Bool:
+            {
+                PzaCheckBox *checkbox = new PzaCheckBox(pin);
+                checkbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+                pin->grid()->setColumnStretch(1, 1);
+                pin->grid()->addWidget(checkbox, 0, 1);
+                connect(pin, &Pin::askWidget, this, [pin, checkbox]() {
+                    pin->setValue(checkbox->isChecked());
+                });
+                break ;
+            }
+            case PinProperty::Type::Int:
+            {
+                PzaSpinBox *valuebox = new PzaSpinBox(pin);
+                PinDecl::Int *iPin = static_cast<PinDecl::Int*>(pin);
+                valuebox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+                valuebox->setMinimum(iPin->min());
+                valuebox->setMaximum(iPin->max());
+                valuebox->setFixedWidth(100);
+                pin->grid()->addWidget(valuebox, 0, 1);
+                connect(pin, &Pin::askWidget, this, [pin, valuebox]() {
+                    pin->setValue(valuebox->value());
+                });
+                break ;
+            }
+            case PinProperty::Type::Float:
+            {
+                PzaDoubleSpinBox *valuebox = new PzaDoubleSpinBox(pin);
+                PinDecl::Float *fPin = static_cast<PinDecl::Float*>(pin);
+                valuebox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+                valuebox->setMinimum(fPin->min());
+                valuebox->setMaximum(fPin->max());
+                valuebox->setFixedWidth(100);
+                pin->grid()->addWidget(valuebox, 0, 1);
+                connect(pin, &Pin::askWidget, this, [pin, valuebox]() {
+                    pin->setValue(valuebox->value());
+                });
+                break ;
+            }
+            case PinProperty::Type::String:
+            {
+                PzaLineEdit *txtbox = new PzaLineEdit(pin);
+                txtbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+                txtbox->setFixedWidth(100);
+                pin->grid()->addWidget(txtbox, 0, 1);
+                connect(pin, &Pin::askWidget, this, [pin, txtbox]() {
+                    pin->setValue(txtbox->text());
+                });
+                break ;
+            }
+            case PinProperty::Type::Enum:
+            {
+                PzaComboBox *combo = new PzaComboBox(pin);
+                combo->setFixedWidth(100);
+                connect(combo, &PzaComboBox::clicked, this, [&, pin](){
+                    forEachInputPin([](Pin *pin)
+                    {
+                        if (dynamic_cast<PinDecl::Enum *>(pin)) {
+                            pin->proxy()->setZValue(0);
+                        }
+                    });
+                    pin->proxy()->setZValue(1);
+                });
+                PinDecl::Enum *ePin = static_cast<PinDecl::Enum*>(pin);
+                connect(ePin, &PinDecl::Enum::initialized, this, [&, ePin, combo](){
+                    combo->clear();
+                    for (auto item: ePin->list()) {
+                        combo->addItem(item);
                     }
                 });
-                pin->proxy()->setZValue(1);
-            });
-            PinDecl::Enum *ePin = static_cast<PinDecl::Enum*>(pin);
-            connect(ePin, &PinDecl::Enum::initialized, this, [&, ePin, combo](){
-                combo->clear();
-                for (auto item: ePin->list()) {
-                    combo->addItem(item);
-                }
-            });
-            pin->grid()->addWidget(combo, 0, 1);
-            break ;
+                pin->grid()->addWidget(combo, 0, 1);
+                break ;
+            }
+            default:
+                break ;
         }
-        default:
-            return ;
     }
-}
-
-void GNode::addPintoMultiPin(struct multiPin *s)
-{
-    int index;
-    Pin *pin;
-    Pin *last;
-    int size;
-
-    size = s->list->size();
-
-    if (size == s->max)
-        return ;
-    last = s->list->back();
-    index = PzaUtils::IndexInVector<Pin *>(_inputPins, last);
-    if (index == -1)
-        return ;
-    pin = addPinFromType(s->type, s->pinName + " " + QString::number(size), PinProperty::Direction::Input, index + 1);
-    s->list->push_back(pin);
-}
-
-void GNode::createProxyMultiPin(struct multiPin *s)
-{
-    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
-    PzaMoreLess *moreLess = new PzaMoreLess(s->name);
-
-    s->proxy = proxy;
-    s->w = moreLess;
-
-    proxy->setWidget(s->w);
-
-    connect(moreLess, &PzaMoreLess::more, this, [&, s]{
-        addPintoMultiPin(s);
-    });
-
-    connect(moreLess, &PzaMoreLess::less, this, [&, s]{
-        int index;
-        Pin *last;
-
-        if ((int)s->list->size() == s->min)
-            return ;
-        last = s->list->back();
-        index = PzaUtils::IndexInVector<Pin *>(_inputPins, last);
-        if (index == -1)
-            return ;
-        PzaUtils::DeleteFromVector<Pin *>(*s->list, last);
-
-        deletePin(last);
-    });
+    pin->proxy()->setWidget(pin);
+    refreshNode();
 }
 
 void GNode::deletePin(Pin *pin)
@@ -401,27 +313,17 @@ void GNode::replacePin(Pin *oldPin, Pin *newPin)
     }
 }
 
-QVariant GNode::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-    return QGraphicsItem::itemChange(change, value);
-}
-
 void GNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    QPoint click;
-    bool wasSelected;
+    QPoint click = mapFromScene(event->scenePos()).toPoint();
+    bool wasSelected = isSelected();
 
-    wasSelected = isSelected();
-
-    click = mapFromScene(event->scenePos()).toPoint();
+    QGraphicsItem::mousePressEvent(event);
 
     setOnTop();
 
-    if (!isInPlugzone(click)) {
-        QGraphicsItem::mousePressEvent(event);
-        if (isSelected() && wasSelected == false)
-            selected();
-        return ;
+    if (isSelected() && wasSelected == false) {
+        selected();
     }
 
     forEachPin([&](Pin *pin) {
@@ -440,6 +342,7 @@ void GNode::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseMoveEvent(event);
 
     setOnTop();
+
 
     updateLinks();
 }
@@ -473,132 +376,6 @@ void GNode::updateLinks()
     });
 }
 
-void GNode::pinBoxSize()
-{
-    _pinBox.setWidth(0);
-    _pinBox.setHeight(0);
-
-    _pinBoxIn.setWidth(0);
-    _pinBoxIn.setHeight(0);
-    forEachInputPin([&](Pin *pin) {
-        _pinBoxIn.setWidth(std::max(_pinBoxIn.width(), pin->sizeHint().width()));
-        _pinBoxIn.setHeight(_pinBoxIn.height() + std::max(pin->sizeHint().height(), _entryMiny) + _spacingY);
-    });
-
-    _pinBoxOut.setWidth(0);
-    _pinBoxOut.setHeight(0);
-    forEachOutputPin([&](Pin *pin) {
-        _pinBoxOut.setWidth(std::max(_pinBoxOut.width(), pin->sizeHint().width()));
-        if (_hasTitle)
-            _pinBoxOut.setHeight(_pinBoxOut.height() + std::max(pin->sizeHint().height(), _entryMiny) + _spacingY);
-        else
-            _pinBoxOut.setHeight(_pinBoxOut.height() + std::max(pin->sizeHint().height(), _entryMiny));
-    });
-    
-    if (_multiPinStructs.size() > 0)
-        _pinBoxOut.setHeight(_pinBoxOut.height() + 10);
-
-    for (auto s: _multiPinStructs) {
-        _pinBoxOut.setWidth(std::max(_pinBoxOut.width(), s->w->sizeHint().width()));
-        _pinBoxOut.setHeight(_pinBoxOut.height() + std::max(s->w->sizeHint().height(), _entryMiny) + _spacingY);
-    }
-
-    if (needSpacing())
-        _pinBox.setWidth(_pinBoxIn.width() + _pinBoxOut.width() + _spacingMid);
-    else
-        _pinBox.setWidth(_pinBoxIn.width() + _pinBoxOut.width());
-
-    if (_pinBoxIn.height() < _pinBoxOut.height())
-        _pinBox.setHeight(_pinBoxOut.height());
-    else
-        _pinBox.setHeight(_pinBoxIn.height());
-}
-
-void GNode::titleboxSize()
-{
-    _title->fontbox = QFontMetrics(_title->font).boundingRect(_userName);
-    _title->box.setWidth(_title->fontbox.width());
-    _title->box.setHeight(_title->fontbox.height() + _title->offset.height() * 2);
-
-    _title->fontpos.setX(_title->offset.width());
-    _title->fontpos.setY(-_title->fontbox.y() + _title->box.height() / 2 - _title->fontbox.height() / 2);
-}
-
-void GNode::resizeBoxes()
-{
-    QSize max(0, 0);
-
-    if (_hasTitle)
-        max.setWidth(std::max(max.width(), _title->box.width()));
-    max.setWidth(std::max(max.width(), _pinBox.width()));
-
-    if (_hasTitle)
-        _title->box.setWidth(max.width() + _plugzone * 2);
-    _pinBox.setWidth(max.width());
-
-    if (needSpacing())
-        _pinBoxIn.setWidth(_pinBox.width() - _pinBoxOut.width() - _spacingMid);
-    else
-        _pinBoxIn.setWidth(_pinBox.width() - _pinBoxOut.width());
-
-    _nodebox.setWidth(max.width() + _plugzone * 2);
-    if (_hasTitle)
-        _nodebox.setHeight(_title->box.height() + _pinBox.height() + _pinBoxOffsetY);
-    else
-        _nodebox.setHeight(_pinBox.height());
-}
-
-void GNode::positionEntries(void)
-{
-    QPoint origin;
-    QPoint pos;
-    int posMaxY = 0;
-
-    if (_hasTitle)
-        origin.setY(_title->box.height() + _pinBoxOffsetY);
-    else
-        origin.setY(0);
-    origin.setX(_plugzone);
-    pos = origin;
-
-    origin = pos;
-
-    forEachInputPin([&](Pin *pin) {
-        if (pin->proxy()) {
-            setPinPlugzone(pin, pos);
-            pin->proxy()->setGeometry(QRect(pos, pin->size()));
-            pin->setPos(pos);
-            pin->setScenePos(mapFromScene(pos));
-            pos.setY(pos.y() + pin->size().height() + _spacingY);
-            posMaxY = std::max(posMaxY, pos.y());
-        }
-    });
-
-    pos = origin;
-    pos.setX(_plugzone + _pinBoxIn.width());
-    if (needSpacing())
-        pos.setX(pos.x() + _spacingMid);
-
-    forEachOutputPin([&](Pin *pin) {
-        if (pin->proxy()) {
-            setPinPlugzone(pin, pos);
-            pin->proxy()->setGeometry(QRect(pos, pin->size()));
-            pin->setScenePos(mapToScene(pos));
-            pos.setY(pos.y() + pin->size().height() + _spacingY);
-            posMaxY = std::max(posMaxY, pos.y());
-        }
-    });
-
-    if (_multiPinStructs.size() > 0)
-        pos.setY(pos.y());
-
-    for (auto s: _multiPinStructs) {
-        s->proxy->setGeometry(QRect(pos, s->w->size()));
-        pos.setY(pos.y() + s->w->size().height() + _spacingY);
-        posMaxY = std::max(posMaxY, pos.y());
-    }
-}
-
 void GNode::setPinPlugzone(Pin *pin, const QPoint &origin)
 {
     QPoint pos;
@@ -610,62 +387,6 @@ void GNode::setPinPlugzone(Pin *pin, const QPoint &origin)
 
     pos.setY(origin.y() + pin->size().height() / 2 - _plugzone / 2);
     pin->setPlugzone(QRect(pos.x(), pos.y(), _plugzone, _plugzone));
-}
-
-void GNode::refreshNode(void)
-{
-    prepareGeometryChange();
-    
-    if (_hasTitle)
-        titleboxSize();
-    pinBoxSize();
-    resizeBoxes();
-    setWidgetSize();
-    positionEntries();
-    updateLinks();
-
-    update();
-}
-
-void GNode::setWidgetSize(void)
-{
-    QSize size(0, 0);
-    
-    forEachInputPin([&](Pin *pin) {
-        size.setWidth(_pinBoxIn.width());
-        size.setHeight(std::max(pin->sizeHint().height(), _entryMiny));
-        pin->setSize(size);
-    });
-    forEachOutputPin([&](Pin *pin) {
-        size.setWidth(_pinBoxOut.width());
-        size.setHeight(std::max(pin->sizeHint().height(), _entryMiny));
-        pin->setSize(size);
-    });
-    for (auto s: _multiPinStructs) {
-        s->w->setFixedSize(_pinBoxOut.width(), std::max(s->w->sizeHint().height(), _entryMiny));
-    }
-}
-
-void GNode::drawBoxes(QPainter *painter)
-{
-    painter->setPen(Qt::NoPen);
-    
-    painter->setBrush(_boxColor);
-    painter->drawRoundedRect(_nodebox, _boxRadius, _boxRadius);
-    if (_hasTitle) {
-        painter->setBrush(_title->boxcolor);
-        painter->drawRoundedRect(_title->box, _boxRadius, _boxRadius);
-    }
-    if (isSelected()) {
-        painter->setBrush(Qt::NoBrush);
-        painter->setPen(QPen("#00E7FF"));
-        painter->drawRoundedRect(_nodebox, _boxRadius, _boxRadius);
-    }
-    else {
-        painter->setBrush(Qt::NoBrush);
-        painter->setPen(QPen("#BBBBBB"));
-        painter->drawRoundedRect(_nodebox, _boxRadius, _boxRadius);
-    }
 }
 
 void GNode::drawValuePlug(QPainter *painter, Pin *pin)
@@ -718,43 +439,7 @@ void GNode::process(void)
     exec();
 }
 
-void GNode::paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWidget *w)
-{
-    (void)option;
-    (void)w;
-    QPen pen;
-    QBrush brush;
-
-    refreshNode();
-
-    drawBoxes(painter);
-    if (_hasTitle) {
-        pen.setColor(_title->fontcolor);
-        pen.setWidth(2);
-
-        painter->setPen(pen);
-        painter->setFont(_title->font);
-        painter->drawText(_title->fontpos, _userName);
-    }
-
-    forEachPin([&](Pin *pin) {
-        switch (pin->type()) {
-            case PinProperty::Type::Array:
-                drawArrayPlug(painter, pin);
-                break;
-            case PinProperty::Type::Exec:
-                drawExecPlug(painter, pin);
-                break;
-            default:
-                drawValuePlug(painter, pin);
-                break;
-        }
-    });
-}
-
 GNode::~GNode()
 {
     _propTable->deleteLater();
-    if (_hasTitle)
-        delete _title;
 }

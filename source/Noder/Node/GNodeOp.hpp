@@ -1,12 +1,10 @@
 #pragma once
 
-#include <GNode.hpp>
+#include <GNodeBasic.hpp>
 
-class GNodeOp : public GNode
+class GNodeOp : public GNodeBasic
 {
     protected:
         GNodeOp(const QString &name);
         ~GNodeOp() = default;
-
-        GNode *branch(void) override {return nullptr;}
 };

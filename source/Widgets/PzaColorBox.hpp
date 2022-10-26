@@ -6,7 +6,7 @@
 
 #include <QDialog>
 #include <QPushButton>
-class PzaColorBox : public QLabel
+class PzaColorBox : public PzaWidget
 {
     Q_OBJECT
 
@@ -20,9 +20,7 @@ class PzaColorBox : public QLabel
 
     private:
         QColor _color;
-        QColorDialog *_dialog;
 
     signals:
-        void colorChanged(void);
-        void lol(void);
+        void colorChanged(const QColor &color);
 };

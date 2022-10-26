@@ -20,6 +20,7 @@ target_sources(${PROG}
 	Node/Pin.cpp
 	Node/GNodeBranch.cpp
 	Node/GNode.cpp
+	Node/GNodeBasic.cpp
 	Node/GNodeOp.cpp
 	Node/GNodeEvent.cpp
 	Node/GNodeExec.cpp

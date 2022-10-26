@@ -31,36 +31,28 @@ class GNode : public QGraphicsObject
     Q_OBJECT
 
     public:
-        struct multiPin {
-            int min;
-            int max;
-            PinProperty::Type type;
-            std::vector<Pin *> *list;
-            QGraphicsProxyWidget *proxy;
-            PzaWidget *w;
-            QString name;
-            QString pinName;
-        };
-
         GNode(const QString &name);
 
         const QString &name() const {return _name;}
-        const QString &userName() const {return _userName;}
 
         void process(void);
         virtual void exec(void) {};
-        virtual GNode *branch(void) = 0;
+        virtual GNode *branch(void) {return nullptr;}
+        
+        virtual void refreshNode(void) = 0;
 
         NoderScene *scene() const {return _scene;}
         void setScene(NoderScene *scene);
-        void refreshNode(void);
         PzaPropertyTable *propTable(void) const {return _propTable;}
         bool isInPlugzone(const QPoint &pos);
         void forEachInputPin(std::function<void(Pin *pin)> func);
         void forEachOutputPin(std::function<void(Pin *pin)> func);
         void forEachPin(std::function<void(Pin *pin)> func);
-        void forEachMultiPin(std::function<void(struct multiPin *s)> func);
         void updateLinks(void);
+
+        void mousePressEvent(QGraphicsSceneMouseEvent * event) override;
+        void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
+        void mouseReleaseEvent(QGraphicsSceneMouseEvent * event) override;
 
         virtual void onEventConnect(void) {};
         virtual void onEventDisconnect(void) {};
@@ -73,17 +65,6 @@ class GNode : public QGraphicsObject
             Value = 0,
             Array,
             Exec
-        };
-
-        struct title {
-            QRect box;
-            QSize size;
-            QFont font;
-            QRect fontbox;
-            QPoint fontpos;
-            QColor fontcolor;
-            QSize offset;
-            QColor boxcolor;
         };
 
         struct plugIconData {
@@ -100,18 +81,11 @@ class GNode : public QGraphicsObject
 
         void setup(void);
         
-        struct multiPin *findMultiPinFromList(std::vector<Pin *> *list);
+        virtual void setType(NodeProperty::Type type);
         void deletePin(Pin *pin);
         void replacePin(Pin *oldPin, Pin *newPin);
         const NodeProperty::Type &nodeType(void) const {return _type;}
-        const QColor &titleColor(const NodeProperty::Type &type);
         const QColor &plugColor(PinProperty::Type type);
-
-        template <typename N>
-        N *addInput(const QString &name)
-        {
-            return addPin<N>(name, PinProperty::Direction::Input);
-        }
 
         template <typename N>
         N *addOutput(const QString &name)
@@ -119,88 +93,21 @@ class GNode : public QGraphicsObject
             return addPin<N>(name, PinProperty::Direction::Output);
         }
 
-        template <typename N>
-        void addMultiInput(const QString &name, const QString &pinName, std::vector<Pin *> *list, int min, int max)
-        {
-            Pin *basePin;
-            struct GNode::multiPin *s;
-
-            if (min < 1)
-                return;
-
-            s = new struct multiPin;
-            s->min = min;
-            s->max = max;
-            s->list = list;
-            s->name = name;
-            s->pinName = pinName;
-
-            basePin = addPin<N>(pinName + " " + QString::number(0), PinProperty::Direction::Input);
-            s->type = basePin->type();
-            list->push_back(basePin);
-            _multiPinStructs.push_back(s);
-
-            for (int i = 1; i < min; i++)
-                addPintoMultiPin(s);
-
-            createProxyMultiPin(s);
-        }
-        template <typename N>
-        void addMultiInput(const QString &name, const QString &pinName, std::vector<Pin *> *list, unsigned int min)
-        {
-            addMultiInput<N>(name, pinName, list, min, -1);
-        }
-        template <typename N>
-        void addMultiInput(const QString &pinName, std::vector<Pin *> *list)
-        {
-            addMultiInput<N>("", pinName, list, 2);
-        }
-        template <typename N>
-        void addMultiInput(const QString &pinName, std::vector<Pin *> *list, unsigned int min)
-        {
-            addMultiInput<N>("", pinName, list, min, -1);
-        }
-        template <typename N>
-        void addMultiInput(std::vector<Pin *> *list, unsigned int min)
-        {
-            addMultiInput<N>("", list, min, -1);
-        }
-        template <typename N>
-        void addMultiInput(std::vector<Pin *> *list, unsigned int min, unsigned int max)
-        {
-            addMultiInput<N>("", list, min, max);
-        }
-        template <typename N>
-        void addMultiInput(std::vector<Pin *> *list)
-        {
-            addMultiInput<N>("", "", list, 2, -1);
-        }
-
         Pin *addPinFromType(PinProperty::Type type, const QString &name, PinProperty::Direction direction, int index = -1);
 
-        bool _hasTitle = true;
         NodeProperty::Type _type;
 
-    private:
-        QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
         QRectF boundingRect() const override { return _nodebox; }
-        void mousePressEvent(QGraphicsSceneMouseEvent * event) override;
-        void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
-        void mouseReleaseEvent(QGraphicsSceneMouseEvent * event) override;
-        void paint(QPainter *, QStyleOptionGraphicsItem const *, QWidget *) override;
-
+        
         void createProxyWidget(Pin *pin);
         void setOnTop(void);
-        void pinBoxSize(void);
-        void titleboxSize(void);
-        void resizeBoxes(void);
-        void positionEntries(void);
-        void setWidgetSize(void);
-        void drawBoxes(QPainter *painter);
+        virtual void pinBoxSize(void) = 0;
+        virtual void resizeBoxes(void) = 0;
+        virtual void positionEntries(void) = 0;
+        virtual void setWidgetSize(void) = 0;
+        virtual void drawBoxes(QPainter *painter) = 0;
         inline bool needSpacing(void) {return (_inputPins.size() > 0 && _outputPins.size() > 0);}
         void setPinPlugzone(Pin *pin, const QPoint &origin);
-        void createProxyMultiPin(struct multiPin *s);
-        void addPintoMultiPin(struct multiPin *s);
         QString loadPlugIcon(const QString &filename);
         struct plugIcon initPlugType(PlugType type);
         QByteArray loadColorValue(const PinProperty::Type &type, bool linked);
@@ -254,33 +161,23 @@ class GNode : public QGraphicsObject
         NoderScene *_scene;
         std::vector<Pin *> _inputPins;
         std::vector<Pin *> _outputPins;
-        std::vector<struct multiPin *> _multiPinStructs;
 
-        struct title *_title = nullptr;
-
-        int _spacingY;
-        int _spacingMid;
         int _plugzone;
         int _plugRadius;
-        int _entryMiny;
-        int _pinBoxOffsetY;
         QRect _nodebox;
         QRect _pinBox;
-        QRect _pinBoxIn;
-        QRect _pinBoxOut;
+        int _entryMiny;
+        int _pinBoxOffsetY;
         QString _name;
-        QString _userName;
         int _boxRadius;
         QColor _boxColor;
 
         PzaPropertyTable *_propTable = nullptr;
-        PzaLabel *_propName = nullptr;
         PzaLabel *_propType = nullptr;
         PzaColorBox *_propBoxColor = nullptr;
-        PzaLineEdit *_propUserName = nullptr;
 
-    private slots:
-        void setUserName(const QString &name) {_userName = name;}
+    public slots:
+        void setColor(const QColor &color);
 
     signals:
         void selected(void);

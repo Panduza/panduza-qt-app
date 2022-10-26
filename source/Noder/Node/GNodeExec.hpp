@@ -1,8 +1,8 @@
 #pragma once
 
-#include <GNode.hpp>
+#include <GNodeBasic.hpp>
 
-class GNodeExec : public GNode
+class GNodeExec : public GNodeBasic
 {
     protected:
         GNodeExec(const QString &name, bool in, bool out);
