@@ -9,6 +9,7 @@
 #include <QSvgRenderer>
 #include <QFile>
 #include <QFont>
+#include <QCoreApplication>
 
 #include <Node/Pin.hpp>
 #include <PzaComboBox.hpp>
@@ -45,14 +46,16 @@ class GNode : public QGraphicsObject
         void setScene(NoderScene *scene);
         PzaPropertyTable *propTable(void) const {return _propTable;}
         bool isInPlugzone(const QPoint &pos);
-        void forEachInputPin(std::function<void(Pin *pin)> func);
-        void forEachOutputPin(std::function<void(Pin *pin)> func);
-        void forEachPin(std::function<void(Pin *pin)> func);
+        void forEachInputPin(const std::function<void(Pin *pin)> &func);
+        void forEachOutputPin(const std::function<void(Pin *pin)> &func);
+        void forEachPin(const std::function<void(Pin *pin)> &func);
         void updateLinks(void);
+        void setPos(const QPointF &pos);
 
-        void mousePressEvent(QGraphicsSceneMouseEvent * event) override;
-        void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
-        void mouseReleaseEvent(QGraphicsSceneMouseEvent * event) override;
+        void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+        void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+        void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+        void keyReleaseEvent(QKeyEvent *event) override;
 
         virtual void onEventConnect(void) {};
         virtual void onEventDisconnect(void) {};
@@ -171,6 +174,7 @@ class GNode : public QGraphicsObject
         QString _name;
         int _boxRadius;
         QColor _boxColor;
+        QPointF _prevPos;
 
         PzaPropertyTable *_propTable = nullptr;
         PzaLabel *_propType = nullptr;

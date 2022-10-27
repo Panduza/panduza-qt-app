@@ -9,6 +9,7 @@
 
 #include "NoderView.hpp"
 #include "NoderSidePanel.hpp"
+#include "NoderGraphArea.hpp"
 #include <PanduzaEngine.hpp>
 #include <PzaMenuBar.hpp>
 #include <PzaMenu.hpp>

@@ -8,6 +8,8 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
     _scenarioArea = new NoderScenarioArea(_main);
     _varArea = new NoderVariableArea(_main);
 
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
     _layout->addWidget(_scenarioArea);
     _layout->addWidget(_varArea);
     _layout->addStretch(1);
@@ -159,6 +161,22 @@ NoderScenarioArea::NoderScenarioArea(QWidget *parent)
 {
     _main = new PzaWidget(this);
     _layout = new QVBoxLayout(_main);
+    _moreLess = new PzaMoreLess("Add scenario", _main);
 
+    _layout->addWidget(_moreLess);
+
+    connect(_moreLess, &PzaMoreLess::more, this, &NoderScenarioArea::addScenario);
+    connect(_moreLess, &PzaMoreLess::less, this, &NoderScenarioArea::removeScenario);
+   
     addWidget(_main);
+}
+
+void NoderScenarioArea::addScenario(void)
+{
+
+}
+
+void NoderScenarioArea::removeScenario(void)
+{
+    
 }

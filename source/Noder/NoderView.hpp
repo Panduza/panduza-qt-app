@@ -37,13 +37,15 @@ class NoderGraphicsView : public QGraphicsView
         void dropEvent(QDropEvent *event) override;
         void dragMoveEvent(QDragMoveEvent *event);
 
+        void setMoveCanceled(bool state) {_moveCanceled = state;}
+
     private:
         QPointF _clickpos;
         NoderScene *_scene;
         NoderStyle _style;
-        QPointF _curpos;
         PzaMenu *_viewMenu;
         GNode *_selectedNode = nullptr;
+        bool _moveCanceled = false;
 
         GNode *createNode(const NoderDataBase::t_CreateNode &f, const QPointF &pos = QPointF(0, 0));
 

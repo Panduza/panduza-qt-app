@@ -27,4 +27,6 @@ target_sources(${PROG}
 	Widgets/PzaScrollArea.cpp
 	Widgets/PzaColorBox.cpp
 	Widgets/PzaStackedWidget.cpp
+	Widgets/PzaTabWidget.cpp
+	Widgets/PzaTextEdit.cpp
 )

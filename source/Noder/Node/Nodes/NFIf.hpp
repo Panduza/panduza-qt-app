@@ -9,7 +9,7 @@ class If : public GNodeBranch
         If();
         ~If() = default;
 
-        GNode *branch(void);
+        GNode *branch(void) override;
     
     private:
         PinDecl::Bool *_cond;

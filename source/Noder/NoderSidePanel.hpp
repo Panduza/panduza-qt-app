@@ -72,6 +72,10 @@ class NoderScenarioArea : public PzaSpoiler
     private:
         PzaWidget *_main;
         QVBoxLayout *_layout;
+        PzaMoreLess *_moreLess;
+
+        void addScenario(void);
+        void removeScenario(void);
 };
 
 class NoderSidePanel : public PzaScrollArea

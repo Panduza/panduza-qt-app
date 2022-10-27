@@ -9,31 +9,24 @@ NoderFrame::NoderFrame(PanduzaEngine *engine)
 
     PzaMenuBar *menuBar = mainMenuBar();
 
-    NoderView *view = new NoderView(this);
-
     //connect(engine, &PanduzaEngine::interfaceRegistered, this, &NoderFrame::newInterface);
 
     _mainLayout = new QVBoxLayout(this);
     _mainLayout->setContentsMargins(0, 0, 0, 5);
     _mainLayout->setSpacing(0);
 
-    QTabWidget *tabBar = new QTabWidget(this);
-
-    tabBar->addTab(view, "Scenario 1");
-
-    PzaSplitter *graphFrame = new PzaSplitter(Qt::Horizontal, this);
-    graphFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    graphFrame->setContentsMargins(0, 0, 0, 0);
-    graphFrame->setStyleSheet("background-color: #181818;");
+    PzaSplitter *mainFrame = new PzaSplitter(Qt::Horizontal, this);
+    mainFrame->setStyleSheet("background-color: #181818;");
 
     NoderSidePanel *sidePanel = new NoderSidePanel(this);
+    NoderGraphArea *graphArea = new NoderGraphArea(this);
 
-    graphFrame->addWidget(sidePanel);
-    graphFrame->addWidget(tabBar);
+    mainFrame->addWidget(sidePanel);
+    mainFrame->addWidget(graphArea);
+    mainFrame->setStretchFactor(1, 1);
 
-    graphFrame->setStretchFactor(1, 1);
     _mainLayout->addWidget(menuBar);
-    _mainLayout->addWidget(graphFrame);
+    _mainLayout->addWidget(mainFrame);
 }
 
 PzaMenuBar *NoderFrame::mainMenuBar(void)

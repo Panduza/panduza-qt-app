@@ -27,7 +27,7 @@ void Array::onEventConnect()
     forEachInputPin([&](Pin *pin) {
         if (pin->linked()) {
             _type = pin->type();
-            from = pin->linkedPins().at(0);
+            from = pin->linkedPins().front();
             to = pin;
             return ;
         }

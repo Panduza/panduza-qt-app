@@ -135,7 +135,7 @@ void Pin::disconnectLink(const QPointF &pos)
     Link *link;
     Pin *from;
 
-    link = _links.at(0);
+    link = _links.front();
 
     from = link->oppositePin(this);
     delete link;
@@ -367,7 +367,7 @@ void Array::onEventConnect(void)
 {
     PinDecl::Array *target;
 
-    target = dynamic_cast<PinDecl::Array *>(linkedPins().at(0));
+    target = dynamic_cast<PinDecl::Array *>(linkedPins().front());
     if (target == nullptr || target->elemType() == PinProperty::Type::Wildcard)
         return ;
     setElemType(target->elemType());

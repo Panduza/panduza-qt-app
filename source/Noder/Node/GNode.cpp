@@ -3,6 +3,7 @@
 #include <NoderDataBase.hpp>
 #include <NoderScene.hpp>
 #include <Link.hpp>
+#include <NoderView.hpp>
 
 GNode::GNode(const QString &name)
     : QGraphicsObject(),
@@ -134,21 +135,21 @@ QByteArray GNode::loadColorNcValue(const PinProperty::Type &type)
 
 }
 
-void GNode::forEachInputPin(std::function<void(Pin *pin)> func)
+void GNode::forEachInputPin(const std::function<void(Pin *pin)> &func)
 {
     for (auto pin: _inputPins) {
         func(pin);
     }
 }
 
-void GNode::forEachOutputPin(std::function<void(Pin *pin)> func)
+void GNode::forEachOutputPin(const std::function<void(Pin *pin)> &func)
 {
     for (auto pin: _outputPins) {
         func(pin);
     }
 }
 
-void GNode::forEachPin(std::function<void(Pin *pin)> func)
+void GNode::forEachPin(const std::function<void(Pin *pin)> &func)
 {
    forEachInputPin(func);
    forEachOutputPin(func);
@@ -318,7 +319,9 @@ void GNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QPoint click = mapFromScene(event->scenePos()).toPoint();
     bool wasSelected = isSelected();
 
-    QGraphicsItem::mousePressEvent(event);
+   QGraphicsItem::mousePressEvent(event);
+
+    _prevPos = pos();
 
     setOnTop();
 
@@ -343,13 +346,31 @@ void GNode::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
     setOnTop();
 
-
     updateLinks();
 }
 
 void GNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mouseReleaseEvent(event);
+
+    _prevPos = pos();
+}
+
+void GNode::keyReleaseEvent(QKeyEvent *event)
+{
+    QGraphicsItem::keyReleaseEvent(event);
+    
+    switch (event->key()) {
+        case Qt::Key_Escape:
+        {
+            setPos(_prevPos);
+            if (scene()->mouseGrabberItem() == this)
+                ungrabMouse();
+            static_cast<NoderGraphicsView *>(_scene->views().first())->setMoveCanceled(true);
+        }
+        default:
+            break;
+    }
 }
 
 void GNode::setOnTop(void)
@@ -411,6 +432,13 @@ void GNode::drawArrayPlug(QPainter *painter, Pin *pin)
 
     svgr.load(xml.toUtf8());
     svgr.render(painter, pin->plugzoneIcon());
+}
+
+void GNode::setPos(const QPointF &pos)
+{
+    QGraphicsItem::setPos(pos);
+
+    updateLinks();
 }
 
 void GNode::drawExecPlug(QPainter *painter, Pin *pin)

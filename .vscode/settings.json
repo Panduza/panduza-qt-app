@@ -93,7 +93,10 @@
         "qdialog": "cpp",
         "qgraphicsproxywidget": "cpp",
         "ranges": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "qcoreapplication": "cpp",
+        "qtabwidget": "cpp",
+        "qtextedit": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

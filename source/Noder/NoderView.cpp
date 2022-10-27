@@ -59,10 +59,8 @@ void NoderGraphicsView::dropEvent(QDropEvent *event)
     mime = static_cast<const PzaMimeData *>(event->mimeData());
     variable = static_cast<NoderVariable *>(mime->dataPtr());
     if (variable) {
-        GNode *node;
         QPointF pos = mapToScene(event->position().toPoint());
-        
-        node = createNode(GNode::CreateNode<Instance>, pos);
+        GNode *node = createNode(GNode::CreateNode<Instance>, pos);
         static_cast<Instance *>(node)->setVariable(variable);
     }
 }
@@ -96,12 +94,23 @@ void NoderGraphicsView::keyPressEvent(QKeyEvent *event)
 
     switch (event->key()) {
         case Qt::Key_Shift:
+        {
             setDragMode(QGraphicsView::RubberBandDrag);
-            break ;
-        case Qt::Key_Delete:
-            QList<QGraphicsItem *> items;
+            break;
+        }
+        default:
+            break;
+    }
+}
 
-            items = _scene->selectedItems();
+void NoderGraphicsView::keyReleaseEvent(QKeyEvent *event)
+{
+    QGraphicsView::keyReleaseEvent(event);
+
+    switch (event->key()) {
+        case Qt::Key_Delete:
+        {
+            QList<QGraphicsItem *> items = _scene->selectedItems();
             for (auto item: items) {
                 GNode *node = dynamic_cast<GNode *>(item);
                 if (node) {
@@ -112,22 +121,11 @@ void NoderGraphicsView::keyPressEvent(QKeyEvent *event)
                 _scene->removeItem(item);
                 delete item;
             }
-            //_scene->executeScene();
             break;
-    }
-}
-
-void NoderGraphicsView::keyReleaseEvent(QKeyEvent *event)
-{
-    QGraphicsView::keyReleaseEvent(event);
-
-    switch (event->key()) {
+        }
         case Qt::Key_A:
             _scene->executeScene();
             break;
-        case Qt::Key_Shift:
-            setDragMode(QGraphicsView::ScrollHandDrag);
-            break ;
     }
 }
 
@@ -140,29 +138,37 @@ void NoderGraphicsView::contextMenuEvent(QContextMenuEvent *event)
 
 void NoderGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-    QGraphicsView::mousePressEvent(event);
+    if (_moveCanceled == true)
+        _moveCanceled = false;
 
     _clickpos = mapToScene(event->pos());
+    
+    QGraphicsView::mousePressEvent(event);
 }
 
 void NoderGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-    QPointF diff;
 
-    if (scene()->mouseGrabberItem() == nullptr && event->buttons() == Qt::LeftButton) {
+    if (_moveCanceled == false
+        && scene()->mouseGrabberItem() == nullptr
+        && event->buttons() == Qt::LeftButton)
+    {
         if ((event->modifiers() & Qt::ShiftModifier) == 0) {
-            diff = _clickpos - mapToScene(event->pos());
+            if (dragMode() != QGraphicsView::ScrollHandDrag)
+                setDragMode(QGraphicsView::ScrollHandDrag);
+            QPointF diff = _clickpos - mapToScene(event->pos());
             setSceneRect(sceneRect().translated(diff.x(), diff.y()));
         }
-    }
-    else {
-        _curpos = mapToScene(event->pos());
+        else {
+        }
     }
     QGraphicsView::mouseMoveEvent(event);
 }
 
 void NoderGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
+    setDragMode(QGraphicsView::NoDrag);
+    
     QGraphicsView::mouseReleaseEvent(event);
 }
 
@@ -226,7 +232,7 @@ void NoderGraphicsView::setViewMenuCallback(QMenu *menu)
 
 void NoderGraphicsView::showEvent(QShowEvent *event)
 {
-    scene()->setSceneRect(rect());
+    //scene()->setSceneRect(rect());
     QGraphicsView::showEvent(event);
 }
 
@@ -277,7 +283,6 @@ NoderNodeArea::NoderNodeArea(QWidget *parent)
 {
 
 }
-
 
 void NoderNodeArea::addNode(GNode *node)
 {

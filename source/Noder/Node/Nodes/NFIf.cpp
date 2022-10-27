@@ -14,7 +14,7 @@ GNode *If::branch(void)
 
     val = _cond->value();
     if (val)
-        return (_true->linkedNodes().size() > 0) ? _true->linkedNodes().at(0) : nullptr;
+        return (_true->linkedNodes().size() > 0) ? _true->linkedNodes().front() : nullptr;
     else
-        return (_false->linkedNodes().size() > 0) ? _false->linkedNodes().at(0) : nullptr;
+        return (_false->linkedNodes().size() > 0) ? _false->linkedNodes().front() : nullptr;
 }

@@ -5,7 +5,10 @@ target_include_directories(${PROG} PRIVATE "./Node/Nodes")
 target_sources(${PROG}
 	PRIVATE
 	NoderFrame.cpp
+	NoderGraphArea.cpp
 	NoderView.cpp
+	NoderConsole.cpp
+	NoderOutputArea.cpp
 	NoderStyle.cpp
 	Node/Nodes/NFDelay.cpp
 	Node/Nodes/NFString.cpp
