@@ -21,6 +21,9 @@ NoderFrame::NoderFrame(PanduzaEngine *engine)
     NoderSidePanel *sidePanel = new NoderSidePanel(this);
     NoderGraphArea *graphArea = new NoderGraphArea(this);
 
+    connect(sidePanel, &NoderSidePanel::newScenarioCreated, graphArea, &NoderGraphArea::newScenario);
+    connect(sidePanel, &NoderSidePanel::newFunctionCreated, graphArea, &NoderGraphArea::newFunction);
+
     mainFrame->addWidget(sidePanel);
     mainFrame->addWidget(graphArea);
     mainFrame->setStretchFactor(1, 1);

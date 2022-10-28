@@ -6,11 +6,21 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
     _main = new PzaWidget(this);
     _layout = new QVBoxLayout(_main);
     _scenarioArea = new NoderScenarioArea(_main);
+    _functionArea = new NoderFunctionArea(_main);
     _varArea = new NoderVariableArea(_main);
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
+    connect(_scenarioArea, &NoderScenarioArea::scenarioCreated, this, [&](NoderScenario *scenario) {
+        newScenarioCreated(scenario);
+    });
+
+    connect(_functionArea, &NoderFunctionArea::functionCreated, this, [&](NoderFunction *function) {
+        newFunctionCreated(function);
+    });
+
     _layout->addWidget(_scenarioArea);
+    _layout->addWidget(_functionArea);
     _layout->addWidget(_varArea);
     _layout->addStretch(1);
 
@@ -162,21 +172,60 @@ NoderScenarioArea::NoderScenarioArea(QWidget *parent)
     _main = new PzaWidget(this);
     _layout = new QVBoxLayout(_main);
     _moreLess = new PzaMoreLess("Add scenario", _main);
+    _scenarioTable = new PzaWidget(_main);
+    _scenarioTableLayout = new QVBoxLayout(_scenarioTable);
 
     _layout->addWidget(_moreLess);
+    _layout->addWidget(_scenarioTable);
 
     connect(_moreLess, &PzaMoreLess::more, this, &NoderScenarioArea::addScenario);
     connect(_moreLess, &PzaMoreLess::less, this, &NoderScenarioArea::removeScenario);
-   
+
     addWidget(_main);
 }
 
 void NoderScenarioArea::addScenario(void)
 {
-
+    NoderScenario *scenario = new NoderScenario(this);
+    
+    _scenarioList.push_back(scenario);
+    _scenarioTableLayout->addWidget(scenario->panelName());
+    scenarioCreated(scenario);
 }
 
 void NoderScenarioArea::removeScenario(void)
+{
+    
+}
+
+NoderFunctionArea::NoderFunctionArea(QWidget *parent)
+    : PzaSpoiler("Function", parent)
+{
+    _main = new PzaWidget(this);
+    _layout = new QVBoxLayout(_main);
+    _moreLess = new PzaMoreLess("Add Function", _main);
+    _functionTable = new PzaWidget(_main);
+    _functionTableLayout = new QVBoxLayout(_functionTable);
+
+    _layout->addWidget(_moreLess);
+    _layout->addWidget(_functionTable);
+
+    connect(_moreLess, &PzaMoreLess::more, this, &NoderFunctionArea::addFunction);
+    connect(_moreLess, &PzaMoreLess::less, this, &NoderFunctionArea::removeFunction);
+   
+    addWidget(_main);
+}
+
+void NoderFunctionArea::addFunction(void)
+{
+    NoderFunction *function = new NoderFunction(this);
+
+    _functionList.push_back(function);
+    _functionTableLayout->addWidget(function->panelName());
+    functionCreated(function);
+}
+
+void NoderFunctionArea::removeFunction(void)
 {
     
 }

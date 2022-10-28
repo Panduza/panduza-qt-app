@@ -8,6 +8,7 @@
 #include <QSplitter>
 
 #include "NoderView.hpp"
+#include "NoderFunction.hpp"
 #include "NoderSidePanel.hpp"
 #include "NoderGraphArea.hpp"
 #include <PanduzaEngine.hpp>

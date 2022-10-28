@@ -38,20 +38,24 @@ class NoderGraphicsView : public QGraphicsView
         void dragMoveEvent(QDragMoveEvent *event);
 
         void setMoveCanceled(bool state) {_moveCanceled = state;}
+        void setMenu(PzaMenu *menu) {_viewMenu = menu;}
+        void addNodeToMenu(PzaMenu *toMenu, const QString &name, const NoderDataBase::t_CreateNode &f);
 
     private:
         QPointF _clickpos;
-        NoderScene *_scene;
+        NoderScene *_scene = nullptr;
         NoderStyle _style;
-        PzaMenu *_viewMenu;
         GNode *_selectedNode = nullptr;
         bool _moveCanceled = false;
+        PzaMenu *_viewMenu = nullptr;
 
         GNode *createNode(const NoderDataBase::t_CreateNode &f, const QPointF &pos = QPointF(0, 0));
 
         void selectNode(GNode *node);
-        void initViewMenu(void);
         void setViewMenuCallback(QMenu *menu);
+
+    public slots:
+        void createNodeFromMenu(void);
 
     signals:
         void nodeSelected(GNode *);
@@ -90,6 +94,8 @@ class NoderView : public PzaSplitter
     public:
         NoderView(QWidget *parent = nullptr);
         ~NoderView() = default;
+
+        NoderGraphicsView *view() const {return _view;}
 
     private:
         NoderGraphicsView *_view;

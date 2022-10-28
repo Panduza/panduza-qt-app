@@ -6,6 +6,9 @@ target_sources(${PROG}
 	PRIVATE
 	NoderFrame.cpp
 	NoderGraphArea.cpp
+	NoderScenario.cpp
+	NoderMainEvent.cpp
+	NoderFunction.cpp
 	NoderView.cpp
 	NoderConsole.cpp
 	NoderOutputArea.cpp

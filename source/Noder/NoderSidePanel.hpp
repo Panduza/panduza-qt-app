@@ -9,6 +9,8 @@
 #include <PzaMoreLess.hpp>
 #include <PzaComboBox.hpp>
 #include <PzaPropertyTable.hpp>
+#include "NoderScenario.hpp"
+#include "NoderFunction.hpp"
 
 class NoderPropertyArea : public PzaSpoiler
 {
@@ -73,13 +75,44 @@ class NoderScenarioArea : public PzaSpoiler
         PzaWidget *_main;
         QVBoxLayout *_layout;
         PzaMoreLess *_moreLess;
+        PzaWidget *_scenarioTable;
+        QVBoxLayout *_scenarioTableLayout;
+        std::vector<NoderScenario *>_scenarioList;
 
         void addScenario(void);
         void removeScenario(void);
+    
+    signals:
+        void scenarioCreated(NoderScenario *scenario);
+};
+
+class NoderFunctionArea : public PzaSpoiler
+{
+    Q_OBJECT
+
+    public:
+        NoderFunctionArea(QWidget *parent = nullptr);
+        ~NoderFunctionArea() = default;
+
+    private:
+        PzaWidget *_main;
+        QVBoxLayout *_layout;
+        PzaMoreLess *_moreLess;
+        PzaWidget *_functionTable;
+        QVBoxLayout *_functionTableLayout;
+        std::vector<NoderFunction *>_functionList;
+
+        void addFunction(void);
+        void removeFunction(void);
+
+    signals:
+        void functionCreated(NoderFunction *function);
 };
 
 class NoderSidePanel : public PzaScrollArea
 {
+    Q_OBJECT
+
     public:
         NoderSidePanel(QWidget *parent = nullptr);
         ~NoderSidePanel() = default;
@@ -90,4 +123,9 @@ class NoderSidePanel : public PzaScrollArea
         PzaSpoiler *_varSp;
         NoderVariableArea *_varArea;
         NoderScenarioArea *_scenarioArea;
+        NoderFunctionArea *_functionArea;
+
+    signals:
+        void newScenarioCreated(NoderScenario *scenario);
+        void newFunctionCreated(NoderFunction *scenario);
 };

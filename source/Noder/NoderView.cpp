@@ -28,8 +28,6 @@ NoderGraphicsView::NoderGraphicsView(QWidget *parent)
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    initViewMenu();
 }
 
 void NoderGraphicsView::dragEnterEvent(QDragEnterEvent *event)
@@ -93,21 +91,6 @@ void NoderGraphicsView::keyPressEvent(QKeyEvent *event)
     QGraphicsView::keyPressEvent(event);
 
     switch (event->key()) {
-        case Qt::Key_Shift:
-        {
-            setDragMode(QGraphicsView::RubberBandDrag);
-            break;
-        }
-        default:
-            break;
-    }
-}
-
-void NoderGraphicsView::keyReleaseEvent(QKeyEvent *event)
-{
-    QGraphicsView::keyReleaseEvent(event);
-
-    switch (event->key()) {
         case Qt::Key_Delete:
         {
             QList<QGraphicsItem *> items = _scene->selectedItems();
@@ -126,14 +109,19 @@ void NoderGraphicsView::keyReleaseEvent(QKeyEvent *event)
         case Qt::Key_A:
             _scene->executeScene();
             break;
+        case Qt::Key_Shift:
+        {
+            setDragMode(QGraphicsView::RubberBandDrag);
+            break;
+        }
+        default:
+            break;
     }
 }
 
-void NoderGraphicsView::contextMenuEvent(QContextMenuEvent *event)
+void NoderGraphicsView::keyReleaseEvent(QKeyEvent *event)
 {
-    QGraphicsView::contextMenuEvent(event);
-
-    _viewMenu->popup(event->globalPos());
+    QGraphicsView::keyReleaseEvent(event);
 }
 
 void NoderGraphicsView::mousePressEvent(QMouseEvent *event)
@@ -172,26 +160,6 @@ void NoderGraphicsView::mouseReleaseEvent(QMouseEvent *event)
     QGraphicsView::mouseReleaseEvent(event);
 }
 
-void NoderGraphicsView::initViewMenu(void)
-{
-    PzaLabel *label;
-    QWidgetAction *ALabel;
-    
-    std::vector<PzaMenu *> &menus = NBD_INST.nodeMenuList();
-    _viewMenu = new PzaMenu(this);
-
-    label = new PzaLabel("Add node");
-    ALabel = new QWidgetAction(label);
-    ALabel->setDefaultWidget(label);
-
-    _viewMenu->addAction(ALabel);
-
-    for (auto menu: menus) {
-        setViewMenuCallback(menu);
-        _viewMenu->addMenu(menu);
-    }
-}
-
 void NoderGraphicsView::selectNode(GNode *node)
 {
     _selectedNode = node;
@@ -212,27 +180,25 @@ GNode *NoderGraphicsView::createNode(const NoderDataBase::t_CreateNode &f, const
     return node;
 }
 
-void NoderGraphicsView::setViewMenuCallback(QMenu *menu)
+void NoderGraphicsView::createNodeFromMenu(void)
 {
-    foreach(QAction *action, menu->actions()) {
-        if (action->menu()) {
-            setViewMenuCallback(action->menu());
-        }
-        else if (action) {
-            connect(action, &QAction::triggered, this, [&]
-            {
-                QAction *action = static_cast<QAction *>(sender());
-                action->data();
-                NoderDataBase::t_CreateNode f = action->data().value<NoderDataBase::t_CreateNode>();
-                createNode(f, _clickpos);
-            });
-        }
-    }
+    QAction *action = static_cast<QAction *>(sender());
+    action->data();
+    NoderDataBase::t_CreateNode f = action->data().value<NoderDataBase::t_CreateNode>();
+    createNode(f, _clickpos);
+}
+
+void NoderGraphicsView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QGraphicsView::contextMenuEvent(event);
+
+    if (_viewMenu)
+        _viewMenu->popup(event->globalPos());
 }
 
 void NoderGraphicsView::showEvent(QShowEvent *event)
 {
-    //scene()->setSceneRect(rect());
+    scene()->setSceneRect(rect());
     QGraphicsView::showEvent(event);
 }
 
@@ -276,6 +242,17 @@ void NoderGraphicsView::drawBackground(QPainter *painter, const QRectF &r)
             painter->drawPoint(dot);
         }
     }
+}
+
+void NoderGraphicsView::addNodeToMenu(PzaMenu *toMenu, const QString &name, const NoderDataBase::t_CreateNode &f)
+{
+    QAction *action;
+    
+    action = new QAction(name);
+    action->setData(QVariant::fromValue(f));
+    toMenu->addAction(action);
+    connect(action, &QAction::triggered, this, &NoderGraphicsView::createNodeFromMenu);
+
 }
 
 NoderNodeArea::NoderNodeArea(QWidget *parent)

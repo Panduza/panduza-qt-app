@@ -77,9 +77,7 @@ class NoderDataBase
         const QString &varTypeName(const NoderPanel::Type type);
         const QString &nodeTypeName(const NodeProperty::Type type);
         const std::vector<QString> &enumValues(const QString &name);
-        void initNodeMenuList(void);
 
-        std::vector<PzaMenu *> &nodeMenuList(void) {return _nodeMenuList;}
 
         static NoderDataBase &GetInstance(void)
         {
@@ -122,6 +120,6 @@ class NoderDataBase
     };
 
     private:
-        NoderDataBase();
+        NoderDataBase() = default;
         std::vector<PzaMenu *> _nodeMenuList;
 };
