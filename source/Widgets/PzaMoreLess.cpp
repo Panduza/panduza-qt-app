@@ -6,11 +6,11 @@ PzaMoreLess::PzaMoreLess(QWidget *parent)
     setAttribute(Qt::WA_StyledBackground, true);
 
     _layout = new QHBoxLayout(this);
-    _more = new QPushButton(this);
-    _less = new QPushButton(this);
+    _more = new PzaPushButton(this);
+    _less = new PzaPushButton(this);
 
-    connect(_more, &QPushButton::clicked, this, [&](){more();});
-    connect(_less, &QPushButton::clicked, this, [&](){less();});
+    connect(_more, &PzaPushButton::clicked, this, [&](){more();});
+    connect(_less, &PzaPushButton::clicked, this, [&](){less();});
 
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 

@@ -8,7 +8,6 @@ class Delay : public GNodeExec
 {
     public:
         Delay();
-        ~Delay() = default;
 
         void exec(void) override;
     private:

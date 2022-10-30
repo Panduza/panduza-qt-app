@@ -9,5 +9,4 @@ class PzaScrollArea : public QScrollArea
     
     public:
         PzaScrollArea(QWidget *parent = nullptr);
-        ~PzaScrollArea() = default;
 };

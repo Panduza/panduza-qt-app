@@ -4,7 +4,6 @@
 
 class Machine;
 class Group;
-class PanduzaEngine;
 
 namespace PzaInterface {
 
@@ -19,15 +18,12 @@ class Interface : public QObject
 
     protected:
         Interface(Group *group, const QString &name);
-        Interface() = default;
-        ~Interface() = default;
 
         typedef std::function<void(const QJsonDocument &json)> t_fAtts;
         typedef std::function<void(const QJsonDocument &json)> t_fCmds;
         std::unordered_map<QString, t_fAtts> _attsMap;
         std::unordered_map<QString, t_fCmds> _cmdsMap;
 
-        PanduzaEngine *_engine;
         Machine *_machine;
         QString _name;
         Group *_group;

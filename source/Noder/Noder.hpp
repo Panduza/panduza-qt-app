@@ -8,13 +8,11 @@
 #include <QColor>
 #include <QVariant>
 
-#include <PanduzaEngine.hpp>
 #include <PzaMenu.hpp>
 
 class Pin;
 class GNode;
-
-#define NBD_INST (NoderDataBase::GetInstance())
+class NoderFrame;
 
 struct PinProperty
 {
@@ -61,13 +59,24 @@ struct NoderPanel
     };
 };
 
-class NoderDataBase
+class Noder : public QObject
 {
-    public:
-        typedef std::function<GNode *(void)> t_CreateNode;
+    Q_OBJECT
 
-        NoderDataBase(NoderDataBase &other) = delete;
-        void operator=(const NoderDataBase &) = delete;
+    public:
+
+        static Noder &Get(void)
+        {
+            static Noder _database;
+            return _database;
+        }
+
+        NoderFrame *Frame = nullptr;
+        
+        Noder(Noder &other) = delete;
+        void operator=(const Noder &) = delete;
+
+        typedef std::function<GNode *(void)> t_CreateNode;
 
         Pin *pinTypeToObj(const PinProperty::Type type);
         const QString &pinTypeToStr(const PinProperty::Type type);
@@ -78,19 +87,11 @@ class NoderDataBase
         const QString &nodeTypeName(const NodeProperty::Type type);
         const std::vector<QString> &enumValues(const QString &name);
 
+        void forEachEnum(const std::function<void(const QString &name, const std::vector<QString> &list)> &f);
+        void forEachEnumName(const std::function<void(const QString &name)> &f);
+        void forEachEnumValues(const QString &name, const std::function<void(const QString &name)> &f);
 
-        static NoderDataBase &GetInstance(void)
-        {
-            static NoderDataBase _database;
-
-            return _database;
-        }
-
-        void forEachEnum(std::function<void(const QString &name, const std::vector<QString> &list)> func);
-        void forEachEnumName(std::function<void(const QString &name)>);
-        void forEachEnumValues(const QString &name, std::function<void(const QString &name)>);
-
-        void forEachVarType(std::function<void(NoderPanel::Type type)> func);
+        void forEachVarType(const std::function<void(NoderPanel::Type type)> &f);
         NoderPanel::Type varTypeFromName(const QString &name);
         PinProperty::Type panelTypeToPinType(const NoderPanel::Type type);
 
@@ -120,6 +121,6 @@ class NoderDataBase
     };
 
     private:
-        NoderDataBase() = default;
+        Noder();
         std::vector<PzaMenu *> _nodeMenuList;
 };

@@ -7,5 +7,4 @@ class PzaDoubleSpinBox : public QDoubleSpinBox
 {
     public:
         PzaDoubleSpinBox(QWidget *parent = nullptr);
-        ~PzaDoubleSpinBox() = default;
 };

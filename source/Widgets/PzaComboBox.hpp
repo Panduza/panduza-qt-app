@@ -10,12 +10,8 @@ class PzaComboBox : public QComboBox
 
     public:
         PzaComboBox(QWidget *parent = nullptr);
-        ~PzaComboBox() = default;
 
         void showPopup(void) override;
-
-    private:
-        bool _init = false;
 
     signals:
         void clicked(void);

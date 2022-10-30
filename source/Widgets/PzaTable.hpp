@@ -8,5 +8,4 @@ class PzaTable : public QTableWidget
 
     public:
         PzaTable(QWidget *parent = nullptr);
-        ~PzaTable() = default;
 };

@@ -5,23 +5,13 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
 {
     _main = new PzaWidget(this);
     _layout = new QVBoxLayout(_main);
-    _scenarioArea = new NoderScenarioArea(_main);
-    _functionArea = new NoderFunctionArea(_main);
-    _varArea = new NoderVariableArea(_main);
+    FunctionArea = new NoderFunctionArea(_main);
+    VariableArea = new NoderVariableArea(_main);
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    connect(_scenarioArea, &NoderScenarioArea::scenarioCreated, this, [&](NoderScenario *scenario) {
-        newScenarioCreated(scenario);
-    });
-
-    connect(_functionArea, &NoderFunctionArea::functionCreated, this, [&](NoderFunction *function) {
-        newFunctionCreated(function);
-    });
-
-    _layout->addWidget(_scenarioArea);
-    _layout->addWidget(_functionArea);
-    _layout->addWidget(_varArea);
+    _layout->addWidget(FunctionArea);
+    _layout->addWidget(VariableArea);
     _layout->addStretch(1);
 
     setStyleSheet("background-color: #252525");
@@ -166,36 +156,55 @@ void NoderDefValArea::del(NoderVariable *var)
     removeWidget(var->defValTable());
 }
 
-NoderScenarioArea::NoderScenarioArea(QWidget *parent)
-    : PzaSpoiler("Scenarios", parent)
+NoderFunctionProperties::NoderFunctionProperties(QWidget *parent)
+    : PzaPopup(parent)
 {
-    _main = new PzaWidget(this);
-    _layout = new QVBoxLayout(_main);
-    _moreLess = new PzaMoreLess("Add scenario", _main);
-    _scenarioTable = new PzaWidget(_main);
-    _scenarioTableLayout = new QVBoxLayout(_scenarioTable);
 
-    _layout->addWidget(_moreLess);
-    _layout->addWidget(_scenarioTable);
-
-    connect(_moreLess, &PzaMoreLess::more, this, &NoderScenarioArea::addScenario);
-    connect(_moreLess, &PzaMoreLess::less, this, &NoderScenarioArea::removeScenario);
-
-    addWidget(_main);
 }
 
-void NoderScenarioArea::addScenario(void)
+NoderFunctionEntry::NoderFunctionEntry(const QString &name, QWidget *parent)
+    : PzaWidget(parent)
 {
-    NoderScenario *scenario = new NoderScenario(this);
-    
-    _scenarioList.push_back(scenario);
-    _scenarioTableLayout->addWidget(scenario->panelName());
-    scenarioCreated(scenario);
+    _layout = new QHBoxLayout(this);
+    _deleteBtn = new PzaPushButton(this);
+    _propBtn = new PzaPushButton(this);
+    _name = new PzaLabel(this);
+    _propTable = new PzaPropertyTable(this);
+    _propDialog = new PzaPopup("Edit Function", _propTable, this);
+    _function = new NoderFunction();
+
+    _propDialog->setValidator();
+
+    _propName = _propTable->addProperty<PzaLineEdit>("Name");
+    _propName->setText(name);
+    _function->setName(name);
+
+    connect(_propDialog, &PzaPopup::validated, this, [&]() {
+        setName(_propName->text());
+    });
+
+    connect(_deleteBtn, &PzaPushButton::clicked, [&](){removed();});
+
+    _layout->setContentsMargins(0, 0, 0, 0);
+    _layout->setSpacing(5);
+
+    _propBtn->setFixedSize(20, 20);
+    _deleteBtn->setFixedSize(20, 20);
+
+    _propBtn->setMenu(_propDialog);
+
+    _layout->addWidget(_name);
+    _layout->addWidget(_propBtn);
+    _layout->addWidget(_deleteBtn);
+
+    setFocusProxy(_name);
+
+    NoderFrame::Get()->Graph->newFunction(_function);
 }
 
-void NoderScenarioArea::removeScenario(void)
+NoderFunctionEntry::~NoderFunctionEntry()
 {
-    
+    _function->deleteLater();
 }
 
 NoderFunctionArea::NoderFunctionArea(QWidget *parent)
@@ -203,29 +212,42 @@ NoderFunctionArea::NoderFunctionArea(QWidget *parent)
 {
     _main = new PzaWidget(this);
     _layout = new QVBoxLayout(_main);
-    _moreLess = new PzaMoreLess("Add Function", _main);
     _functionTable = new PzaWidget(_main);
     _functionTableLayout = new QVBoxLayout(_functionTable);
 
-    _layout->addWidget(_moreLess);
+    PzaPushButton *addBtn = new PzaPushButton(_main);
+
+    addBtn->setText("Add function");
+    connect(addBtn, &PzaPushButton::clicked, this, &NoderFunctionArea::addFunction);
+
+    _layout->addWidget(addBtn);
     _layout->addWidget(_functionTable);
 
-    connect(_moreLess, &PzaMoreLess::more, this, &NoderFunctionArea::addFunction);
-    connect(_moreLess, &PzaMoreLess::less, this, &NoderFunctionArea::removeFunction);
-   
     addWidget(_main);
 }
 
 void NoderFunctionArea::addFunction(void)
 {
-    NoderFunction *function = new NoderFunction(this);
+    auto getNameInVector = [](NoderFunctionEntry *entry) -> const QString & {
+        return entry->function()->name();
+    };
 
-    _functionList.push_back(function);
-    _functionTableLayout->addWidget(function->panelName());
-    functionCreated(function);
+    const QString &name = PzaUtils::allocateName<NoderFunctionEntry *>(_functionList, DEFAULT_FUNCTION_NAME, getNameInVector);
+
+    NoderFunctionEntry *entry = new NoderFunctionEntry(name, this);
+
+    entry->setName(name);
+
+    connect(entry, &NoderFunctionEntry::removed, this, &NoderFunctionArea::removeFunction);
+
+    _functionList.push_back(entry);
+    _functionTableLayout->addWidget(entry);
 }
 
 void NoderFunctionArea::removeFunction(void)
 {
-    
+    NoderFunctionEntry *entry = static_cast<NoderFunctionEntry *>(sender());
+
+    PzaUtils::DeleteFromVector(_functionList, entry);
+    entry->deleteLater();
 }

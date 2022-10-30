@@ -1,6 +1,6 @@
 #include <GNode.hpp>
 
-#include <NoderDataBase.hpp>
+#include <Noder.hpp>
 #include <NoderScene.hpp>
 #include <Link.hpp>
 #include <NoderView.hpp>
@@ -62,7 +62,7 @@ void GNode::setColor(const QColor &color)
 void GNode::setType(NodeProperty::Type type)
 {
     _type = type;
-    _propType->setText(NBD_INST.nodeTypeName(_type));
+    _propType->setText(Noder::Get().nodeTypeName(_type));
 }
 
 struct GNode::plugIcon GNode::initPlugType(PlugType type)
@@ -114,8 +114,8 @@ QByteArray GNode::loadColorValue(const PinProperty::Type &type, bool linked)
     QString xml;
     QColor color;
 
-    color = NBD_INST.plugColor(type);
-    color = NBD_INST.plugColor(type);
+    color = Noder::Get().plugColor(type);
+    color = Noder::Get().plugColor(type);
     if (linked)
         xml = _mapPlugFiles[PlugType::Value].plugC.data;
     else
@@ -427,7 +427,7 @@ void GNode::drawArrayPlug(QPainter *painter, Pin *pin)
     QString xml;
 
     xml = _mapPlugFiles[PlugType::Array].plugC.data;
-    const QColor &color = NBD_INST.plugColor(static_cast<PinDecl::Array *>(pin)->elemType());
+    const QColor &color = Noder::Get().plugColor(static_cast<PinDecl::Array *>(pin)->elemType());
     xml.replace("fill:#ffffff", "fill:" + color.name());
 
     svgr.load(xml.toUtf8());

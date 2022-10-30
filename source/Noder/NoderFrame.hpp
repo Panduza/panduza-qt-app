@@ -2,32 +2,38 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QPushButton>
 #include <QTabWidget>
 #include <QDockWidget>
 #include <QSplitter>
 
-#include "NoderView.hpp"
-#include "NoderFunction.hpp"
-#include "NoderSidePanel.hpp"
-#include "NoderGraphArea.hpp"
-#include <PanduzaEngine.hpp>
-#include <PzaMenuBar.hpp>
-#include <PzaMenu.hpp>
-#include <PzaSplitter.hpp>
+#include "Noder.hpp"
+
+class NoderSidePanel;
+class NoderGraph;
+class NoderMenuBar;
 
 class NoderFrame : public PzaWidget
 {
     public:
-        NoderFrame(PanduzaEngine *engine);
-        ~NoderFrame() = default;
 
-        PzaMenuBar *mainMenuBar(void);
+        NoderFrame(NoderFrame &other) = delete;
+        void operator=(const NoderFrame &) = delete;
+
+        static NoderFrame *Get(void)
+        {
+            static NoderFrame *frame;
+
+            if (frame == nullptr)
+                frame = new NoderFrame();
+            return frame;
+        }
+
+        NoderSidePanel *SidePanel = nullptr;
+        NoderGraph *Graph = nullptr;
+        NoderMenuBar *MenuBar = nullptr;
 
     private:
-        QVBoxLayout *_mainLayout;
-        PanduzaEngine *_engine;
-        QVBoxLayout *_sidePanelLayout;
+        NoderFrame();
 
-        PzaWidget *sidePanel(QWidget *parent);
+        QVBoxLayout *_layout;
 };

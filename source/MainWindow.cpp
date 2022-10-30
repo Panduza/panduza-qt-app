@@ -1,24 +1,17 @@
 #include "MainWindow.hpp"
 #include <NoderFrame.hpp>
-#include <PanduzaEngine.hpp>
 
 MainWindow::MainWindow()
     : QMainWindow(),
     _mainLayout(&_mainWidget)
 {
-
     resize(800, 600);
 
     loadTheme("DefaultTheme.json");
 
-    PanduzaEngine *engine = new PanduzaEngine();
-
-    PzaMenuBar *menuBar();
-    NoderFrame *frame = new NoderFrame(engine);
-
     _mainLayout.setContentsMargins(0, 0, 0, 0);
-    _mainLayout.addWidget(frame);
-    
+    _mainLayout.addWidget(Noder::Get().Frame);
+
     setCentralWidget(&_mainWidget);
 }
 

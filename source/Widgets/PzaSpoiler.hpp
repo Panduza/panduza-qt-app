@@ -11,7 +11,6 @@ class PzaSpoiler : public PzaWidget
     public:
         PzaSpoiler(QWidget *parent = nullptr);
         PzaSpoiler(const QString &name, QWidget *parent = nullptr);
-        ~PzaSpoiler() = default;
     
         void setFold(bool state);
         bool folded(void) const {return _fold;}

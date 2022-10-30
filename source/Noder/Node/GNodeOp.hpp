@@ -6,5 +6,4 @@ class GNodeOp : public GNodeBasic
 {
     protected:
         GNodeOp(const QString &name);
-        ~GNodeOp() = default;
 };

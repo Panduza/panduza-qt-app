@@ -11,7 +11,6 @@ class PzaProperty : public PzaWidget
 
     public:
         PzaProperty(const QString &name, QWidget *parent = nullptr);
-        ~PzaProperty() = default;
 
     protected:
         QHBoxLayout *_layout;
@@ -22,7 +21,6 @@ class PzaPropertyComboBox : public PzaProperty
 {
     public:
         PzaPropertyComboBox(const QString &name, QWidget *parent);
-        ~PzaPropertyComboBox() = default;
 
         PzaComboBox *comboBox(void) {return _prop;}
 

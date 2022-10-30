@@ -1,35 +1,40 @@
-#include <NoderDataBase.hpp>
+#include <Noder.hpp>
 #include <Pin.hpp>
-#include <PanduzaEngine.hpp>
 #include <GNode.hpp>
+#include "NoderFrame.hpp"
 
-void NoderDataBase::forEachEnum(std::function<void(const QString &name, const std::vector<QString> &list)> func)
+Noder::Noder()
+{
+    Frame = NoderFrame::Get();
+}
+
+void Noder::forEachEnum(const std::function<void(const QString &name, const std::vector<QString> &list)> &f)
 {
     for (auto var : _enumMap) {
-        func(var.first, var.second);
+        f(var.first, var.second);
     }
 }
 
-void NoderDataBase::forEachEnumName(std::function<void(const QString &name)> func)
+void Noder::forEachEnumName(const std::function<void(const QString &name)> &f)
 {
     for (auto var : _enumMap) {
-        func(var.first);
+        f(var.first);
     }
 }
 
-void NoderDataBase::forEachEnumValues(const QString &name, std::function<void(const QString &name)> func)
+void Noder::forEachEnumValues(const QString &name, const std::function<void(const QString &name)> &f)
 {
     for (auto var : _enumMap[name]) {
-        func(var);
+        f(var);
     }
 }
 
-const std::vector<QString> &NoderDataBase::enumValues(const QString &name)
+const std::vector<QString> &Noder::enumValues(const QString &name)
 {
     return _enumMap[name];
 }
 
-Pin *NoderDataBase::pinTypeToObj(const PinProperty::Type type)
+Pin *Noder::pinTypeToObj(const PinProperty::Type type)
 {
     switch (type) {
         case PinProperty::Type::Bool:       return new PinDecl::Bool();
@@ -44,7 +49,7 @@ Pin *NoderDataBase::pinTypeToObj(const PinProperty::Type type)
     }
 }
 
-PinProperty::Type NoderDataBase::panelTypeToPinType(const NoderPanel::Type type)
+PinProperty::Type Noder::panelTypeToPinType(const NoderPanel::Type type)
 {
     switch (type) {
         case NoderPanel::Type::Bool:    return PinProperty::Type::Bool;
@@ -56,7 +61,7 @@ PinProperty::Type NoderDataBase::panelTypeToPinType(const NoderPanel::Type type)
     }
 }
 
-const QString &NoderDataBase::pinTypeToStr(const PinProperty::Type type)
+const QString &Noder::pinTypeToStr(const PinProperty::Type type)
 {
     static std::unordered_map<PinProperty::Type, QString> map = {
         {PinProperty::Type::Wildcard, "Wildcard"},
@@ -71,7 +76,7 @@ const QString &NoderDataBase::pinTypeToStr(const PinProperty::Type type)
     return map[type];
 }
 
-const QString &NoderDataBase::pinTypeToDir(const PinProperty::Direction direction)
+const QString &Noder::pinTypeToDir(const PinProperty::Direction direction)
 {
     static std::unordered_map<PinProperty::Direction, QString> map = {
         {PinProperty::Direction::Input, "Input"},
@@ -80,7 +85,7 @@ const QString &NoderDataBase::pinTypeToDir(const PinProperty::Direction directio
     return map[direction];
 }
 
-const QColor &NoderDataBase::plugColor(const PinProperty::Type type)
+const QColor &Noder::plugColor(const PinProperty::Type type)
 {
     static std::unordered_map<PinProperty::Type, QColor> map = {
         {PinProperty::Type::Wildcard, QColor("white")},
@@ -94,7 +99,7 @@ const QColor &NoderDataBase::plugColor(const PinProperty::Type type)
     return map[type];
 }
 
-const QColor &NoderDataBase::varColor(const NoderPanel::Type type)
+const QColor &Noder::varColor(const NoderPanel::Type type)
 {
     static std::unordered_map<NoderPanel::Type, QColor> map = {
         {NoderPanel::Type::Bool, plugColor(PinProperty::Type::Bool)},
@@ -106,7 +111,7 @@ const QColor &NoderDataBase::varColor(const NoderPanel::Type type)
     return map[type];
 }
 
-const QString &NoderDataBase::nodeTypeName(const NodeProperty::Type type)
+const QString &Noder::nodeTypeName(const NodeProperty::Type type)
 {
     static std::unordered_map<NodeProperty::Type, QString> map = {
         {NodeProperty::Type::Operation, "Operation"},
@@ -118,12 +123,12 @@ const QString &NoderDataBase::nodeTypeName(const NodeProperty::Type type)
     return map[type];
 }
 
-const QString &NoderDataBase::varTypeName(const NoderPanel::Type type)
+const QString &Noder::varTypeName(const NoderPanel::Type type)
 {
     return _varTypeMap[type];
 }
 
-NoderPanel::Type NoderDataBase::varTypeFromName(const QString &name)
+NoderPanel::Type Noder::varTypeFromName(const QString &name)
 {
     for (const auto& [key, value] : _varTypeMap)
         if (value == name)
@@ -132,9 +137,9 @@ NoderPanel::Type NoderDataBase::varTypeFromName(const QString &name)
     return NoderPanel::Type::Bool;
 }
 
-void NoderDataBase::forEachVarType(std::function<void(NoderPanel::Type type)> func)
+void Noder::forEachVarType(const std::function<void(NoderPanel::Type type)> &f)
 {
     for (auto var : _varTypeMap) {
-        func(var.first);
+        f(var.first);
     }
 }

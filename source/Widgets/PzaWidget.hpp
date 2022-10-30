@@ -9,7 +9,6 @@ class PzaWidget : public QWidget
     
     public:
         PzaWidget(QWidget *parent = nullptr);
-        ~PzaWidget() = default;
 
     void mousePressEvent(QMouseEvent *event) override;
 

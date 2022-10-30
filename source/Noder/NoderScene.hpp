@@ -3,7 +3,6 @@
 #include <QGraphicsScene>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
-#include <PanduzaEngine.hpp>
 
 class GNode;
 

@@ -7,7 +7,6 @@ class NoderOutputArea : public PzaTabWidget
 {
     public:
         NoderOutputArea(QWidget *parent = nullptr);
-        ~NoderOutputArea() = default;
 
     private:
         NoderConsole *_console;

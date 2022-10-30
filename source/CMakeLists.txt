@@ -29,4 +29,6 @@ target_sources(${PROG}
 	Widgets/PzaStackedWidget.cpp
 	Widgets/PzaTabWidget.cpp
 	Widgets/PzaTextEdit.cpp
+	Widgets/PzaPushButton.cpp
+	Widgets/PzaPopup.cpp
 )

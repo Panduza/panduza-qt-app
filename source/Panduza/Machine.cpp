@@ -1,9 +1,7 @@
 #include "Machine.hpp"
-#include <PanduzaEngine.hpp>
 
-Machine::Machine(PanduzaEngine *engine, const QString &name)
-    : _engine(engine),
-    _name(name)
+Machine::Machine(const QString &name)
+    : _name(name)
 {
 
 }

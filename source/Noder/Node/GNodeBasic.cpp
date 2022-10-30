@@ -1,6 +1,6 @@
 #include <GNodeBasic.hpp>
 
-#include <NoderDataBase.hpp>
+#include <Noder.hpp>
 #include <NoderScene.hpp>
 #include <Link.hpp>
 

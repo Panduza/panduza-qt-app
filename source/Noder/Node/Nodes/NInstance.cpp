@@ -54,7 +54,7 @@ void Instance::updatePin(void)
     PinProperty::Type type;
     Pin *newPin;
 
-    type = NBD_INST.panelTypeToPinType(_var->type());
+    type = Noder::Get().panelTypeToPinType(_var->type());
     newPin = addPinFromType(type, _var->name(), PinProperty::Direction::Output);
     if (type == PinProperty::Type::Enum) {
         PinDecl::Enum *pin = static_cast<PinDecl::Enum *>(newPin);

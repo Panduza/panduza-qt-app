@@ -7,7 +7,6 @@ class Print : public GNodeExec
 {
     public:
         Print();
-        ~Print() = default;
 
         void exec() override;
 
@@ -20,7 +19,6 @@ class Cat : public GNodeOp
 {
     public:
         Cat();
-        ~Cat() = default;
 
         void exec() override;
 

@@ -8,5 +8,4 @@ class PzaTabWidget : public QTabWidget
     
     public:
         PzaTabWidget(QWidget *parent = nullptr);
-        ~PzaTabWidget() = default;
 };

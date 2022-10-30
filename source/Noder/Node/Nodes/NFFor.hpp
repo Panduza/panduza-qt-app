@@ -7,7 +7,6 @@ class For : public GNodeBranch
 {
     public:
         For();
-        ~For() = default;
 
         GNode *branch(void) override;
     
@@ -23,7 +22,6 @@ class ForEachInArray : public GNodeBranch
 {
     public:
         ForEachInArray();
-        ~ForEachInArray() = default;
 
         GNode *branch(void) override;
 

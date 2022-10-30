@@ -8,5 +8,4 @@ class PzaTextEdit : public QTextEdit
     
     public:
         PzaTextEdit(QWidget *parent = nullptr);
-        ~PzaTextEdit() = default;
 };

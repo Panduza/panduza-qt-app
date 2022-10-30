@@ -9,7 +9,6 @@ class Instance : public GNodeInstance
 
     public:
         Instance();
-        ~Instance() = default;
 
         void exec() override;
         void setVariable(NoderVariable *ref);

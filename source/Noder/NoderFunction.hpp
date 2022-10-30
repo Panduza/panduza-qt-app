@@ -2,21 +2,29 @@
 
 #include "NoderView.hpp"
 
+#include <PzaPushButton.hpp>
+
+#include <NFArray.hpp>
+#include <NFMath.hpp>
+#include <NFString.hpp>
+#include <NFFor.hpp>
+#include <NFIf.hpp>
+#include <NFEvent.hpp>
+#include <NFDelay.hpp>
+#include <NFIO.hpp>
+
 class NoderFunction : public NoderView
 {
     Q_OBJECT
     
     public:
         NoderFunction(QWidget *parent = nullptr);
-        ~NoderFunction() = default;
 
-        void setName(void) {_name = _panelName->text(); nameChanged();}
+        void setName(const QString &name) {_name = name; nameChanged();}
         const QString &name(void) const {return _name;}
-        PzaLineEdit *panelName(void) const {return _panelName;}
 
     private:
         QString _name;
-        PzaLineEdit *_panelName;
     
     signals:
         void nameChanged(void);

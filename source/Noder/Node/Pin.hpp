@@ -6,7 +6,8 @@
 #include <QGridLayout>
 
 #include <PzaLimits.hpp>
-#include <NoderDataBase.hpp>
+#include <Interface/Interface.hpp>
+#include <Noder.hpp>
 
 class GNode;
 class Link;
@@ -71,10 +72,10 @@ class Pin : public PzaWidget
         void disconnectLink(const QPointF &pos);
         std::vector<GNode *> &linkedNodes(void) {return _linkedNodes;}
         std::vector<Pin *> &linkedPins(void) {return _linkedPins;}
-        void forEachLinkedPin(std::function<void(Pin *pin)> func);
-        void forEachLinkedNode(std::function<void(GNode *node)> func);
+        void forEachLinkedPin(const std::function<void(Pin *pin)> &func);
+        void forEachLinkedNode(const std::function<void(GNode *node)> &func);
         const QColor &plugColor(void) {return _plugColor;}
-        virtual void setPlugColor(void) {_plugColor = NBD_INST.plugColor(_type);}
+        virtual void setPlugColor(void) {_plugColor = Noder::Get().plugColor(_type);}
         void setNode(GNode *node) {_node = node;}
         void removeLink(Link *link);
         void removeLinks(void);
@@ -135,7 +136,7 @@ class Pin : public PzaWidget
         std::vector<Pin *> _linkedPins;
         QColor _plugColor;
 
-        void forEachLink(std::function<void(Link *link)> func);
+        void forEachLink(const std::function<void(Link *link)> &func);
 
     private:
         bool _dead = false;
@@ -151,7 +152,6 @@ class Wildcard : public Pin
 {
     public:
         Wildcard();
-        ~Wildcard() = default;
 
     private:
         COMPATIBLE_TYPES
@@ -169,7 +169,6 @@ class Float : public Pin
 {
     public:
         Float(double value = 0.f, double min = _Float_MIN, double max = _Float_MAX, unsigned int decimals = 2);
-        ~Float() = default;
 
         void setValue(const double value) override {_value = value;}
         void setValue(const int val) override;
@@ -209,7 +208,6 @@ class Int : public Pin
 {
     public:
         Int(int value = 0, int min = _Int_MIN, int max = _Int_MAX);
-        ~Int() = default;
 
         void setValue(const int value) override {_value = value;}
         void setValue(const double val) override;
@@ -246,7 +244,6 @@ class Bool : public Pin
 {
     public:
         Bool(bool value = false);
-        ~Bool() = default;
 
         void setValue(const bool value) override {_value = value;}
 
@@ -275,7 +272,6 @@ class String : public Pin
 {
     public:
         String(const QString &value = "");
-        ~String() = default;
 
         void setValue(const QString &value) override;
         void setValue(const double value) override;
@@ -305,7 +301,6 @@ class Enum : public Pin
     
     public:
         Enum();
-        ~Enum() = default;
 
         const QString &enumName(void) {return _enumName;}
         void initialize(const QString &name);
@@ -332,7 +327,6 @@ class Array : public Pin
 {
     public:
         Array();
-        ~Array() = default;
 
         const auto &list(void) {return _list;}
         const PinProperty::Type &elemType(void) {return _elemType;}
@@ -358,7 +352,7 @@ class Array : public Pin
 
         void onEventConnect(void) override;
         void onEventDisconnect(void) override;
-        virtual void setPlugColor(void) {_plugColor = NBD_INST.plugColor(_elemType);}
+        virtual void setPlugColor(void) {_plugColor = Noder::Get().plugColor(_elemType);}
 
     private:
         COMPATIBLE_TYPES
@@ -377,7 +371,6 @@ class Exec : public Pin
 {
     public:
         Exec();
-        ~Exec() = default;
 
     private:
         COMPATIBLE_TYPES
@@ -389,7 +382,6 @@ class Interface : public Pin
 {
     public:
         Interface();
-        ~Interface() = default;
 
         PzaInterface::Interface *object(void) {return _object;}
 

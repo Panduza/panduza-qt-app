@@ -2,21 +2,24 @@
 
 #include <QVBoxLayout>
 
+#include "NoderFrame.hpp"
+#include "NoderGraph.hpp"
 #include "NoderVariable.hpp"
+#include "NoderFunction.hpp"
 #include <PzaScrollArea.hpp>
 #include <PzaWidget.hpp>
 #include <PzaSpoiler.hpp>
 #include <PzaMoreLess.hpp>
 #include <PzaComboBox.hpp>
 #include <PzaPropertyTable.hpp>
-#include "NoderScenario.hpp"
-#include "NoderFunction.hpp"
+#include <PzaPopup.hpp>
+
+#define DEFAULT_FUNCTION_NAME "New Function"
 
 class NoderPropertyArea : public PzaSpoiler
 {
     public:
         NoderPropertyArea(QWidget *parent = nullptr);
-        ~NoderPropertyArea() = default;
 
         void updateProperty(NoderVariable *var);
         void addProperty(NoderVariable *var);
@@ -27,7 +30,6 @@ class NoderDefValArea : public PzaSpoiler
 {
     public:
         NoderDefValArea(QWidget *parent = nullptr);
-        ~NoderDefValArea() = default;
 
         void updateValArea(NoderVariable *var);
         void add(NoderVariable *var);
@@ -40,7 +42,6 @@ class NoderVariableArea : public PzaSpoiler
 
     public:
         NoderVariableArea(QWidget *parent = nullptr);
-        ~NoderVariableArea() = default;
 
         void addVariable(void);
         void removeVariable(void);
@@ -63,27 +64,38 @@ class NoderVariableArea : public PzaSpoiler
         void varRemoved(NoderVariable *var);
 };
 
-class NoderScenarioArea : public PzaSpoiler
+class NoderFunctionProperties : public PzaPopup
+{
+    public:
+        NoderFunctionProperties(QWidget *parent = nullptr);
+    
+    private:
+
+};
+
+class NoderFunctionEntry : public PzaWidget
 {
     Q_OBJECT
 
     public:
-        NoderScenarioArea(QWidget *parent = nullptr);
-        ~NoderScenarioArea() = default;
+        NoderFunctionEntry(const QString &name, QWidget *parent = nullptr);
+        ~NoderFunctionEntry();
+
+        void setName(const QString &name) {_name->setText(name); _function->setName(name);}
+        NoderFunction *function(void) const {return _function;}
 
     private:
-        PzaWidget *_main;
-        QVBoxLayout *_layout;
-        PzaMoreLess *_moreLess;
-        PzaWidget *_scenarioTable;
-        QVBoxLayout *_scenarioTableLayout;
-        std::vector<NoderScenario *>_scenarioList;
-
-        void addScenario(void);
-        void removeScenario(void);
+        NoderFunction *_function;
+        QHBoxLayout *_layout;
+        PzaPushButton *_propBtn;
+        PzaPushButton *_deleteBtn;
+        PzaPopup *_propDialog;
+        PzaLineEdit *_propName;
+        PzaPropertyTable *_propTable;
+        PzaLabel *_name;
     
     signals:
-        void scenarioCreated(NoderScenario *scenario);
+        void removed(void);
 };
 
 class NoderFunctionArea : public PzaSpoiler
@@ -92,7 +104,6 @@ class NoderFunctionArea : public PzaSpoiler
 
     public:
         NoderFunctionArea(QWidget *parent = nullptr);
-        ~NoderFunctionArea() = default;
 
     private:
         PzaWidget *_main;
@@ -100,13 +111,11 @@ class NoderFunctionArea : public PzaSpoiler
         PzaMoreLess *_moreLess;
         PzaWidget *_functionTable;
         QVBoxLayout *_functionTableLayout;
-        std::vector<NoderFunction *>_functionList;
+        //std::map<QString, NoderFunctionEntry *>_functionMap;
+        std::vector<NoderFunctionEntry *> _functionList;
 
         void addFunction(void);
         void removeFunction(void);
-
-    signals:
-        void functionCreated(NoderFunction *function);
 };
 
 class NoderSidePanel : public PzaScrollArea
@@ -114,18 +123,24 @@ class NoderSidePanel : public PzaScrollArea
     Q_OBJECT
 
     public:
-        NoderSidePanel(QWidget *parent = nullptr);
-        ~NoderSidePanel() = default;
+        NoderSidePanel(NoderSidePanel &other) = delete;
+        void operator=(const NoderSidePanel &) = delete;
+
+        NoderVariableArea *VariableArea = nullptr;
+        NoderFunctionArea *FunctionArea = nullptr;
+
+        static NoderSidePanel *Get(void)
+        {
+            static NoderSidePanel *sidePanel;
+
+            if (sidePanel == nullptr)
+                sidePanel = new NoderSidePanel();
+            return sidePanel;
+        }
 
     private:
+        NoderSidePanel(QWidget *parent = nullptr);
+        
         PzaWidget *_main;
         QVBoxLayout *_layout;
-        PzaSpoiler *_varSp;
-        NoderVariableArea *_varArea;
-        NoderScenarioArea *_scenarioArea;
-        NoderFunctionArea *_functionArea;
-
-    signals:
-        void newScenarioCreated(NoderScenario *scenario);
-        void newFunctionCreated(NoderFunction *scenario);
 };

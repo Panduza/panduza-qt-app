@@ -4,15 +4,30 @@ target_include_directories(${PROG} PRIVATE "./Node/Nodes")
 
 target_sources(${PROG}
 	PRIVATE
+	Noder.cpp
 	NoderFrame.cpp
-	NoderGraphArea.cpp
-	NoderScenario.cpp
-	NoderMainEvent.cpp
+	NoderGraph.cpp
 	NoderFunction.cpp
+	NoderScenario.cpp
+	NoderMenuBar.cpp
+	NoderSidePanel.cpp
 	NoderView.cpp
+	NoderScene.cpp
+	NoderVariable.cpp
 	NoderConsole.cpp
 	NoderOutputArea.cpp
 	NoderStyle.cpp
+
+	Node/GNode.cpp
+	Node/Pin.cpp
+	Node/Link.cpp
+	Node/GNodeInstance.cpp
+	Node/GNodeBranch.cpp
+	Node/GNodeBasic.cpp
+	Node/GNodeOp.cpp
+	Node/GNodeEvent.cpp
+	Node/GNodeExec.cpp
+
 	Node/Nodes/NFDelay.cpp
 	Node/Nodes/NFString.cpp
 	Node/Nodes/NFArray.cpp
@@ -22,17 +37,4 @@ target_sources(${PROG}
 	Node/Nodes/NFMath.cpp
 	Node/Nodes/NFIO.cpp
 	Node/Nodes/NInstance.cpp
-	Node/GNodeInstance.cpp
-	Node/Pin.cpp
-	Node/GNodeBranch.cpp
-	Node/GNode.cpp
-	Node/GNodeBasic.cpp
-	Node/GNodeOp.cpp
-	Node/GNodeEvent.cpp
-	Node/GNodeExec.cpp
-	Node/Link.cpp
-	NoderScene.cpp
-	NoderDataBase.cpp
-	NoderSidePanel.cpp
-	NoderVariable.cpp
 )

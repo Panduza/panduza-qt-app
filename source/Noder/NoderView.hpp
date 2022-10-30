@@ -22,7 +22,6 @@ class NoderGraphicsView : public QGraphicsView
 
     public:
         NoderGraphicsView(QWidget *parent = nullptr);
-        ~NoderGraphicsView() = default;
 
         void mouseMoveEvent(QMouseEvent *event) override;
         void mousePressEvent(QMouseEvent *event) override;
@@ -39,7 +38,7 @@ class NoderGraphicsView : public QGraphicsView
 
         void setMoveCanceled(bool state) {_moveCanceled = state;}
         void setMenu(PzaMenu *menu) {_viewMenu = menu;}
-        void addNodeToMenu(PzaMenu *toMenu, const QString &name, const NoderDataBase::t_CreateNode &f);
+        void addNodeToMenu(PzaMenu *toMenu, const QString &name, const Noder::t_CreateNode &f);
 
     private:
         QPointF _clickpos;
@@ -49,7 +48,7 @@ class NoderGraphicsView : public QGraphicsView
         bool _moveCanceled = false;
         PzaMenu *_viewMenu = nullptr;
 
-        GNode *createNode(const NoderDataBase::t_CreateNode &f, const QPointF &pos = QPointF(0, 0));
+        GNode *createNode(const Noder::t_CreateNode &f, const QPointF &pos = QPointF(0, 0));
 
         void selectNode(GNode *node);
         void setViewMenuCallback(QMenu *menu);
@@ -69,7 +68,6 @@ class NoderNodeArea : public PzaSpoiler
 
     public:
         NoderNodeArea(QWidget *parent = nullptr);
-        ~NoderNodeArea() = default;
 
     public slots:
         void addNode(GNode *node);
@@ -81,7 +79,6 @@ class NoderViewPanel : public PzaScrollArea
 {
     public:
         NoderViewPanel(NoderGraphicsView *view, QWidget *parent = nullptr);
-        ~NoderViewPanel() = default;
 
     private:
         PzaWidget *_main;
@@ -93,7 +90,6 @@ class NoderView : public PzaSplitter
 {
     public:
         NoderView(QWidget *parent = nullptr);
-        ~NoderView() = default;
 
         NoderGraphicsView *view() const {return _view;}
 

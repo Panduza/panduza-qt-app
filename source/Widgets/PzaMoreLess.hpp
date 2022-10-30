@@ -2,8 +2,8 @@
 
 #include <QDebug>
 #include <QVBoxLayout>
-#include <QPushButton>
 
+#include <PzaPushButton.hpp>
 #include <PzaLabel.hpp>
 #include <PzaWidget.hpp>
 
@@ -14,13 +14,12 @@ class PzaMoreLess : public PzaWidget
     public:
         PzaMoreLess(QWidget *parent = nullptr);
         PzaMoreLess(const QString &name, QWidget *parent = nullptr);
-        ~PzaMoreLess() = default;
 
     private:
         QHBoxLayout *_layout;
         PzaLabel *_name;
-        QPushButton *_more;
-        QPushButton *_less;
+        PzaPushButton *_more;
+        PzaPushButton *_less;
 
     signals:
         void more(void);

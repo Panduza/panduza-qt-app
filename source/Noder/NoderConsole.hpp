@@ -10,7 +10,6 @@ class NoderConsole : public PzaWidget
 {
     public:
         NoderConsole(QWidget *parent = nullptr);
-        ~NoderConsole() = default;
 
     private:
         QVBoxLayout *_layout;

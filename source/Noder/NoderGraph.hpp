@@ -5,21 +5,18 @@
 #include "NoderOutputArea.hpp"
 #include "NoderScenario.hpp"
 #include "NoderFunction.hpp"
-#include "NoderMainEvent.hpp"
 
-class NoderGraphArea : public PzaSplitter
+class NoderGraph : public PzaSplitter
 {
     Q_OBJECT
 
     public:
-        NoderGraphArea(QWidget *parent = nullptr);
-        ~NoderGraphArea() = default;
+        NoderGraph(QWidget *parent = nullptr);
 
     private:
         PzaTabWidget *_tab;
         NoderOutputArea *_outputArea;
 
     public slots:
-        void newScenario(NoderScenario *scenario);
         void newFunction(NoderFunction *scenario);
 };

@@ -5,7 +5,7 @@
 #include <QMouseEvent>
 #include <QDrag>
 
-#include "NoderDataBase.hpp"
+#include "Noder.hpp"
 #include <PzaWidget.hpp>
 #include <PzaLineEdit.hpp>
 #include <PzaLabel.hpp>
@@ -22,7 +22,7 @@ class NoderVariable : public PzaWidget
 
     public:
         NoderVariable(NoderPanel::Type type, QWidget *parent = nullptr);
-        ~NoderVariable() = default;
+
         void setSelected(bool state);
         const QString &name() {return _name;}
         NoderPanel::Type type(void) {return _type;}
@@ -62,7 +62,6 @@ class NoderValBool : public PzaPropertyTable
 
     public:
         NoderValBool(QWidget *parent = nullptr);
-        ~NoderValBool() = default;
 
         bool value(void) const {return _value;}
 
@@ -80,7 +79,6 @@ class NoderValInt : public PzaPropertyTable
 
     public:
         NoderValInt(QWidget *parent = nullptr);
-        ~NoderValInt() = default;
 
         int value(void) const {return _value;}
     
@@ -98,7 +96,6 @@ class NoderValFloat : public PzaPropertyTable
     
     public:
         NoderValFloat(QWidget *parent = nullptr);
-        ~NoderValFloat() = default;
         
         double value(void) const {return _value;}
 
@@ -116,7 +113,6 @@ class NoderValString : public PzaPropertyTable
     
     public:
         NoderValString(QWidget *parent = nullptr);
-        ~NoderValString() = default;
 
         const QString &text(void) const {return _text;}
 
@@ -134,7 +130,6 @@ class NoderValEnum : public PzaPropertyTable
 
     public:
         NoderValEnum(QWidget *parent = nullptr);
-        ~NoderValEnum() = default;
 
         const QString &enumName(void) {return _enumName;}
         const QString &enumValue(void) {return _enumValue;}

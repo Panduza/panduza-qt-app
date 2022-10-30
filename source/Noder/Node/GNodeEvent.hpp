@@ -6,5 +6,4 @@ class GNodeEvent : public GNodeExec
 {
     protected:
         GNodeEvent(const QString &name);
-        ~GNodeEvent() = default;
 };

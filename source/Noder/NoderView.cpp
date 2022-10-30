@@ -1,6 +1,6 @@
 #include "NoderView.hpp"
 #include "NoderStyle.hpp"
-#include "NoderDataBase.hpp"
+#include "Noder.hpp"
 
 #include <GNode.hpp>
 #include <Nodes/NInstance.hpp>
@@ -166,7 +166,7 @@ void NoderGraphicsView::selectNode(GNode *node)
     nodeSelected(node);
 }
 
-GNode *NoderGraphicsView::createNode(const NoderDataBase::t_CreateNode &f, const QPointF &pos)
+GNode *NoderGraphicsView::createNode(const Noder::t_CreateNode &f, const QPointF &pos)
 {
     GNode *node;
     
@@ -184,7 +184,7 @@ void NoderGraphicsView::createNodeFromMenu(void)
 {
     QAction *action = static_cast<QAction *>(sender());
     action->data();
-    NoderDataBase::t_CreateNode f = action->data().value<NoderDataBase::t_CreateNode>();
+    Noder::t_CreateNode f = action->data().value<Noder::t_CreateNode>();
     createNode(f, _clickpos);
 }
 
@@ -244,7 +244,7 @@ void NoderGraphicsView::drawBackground(QPainter *painter, const QRectF &r)
     }
 }
 
-void NoderGraphicsView::addNodeToMenu(PzaMenu *toMenu, const QString &name, const NoderDataBase::t_CreateNode &f)
+void NoderGraphicsView::addNodeToMenu(PzaMenu *toMenu, const QString &name, const Noder::t_CreateNode &f)
 {
     QAction *action;
     
@@ -298,10 +298,10 @@ NoderView::NoderView(QWidget *parent)
     : PzaSplitter(parent)
 {
     _view = new NoderGraphicsView(this);
-    _viewPanel = new NoderViewPanel(_view, this);
+    //_viewPanel = new NoderViewPanel(_view, this);
 
     setStretchFactor(0, 1);
 
     addWidget(_view);
-    addWidget(_viewPanel);
+  //  addWidget(_viewPanel);
 }

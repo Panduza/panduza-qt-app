@@ -6,7 +6,6 @@ class GNodeInstance : public GNode
 {
     protected:
         GNodeInstance();
-        ~GNodeInstance() = default;
     
     private:
         void pinBoxSize(void) override;

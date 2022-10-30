@@ -4,6 +4,7 @@ GNodeInstance::GNodeInstance()
     : GNode("Instance")
 {
     _pinBoxOffsetY = 5;
+    _boxRadius = 20;
 
     _propType = _propTable->addProperty<PzaLabel>("Type");
     _propBoxColor = _propTable->addProperty<PzaColorBox>("Box color");

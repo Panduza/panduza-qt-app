@@ -7,7 +7,6 @@ class If : public GNodeBranch
 {
     public:
         If();
-        ~If() = default;
 
         GNode *branch(void) override;
     

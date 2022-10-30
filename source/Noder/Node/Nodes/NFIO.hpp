@@ -6,7 +6,6 @@ class IoInit : public GNodeExec
 {
     public:
         IoInit();
-        ~IoInit() = default;
 
         void exec() override;
 
@@ -20,7 +19,6 @@ class IoSetDirection : public GNodeExec
 {
     public:
         IoSetDirection();
-        ~IoSetDirection() = default;
 
         void exec() override;
 
@@ -32,7 +30,6 @@ class IoSetValue : public GNodeExec
 {
     public:
         IoSetValue();
-        ~IoSetValue() = default;
 
         void exec() override;
 

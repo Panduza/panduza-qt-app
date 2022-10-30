@@ -27,16 +27,11 @@ PzaComboBox::PzaComboBox(QWidget *parent)
         "   background-color: #474747;"
         "}"
     );
+    view()->parentWidget()->setStyleSheet("background-color: #474747");
 }
 
 void PzaComboBox::showPopup(void)
 {
     QComboBox::showPopup();
-    
-    // Dummy trick to bypass Scene warning on sendEvent when view() is called
-    if (_init == false) {
-        view()->parentWidget()->setStyleSheet("background-color: #474747");
-        _init = true;
-    }
     clicked();
 }

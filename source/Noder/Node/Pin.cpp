@@ -150,7 +150,7 @@ void Pin::moveLinks(void)
     });
 }
 
-void Pin::forEachLinkedNode(std::function<void(GNode *Node)> func)
+void Pin::forEachLinkedNode(const std::function<void(GNode *Node)> &func)
 {
     Pin *target;
 
@@ -160,7 +160,7 @@ void Pin::forEachLinkedNode(std::function<void(GNode *Node)> func)
     });
 }
 
-void Pin::forEachLinkedPin(std::function<void(Pin *pin)> func)
+void Pin::forEachLinkedPin(const std::function<void(Pin *pin)> &func)
 {
     Pin *target;
 
@@ -170,7 +170,7 @@ void Pin::forEachLinkedPin(std::function<void(Pin *pin)> func)
     });
 }
 
-void Pin::forEachLink(std::function<void(Link *link)> func)
+void Pin::forEachLink(const std::function<void(Link *link)> &func)
 {
     for (auto link: _links) {
         func(link);
@@ -320,7 +320,7 @@ void Enum::modifyEnumName(const QString &name)
 
 void Enum::initialize(const QString &name)
 {
-    _list = NBD_INST.enumValues(name);
+    _list = Noder::Get().enumValues(name);
     _enumName = name;
     initialized();
 }
@@ -352,8 +352,8 @@ bool Array::isCompatible(Pin *to)
         return false;
 
     toArray = static_cast<PinDecl::Array *>(to);
-    elem = NBD_INST.pinTypeToObj(elemType());
-    toElem = NBD_INST.pinTypeToObj(toArray->elemType());
+    elem = Noder::Get().pinTypeToObj(elemType());
+    toElem = Noder::Get().pinTypeToObj(toArray->elemType());
 
     ret = elem->isCompatible(toElem);
 

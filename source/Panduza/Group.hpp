@@ -11,7 +11,6 @@ class Group
 {
     public:
         Group(Machine *machine, const QString &name);
-        ~Group() = default;
 
         Interface *findInterface(const QString &name)
         {

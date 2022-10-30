@@ -6,7 +6,6 @@ class PzaStackedWidget : public QStackedWidget
 {
     public:
         PzaStackedWidget(QWidget *parent = nullptr);
-        ~PzaStackedWidget() = default;
 
         QSize sizeHint() const override
         {

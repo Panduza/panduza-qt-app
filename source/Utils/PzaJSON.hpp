@@ -4,61 +4,58 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-class PzaJSON
+namespace PzaJSON
 {
-    public:
-        static QString KeyToString(const QJsonDocument &json, const QString &key)
-        {
-            return PzaJSON::_keyToValue<QString>(json, key);
-        }
-        static int KeyToInt(const QJsonDocument &json, const QString &key)
-        {
-            return PzaJSON::_keyToValue<int>(json, key);
-        }
-        static double KeyToDouble(const QJsonDocument &json, const QString &key)
-        {
-            return PzaJSON::_keyToValue<double>(json, key);
-        }
 
-        static QByteArray FromString(const QString &key, const QString &value)
-        {
-            return PzaJSON::_fromValue<QString>(key, "\"" + value + "\"");
-        }
+template<typename R>
+static R _keyToValue(const QJsonDocument &json, const QString &key)
+{
+    R ret = 0;
+    QJsonObject obj = json.object();
+    if (obj.contains(key))
+        ret = obj[key].toVariant().value<R>();
+    return ret;
+}
 
-        static QByteArray FromInt(const QString &key, const int &value)
-        {
-            return PzaJSON::_fromValue<int>(key, value);
-        }
+template<typename R>
+static QByteArray _fromValue(const QString &key, const R &value)
+{
+    return QString("{\"%1\" : %2}").arg(key).arg(value).toUtf8();
+}
 
-        static QByteArray FromDouble(const QString &key, const double &value)
-        {
-            return PzaJSON::_fromValue<double>(key, value);
-        }
+static QString KeyToString(const QJsonDocument &json, const QString &key)
+{
+    return PzaJSON::_keyToValue<QString>(json, key);
+}
 
-        static QByteArray FromBool(const QString &key, const bool &value)
-        {
-            return PzaJSON::_fromValue<QString>(key, (value) ? "true" : "false");
-        }
+static int KeyToInt(const QJsonDocument &json, const QString &key)
+{
+    return PzaJSON::_keyToValue<int>(json, key);
+}
 
-    private:
+static double KeyToDouble(const QJsonDocument &json, const QString &key)
+{
+    return PzaJSON::_keyToValue<double>(json, key);
+}
 
-        template<typename R>
-        static R _keyToValue(const QJsonDocument &json, const QString &key)
-        {
-            R ret = 0;
-            QJsonObject obj = json.object();
+static QByteArray FromString(const QString &key, const QString &value)
+{
+    return PzaJSON::_fromValue<QString>(key, "\"" + value + "\"");
+}
 
-            if (obj.contains(key))
-                ret = obj[key].toVariant().value<R>();
+static QByteArray FromInt(const QString &key, const int &value)
+{
+    return PzaJSON::_fromValue<int>(key, value);
+}
 
-            return ret;
-        }
+static QByteArray FromDouble(const QString &key, const double &value)
+{
+    return PzaJSON::_fromValue<double>(key, value);
+}
 
-        template<typename R>
-        static QByteArray _fromValue(const QString &key, const R &value)
-        {
-            return QString("{\"%1\" : %2}").arg(key).arg(value).toUtf8();
-        }
-        PzaJSON() = default;
-        ~PzaJSON() = default;
+static QByteArray FromBool(const QString &key, const bool &value)
+{
+    return PzaJSON::_fromValue<QString>(key, (value) ? "true" : "false");
+}
+
 };

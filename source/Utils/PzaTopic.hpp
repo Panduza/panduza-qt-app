@@ -6,9 +6,6 @@
 class PzaTopic
 {
     public:
-        PzaTopic() = default;
-        ~PzaTopic() = default;
-
         int parseTopic(const QString &topic)
         {
             QStringList list = topic.split("/");

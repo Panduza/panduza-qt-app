@@ -10,7 +10,6 @@ class PzaLineEdit : public QLineEdit
     public:
         PzaLineEdit(const QString &name, QWidget *parent = nullptr);
         PzaLineEdit(QWidget *parent = nullptr);
-        ~PzaLineEdit() = default;
 
     protected:
         virtual void focusInEvent(QFocusEvent *e);

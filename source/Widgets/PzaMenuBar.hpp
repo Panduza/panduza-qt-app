@@ -7,5 +7,4 @@ class PzaMenuBar : public QMenuBar
 {
     public:
         PzaMenuBar(QWidget *parent = nullptr);
-        ~PzaMenuBar() = default;
 };

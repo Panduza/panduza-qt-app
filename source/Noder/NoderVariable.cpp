@@ -11,7 +11,7 @@ NoderVariable::NoderVariable(NoderPanel::Type type, QWidget *parent)
     _propTable = new PzaPropertyTable(this);
     _propName = _propTable->addProperty<PzaLabel>("Name");
     _propType = _propTable->addProperty<PzaComboBox>("Type");
-    _typeName = new PzaLabel(NBD_INST.varTypeName(type), this);
+    _typeName = new PzaLabel(Noder::Get().varTypeName(type), this);
     _varLabel = new PzaLineEdit("New variable", this);
     _colorFrame = new QFrame(this);
     
@@ -39,10 +39,10 @@ NoderVariable::NoderVariable(NoderPanel::Type type, QWidget *parent)
     _layout->addWidget(_colorFrame);
     _layout->addWidget(_typeName);
 
-    NBD_INST.forEachVarType([&](NoderPanel::Type type) {
-        _propType->insertItem(0, NBD_INST.varTypeName(type));
+    Noder::Get().forEachVarType([&](NoderPanel::Type type) {
+        _propType->insertItem(0, Noder::Get().varTypeName(type));
     });
-    index = _propType->findText(NBD_INST.varTypeName(_type));
+    index = _propType->findText(Noder::Get().varTypeName(_type));
 
     _propType->setCurrentIndex(index);
 
@@ -50,7 +50,7 @@ NoderVariable::NoderVariable(NoderPanel::Type type, QWidget *parent)
 
     connect(_propType, &PzaComboBox::currentIndexChanged, this, [&](int index){
         const QString &typeName = _propType->itemText(index);
-        setType(NBD_INST.varTypeFromName(typeName));
+        setType(Noder::Get().varTypeFromName(typeName));
     });
 }
 
@@ -65,10 +65,10 @@ void NoderVariable::setType(const NoderPanel::Type type)
 {
     _type = type;
     _colorFrame->setStyleSheet(
-        "background-color: " + NBD_INST.varColor(type).name() + ";"
+        "background-color: " + Noder::Get().varColor(type).name() + ";"
         "border-radius: 3px;"
     );
-    _typeName->setText(NBD_INST.varTypeName(type));
+    _typeName->setText(Noder::Get().varTypeName(type));
     typeChanged();
 }
 
@@ -179,7 +179,7 @@ NoderValEnum::NoderValEnum(QWidget *parent)
     connect(_enumValuesBox, &PzaComboBox::currentIndexChanged, this, &NoderValEnum::updateValuesBox);
     connect(_enumNameBox, &PzaComboBox::currentIndexChanged, this, &NoderValEnum::updateNameBox);
     
-    NBD_INST.forEachEnumName([&](const QString &name) {
+    Noder::Get().forEachEnumName([&](const QString &name) {
         _enumNameBox->addItem(name);
     });
     
@@ -191,7 +191,7 @@ void NoderValEnum::updateNameBox(void)
     QString current = _enumNameBox->currentText();
     
     _enumValuesBox->clear();
-    NBD_INST.forEachEnumValues(current, [&](const QString &value) {
+    Noder::Get().forEachEnumValues(current, [&](const QString &value) {
         _enumValuesBox->addItem(value);
     });
     _enumValuesBox->setCurrentIndex(0);

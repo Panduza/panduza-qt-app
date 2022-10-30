@@ -96,7 +96,9 @@
         "cinttypes": "cpp",
         "qcoreapplication": "cpp",
         "qtabwidget": "cpp",
-        "qtextedit": "cpp"
+        "qtextedit": "cpp",
+        "any": "cpp",
+        "fstream": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

@@ -7,7 +7,6 @@ class GNodeExec : public GNodeBasic
     protected:
         GNodeExec(const QString &name, bool in, bool out);
         GNodeExec(const QString &name);
-        ~GNodeExec() = default;
 
         GNode *branch(void) override;
         void evaluateOperations(GNode *node);
