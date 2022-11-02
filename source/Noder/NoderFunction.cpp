@@ -5,17 +5,17 @@ NoderFunction::NoderFunction(QWidget *parent)
 {
     PzaMenu *menu = new PzaMenu(this);
 
-    PzaMenu *EventMenu = new PzaMenu("Event");
-    PzaMenu *BranchMenu = new PzaMenu("Branch");
-    PzaMenu *ArithMenu = new PzaMenu("Arithmetic");
-    PzaMenu *StringMenu = new PzaMenu("String");
-    PzaMenu *TimeMenu = new PzaMenu("Time");
-    PzaMenu *ArrayMenu = new PzaMenu("Array");
-    PzaMenu *InterfaceMenu = new PzaMenu("Interfaces");
+    PzaMenu *EventMenu = new PzaMenu("Event", menu);
+    PzaMenu *BranchMenu = new PzaMenu("Branch", menu);
+    PzaMenu *ArithMenu = new PzaMenu("Arithmetic", menu);
+    PzaMenu *StringMenu = new PzaMenu("String", menu);
+    PzaMenu *TimeMenu = new PzaMenu("Time", menu);
+    PzaMenu *ArrayMenu = new PzaMenu("Array", menu);
+    PzaMenu *InterfaceMenu = new PzaMenu("Interfaces", menu);
 
-    PzaMenu *InterfaceCommonMenu = new PzaMenu("Interface");
-    PzaMenu *IoMenu = new PzaMenu("Io");
-    PzaMenu *PsuMenu = new PzaMenu("Power Supply");
+    PzaMenu *InterfaceCommonMenu = new PzaMenu("Interface", menu);
+    PzaMenu *IoMenu = new PzaMenu("Io", menu);
+    PzaMenu *PsuMenu = new PzaMenu("Power Supply", menu);
  
     menu->addMenu(EventMenu);
     menu->addMenu(BranchMenu);
@@ -29,7 +29,7 @@ NoderFunction::NoderFunction(QWidget *parent)
     InterfaceMenu->addMenu(IoMenu);
     InterfaceMenu->addMenu(PsuMenu);
 
-    view()->addNodeToMenu(EventMenu, "Event Start", GNode::CreateNode<MainEvent>);
+    view()->addNodeToMenu(EventMenu, "Function Start", GNode::CreateNode<EventFunctionStart>);
     view()->addNodeToMenu(BranchMenu, "If", GNode::CreateNode<If>);
     view()->addNodeToMenu(BranchMenu, "For", GNode::CreateNode<For>);
     view()->addNodeToMenu(BranchMenu, "For Each Element in Array", GNode::CreateNode<ForEachInArray>);
@@ -48,4 +48,11 @@ NoderFunction::NoderFunction(QWidget *parent)
     view()->addNodeToMenu(IoMenu, "Set I/O Direction", GNode::CreateNode<Addition>);
 
     view()->setMenu(menu);
+
+    _startNode = view()->createNode(GNode::CreateNode<EventFunctionStart>, QPointF(0, 0));
+}
+
+void NoderFunction::updateStartNode(void)
+{
+   // _startNode
 }

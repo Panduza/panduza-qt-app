@@ -466,8 +466,3 @@ void GNode::process(void)
 
     exec();
 }
-
-GNode::~GNode()
-{
-    _propTable->deleteLater();
-}

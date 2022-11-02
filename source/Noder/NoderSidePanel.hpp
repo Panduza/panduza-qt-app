@@ -14,108 +14,187 @@
 #include <PzaPropertyTable.hpp>
 #include <PzaPopup.hpp>
 
-#define DEFAULT_FUNCTION_NAME "New Function"
+#define DEFAULT_FUNCTION_NAME   "New Function"
+#define DEFAULT_PIN_NAME        "New Pin"
+#define DEFAULT_VARIABLE_NAME   "New Variable"
+#define DEFAULT_VARIABLE_TYPE   NoderPanel::Type::Bool
 
-class NoderPropertyArea : public PzaSpoiler
-{
-    public:
-        NoderPropertyArea(QWidget *parent = nullptr);
+class NoderFunctionPinArea;
 
-        void updateProperty(NoderVariable *var);
-        void addProperty(NoderVariable *var);
-        void deleteProperty(NoderVariable *var);
-};
-
-class NoderDefValArea : public PzaSpoiler
-{
-    public:
-        NoderDefValArea(QWidget *parent = nullptr);
-
-        void updateValArea(NoderVariable *var);
-        void add(NoderVariable *var);
-        void del(NoderVariable *var);
-};
-
-class NoderVariableArea : public PzaSpoiler
+class NoderPin : public QObject
 {
     Q_OBJECT
 
     public:
-        NoderVariableArea(QWidget *parent = nullptr);
+        void setName(const QString &name) {_name = name;}
+        void setType(PinProperty::Type type) {_type = type;}
+        void setDirection(PinProperty::Direction direction) {_direction = direction;}
+        void createPin(void);
 
-        void addVariable(void);
-        void removeVariable(void);
-        void selectVar(NoderVariable *target);
+        const QString &name(void) const {return _name;}
+        PinProperty::Type type(void) const {return _type;}
+        PinProperty::Direction direction(void) const {return _direction;}
+        Pin *pin(void) const {return _pin;}
 
     private:
-        PzaWidget *_main;
-        QVBoxLayout *_layout;
-        PzaWidget *_varTable;
-        QVBoxLayout *_varTableLayout;
-        PzaMoreLess *_moreLess;
-        std::vector<NoderVariable *> _varList;
-        NoderVariable *_selectedVar = nullptr;
-        NoderPropertyArea *_propertyArea;
-        NoderDefValArea *_defValArea;
-
-    signals:
-        void varUpdated(NoderVariable *var);
-        void varAdded(NoderVariable *var);
-        void varRemoved(NoderVariable *var);
+        QString _name;
+        PinProperty::Type _type;
+        PinProperty::Direction _direction;
+        Pin *_pin = nullptr;
 };
 
-class NoderFunctionProperties : public PzaPopup
+template <class N>
+class NoderSidePanelEntry : public PzaWidget
 {
     public:
-        NoderFunctionProperties(QWidget *parent = nullptr);
-    
-    private:
+        void setName(const QString &name);
+        const QString &name(void) {return _name;}
+        virtual void setSelected(bool state);
+        N *elem(void) const {return _elem;}
 
-};
+    protected:
+        NoderSidePanelEntry(QWidget *parent = nullptr);
 
-class NoderFunctionEntry : public PzaWidget
-{
-    Q_OBJECT
+        virtual void remove(void) {}
 
-    public:
-        NoderFunctionEntry(const QString &name, QWidget *parent = nullptr);
-        ~NoderFunctionEntry();
-
-        void setName(const QString &name) {_name->setText(name); _function->setName(name);}
-        NoderFunction *function(void) const {return _function;}
-
-    private:
-        NoderFunction *_function;
+        N *_elem;
+        QString _name;
         QHBoxLayout *_layout;
         PzaPushButton *_propBtn;
         PzaPushButton *_deleteBtn;
-        PzaPopup *_propDialog;
-        PzaLineEdit *_propName;
+        PzaLabel *_nameLabel;
+        PzaPopup *_propPopup;
         PzaPropertyTable *_propTable;
-        PzaLabel *_name;
+        PzaLineEdit *_propName;
+};
+
+class NoderVariableEntry : public NoderSidePanelEntry<NoderVariable>
+{
+    Q_OBJECT
+
+    public:
+        NoderVariableEntry(QWidget *parent = nullptr);
+
+        void remove(void) override {removed();}
+        void setType(NoderPanel::Type type);
+        PzaPropertyTable *createDefValTable(void);
+
+        void mouseMoveEvent(QMouseEvent *event) override;
+
+    private:
+        QFrame *_colorFrame;
+        PzaLabel *_typeLabel;
+        PzaComboBox *_propType;
     
+    signals:
+        void typeChanged(void);
+        void removed(void);
+};
+
+
+class NoderPinEntry : public NoderSidePanelEntry<NoderPin>
+{
+    Q_OBJECT
+    
+    public:
+        NoderPinEntry(QWidget *parent = nullptr);
+
+        void setType(PinProperty::Type type);
+        void setDirection(PinProperty::Direction direction);
+        
+        void remove(void) override {removed();}
+
+    private:
+        QFrame *_colorFrame;
+        PzaLabel *_typeLabel;
+        PzaLabel *_directionLabel;
+        PzaComboBox *_propType;
+        PzaComboBox *_propDirection;
+
+    signals:
+        void pinChanged(void);
+        void removed(void);
+};
+
+
+class NoderFunctionEntry : public NoderSidePanelEntry<NoderFunction>
+{
+    Q_OBJECT
+    
+    public:
+        NoderFunctionEntry(QWidget *parent = nullptr);
+        
+        void remove(void) override {removed();}
+        NoderFunctionPinArea *pinArea(void) const {return _pinArea;}
+        void createPinArea(void);
+
+        void mouseMoveEvent(QMouseEvent *event) override;
+
+    private:
+        NoderFunctionPinArea *_pinArea = nullptr;
+
     signals:
         void removed(void);
 };
 
-class NoderFunctionArea : public PzaSpoiler
+template <class N>
+class NoderSidePanelArea : public PzaWidget
+{
+    protected:
+        NoderSidePanelArea(QWidget *parent = nullptr);
+
+        virtual void addEntry(void);
+        virtual void removeEntry(N *target);
+        virtual void selectEntry(N *target);
+
+        PzaPushButton *_addBtn;
+        QVBoxLayout *_layout;
+        PzaWidget *_entryTable;
+        QVBoxLayout *_entryTableLayout;
+        std::vector<N *> _entryList;
+        N *_selectedEntry = nullptr;
+        QString _defaultEntryName;
+};
+
+class NoderFunctionPinArea : public NoderSidePanelArea<NoderPinEntry>
 {
     Q_OBJECT
+    
+    public:
+        NoderFunctionPinArea(QWidget *parent = nullptr);
 
+        void addEntry(void) override;
+        void removeEntry(NoderPinEntry *target) override;
+        void selectEntry(NoderPinEntry *target) override;
+
+    signals:
+        void pinChanged(NoderPin *elem);
+};
+
+class NoderVariableArea : public NoderSidePanelArea<NoderVariableEntry>
+{
+    public:
+        NoderVariableArea(QWidget *parent = nullptr);
+        
+        void addEntry(void) override;
+        void removeEntry(NoderVariableEntry *target) override;
+        void selectEntry(NoderVariableEntry *target) override;
+
+    private:
+        PzaSpoiler *_defValArea = nullptr;
+};
+
+class NoderFunctionArea : public NoderSidePanelArea<NoderFunctionEntry>
+{
     public:
         NoderFunctionArea(QWidget *parent = nullptr);
 
-    private:
-        PzaWidget *_main;
-        QVBoxLayout *_layout;
-        PzaMoreLess *_moreLess;
-        PzaWidget *_functionTable;
-        QVBoxLayout *_functionTableLayout;
-        //std::map<QString, NoderFunctionEntry *>_functionMap;
-        std::vector<NoderFunctionEntry *> _functionList;
+        void addEntry(void) override;
+        void removeEntry(NoderFunctionEntry *target) override;
+        void selectEntry(NoderFunctionEntry *target) override;
 
-        void addFunction(void);
-        void removeFunction(void);
+    private:
+        PzaSpoiler *_pinSpoiler;
 };
 
 class NoderSidePanel : public PzaScrollArea

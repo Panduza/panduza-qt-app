@@ -39,6 +39,7 @@ class NoderGraphicsView : public QGraphicsView
         void setMoveCanceled(bool state) {_moveCanceled = state;}
         void setMenu(PzaMenu *menu) {_viewMenu = menu;}
         void addNodeToMenu(PzaMenu *toMenu, const QString &name, const Noder::t_CreateNode &f);
+        GNode *createNode(const Noder::t_CreateNode &f, const QPointF &pos = QPointF(0, 0));
 
     private:
         QPointF _clickpos;
@@ -48,7 +49,6 @@ class NoderGraphicsView : public QGraphicsView
         bool _moveCanceled = false;
         PzaMenu *_viewMenu = nullptr;
 
-        GNode *createNode(const Noder::t_CreateNode &f, const QPointF &pos = QPointF(0, 0));
 
         void selectNode(GNode *node);
         void setViewMenuCallback(QMenu *menu);
@@ -62,19 +62,6 @@ class NoderGraphicsView : public QGraphicsView
         void nodeRemoved(GNode *);
 };
 
-class NoderNodeArea : public PzaSpoiler
-{
-    Q_OBJECT
-
-    public:
-        NoderNodeArea(QWidget *parent = nullptr);
-
-    public slots:
-        void addNode(GNode *node);
-        void removedNode(GNode *node);
-        void setCurrentNode(GNode *node);
-};
-
 class NoderViewPanel : public PzaScrollArea
 {
     public:
@@ -83,7 +70,7 @@ class NoderViewPanel : public PzaScrollArea
     private:
         PzaWidget *_main;
         QVBoxLayout *_layout;
-        NoderNodeArea *_nodeArea;
+        PzaSpoiler *_nodeArea;
 };
 
 class NoderView : public PzaSplitter

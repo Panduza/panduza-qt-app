@@ -2,8 +2,14 @@
 
 #include <GNodeExec.hpp>
 
-class GNodeEvent : public GNodeExec
+class GNodeEventStart : public GNodeExec
 {
     protected:
-        GNodeEvent(const QString &name);
+        GNodeEventStart(const QString &name);
+};
+
+class GNodeEventEnd: public GNodeExec
+{
+    protected:
+        GNodeEventEnd(const QString &name);
 };

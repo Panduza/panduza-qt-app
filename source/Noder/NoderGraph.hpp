@@ -13,6 +13,8 @@ class NoderGraph : public PzaSplitter
     public:
         NoderGraph(QWidget *parent = nullptr);
 
+        void setActive(NoderFunction *function);
+
     private:
         PzaTabWidget *_tab;
         NoderOutputArea *_outputArea;

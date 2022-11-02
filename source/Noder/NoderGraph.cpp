@@ -22,14 +22,9 @@ void NoderGraph::newFunction(NoderFunction *function)
     });
     _tab->setCurrentIndex(index);
 }
-/*
-void NoderGraph::removeFunction(NoderFunction *function)
+
+void NoderGraph::setActive(NoderFunction *function)
 {
-    int index = _tab->addTab(function, function->name());
-    connect(function, &NoderFunction::nameChanged, this, [&, function](){
-        _tab->setTabText(_tab->indexOf(function), function->name());
-    });
+    int index = _tab->indexOf(function);
     _tab->setCurrentIndex(index);
 }
-
-*/

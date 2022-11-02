@@ -51,6 +51,15 @@ void PzaSpoiler::removeWidget(QWidget *w)
     _content->removeWidget(w);
 }
 
+void PzaSpoiler::removeAllWidgets(void)
+{
+    for(int i = _content->count(); i >= 0; i--)
+    {
+        QWidget* widget = _content->widget(i);
+        _content->removeWidget(widget);
+    }
+}
+
 void PzaSpoiler::setCurrentWidget(QWidget *w)
 {
     _content->setCurrentWidget(w);

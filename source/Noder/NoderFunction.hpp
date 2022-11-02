@@ -22,9 +22,11 @@ class NoderFunction : public NoderView
 
         void setName(const QString &name) {_name = name; nameChanged();}
         const QString &name(void) const {return _name;}
+        void updateStartNode(void);
 
     private:
         QString _name;
+        GNode *_startNode;
     
     signals:
         void nameChanged(void);

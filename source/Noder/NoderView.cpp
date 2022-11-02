@@ -39,8 +39,11 @@ void NoderGraphicsView::dragEnterEvent(QDragEnterEvent *event)
 void NoderGraphicsView::dragMoveEvent(QDragMoveEvent *event)
 {
     QGraphicsView::dragMoveEvent(event);
-    if (event->mimeData()->hasFormat("noder/variable") == true)
+    if (event->mimeData()->hasFormat("noder/variable") == true
+            || event->mimeData()->hasFormat("noder/function") == true) {
         event->accept();
+        }
+    
     else
         event->ignore();
 }
@@ -99,7 +102,6 @@ void NoderGraphicsView::keyPressEvent(QKeyEvent *event)
                 if (node) {
                     if (_selectedNode == node)
                         _selectedNode = nullptr;
-                    nodeRemoved(node);
                 }
                 _scene->removeItem(item);
                 delete item;
@@ -177,6 +179,9 @@ GNode *NoderGraphicsView::createNode(const Noder::t_CreateNode &f, const QPointF
     connect(node, &GNode::selected, this, [&, node]() {
         selectNode(node);
     });
+    connect(node, &GNode::destroyed, this, [&, node]() {
+        nodeRemoved(node);
+    });
     return node;
 }
 
@@ -248,32 +253,11 @@ void NoderGraphicsView::addNodeToMenu(PzaMenu *toMenu, const QString &name, cons
 {
     QAction *action;
     
-    action = new QAction(name);
+    action = new QAction(name, toMenu);
     action->setData(QVariant::fromValue(f));
     toMenu->addAction(action);
     connect(action, &QAction::triggered, this, &NoderGraphicsView::createNodeFromMenu);
 
-}
-
-NoderNodeArea::NoderNodeArea(QWidget *parent)
-    : PzaSpoiler("Node properties", parent)
-{
-
-}
-
-void NoderNodeArea::addNode(GNode *node)
-{
-    addWidget(node->propTable());
-}
-
-void NoderNodeArea::removedNode(GNode *node)
-{
-    removeWidget(node->propTable());
-}
-
-void NoderNodeArea::setCurrentNode(GNode *node)
-{
-    setCurrentWidget(node->propTable());
 }
 
 NoderViewPanel::NoderViewPanel(NoderGraphicsView *view, QWidget *parent)
@@ -281,13 +265,19 @@ NoderViewPanel::NoderViewPanel(NoderGraphicsView *view, QWidget *parent)
 {
     _main = new PzaWidget(this);
     _layout = new QVBoxLayout(_main);
-    _nodeArea = new NoderNodeArea(_main);
+    _nodeArea = new PzaSpoiler("Node Properties", this);
 
     _main->setStyleSheet("background-color: #252525");
 
-    connect(view, &NoderGraphicsView::nodeCreated, _nodeArea, &NoderNodeArea::addNode);
-    connect(view, &NoderGraphicsView::nodeRemoved, _nodeArea, &NoderNodeArea::removedNode);
-    connect(view, &NoderGraphicsView::nodeSelected, _nodeArea, &NoderNodeArea::setCurrentNode);
+    connect(view, &NoderGraphicsView::nodeCreated, _nodeArea, [&](const GNode *node) {
+        _nodeArea->addWidget(node->propTable());
+    });
+    connect(view, &NoderGraphicsView::nodeRemoved, _nodeArea, [&](const GNode *node) {
+        _nodeArea->removeWidget(node->propTable());
+    });
+    connect(view, &NoderGraphicsView::nodeSelected, _nodeArea, [&](const GNode *node) {
+        _nodeArea->setCurrentWidget(node->propTable());
+    });
 
     _layout->addWidget(_nodeArea);
     _layout->addStretch(1);
@@ -298,10 +288,10 @@ NoderView::NoderView(QWidget *parent)
     : PzaSplitter(parent)
 {
     _view = new NoderGraphicsView(this);
-    //_viewPanel = new NoderViewPanel(_view, this);
+    _viewPanel = new NoderViewPanel(_view, this);
 
     setStretchFactor(0, 1);
 
     addWidget(_view);
-  //  addWidget(_viewPanel);
+    addWidget(_viewPanel);
 }

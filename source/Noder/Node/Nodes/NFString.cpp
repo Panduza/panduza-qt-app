@@ -3,12 +3,19 @@
 Print::Print()
     : GNodeExec("Print String")
 {
-    _string = addInput<PinDecl::String>("String");
+    addMultiInput<PinDecl::String>("String", &_list, 1);
 }
 
 void Print::exec(void)
 {
-    qDebug() << _string->value();
+    PinDecl::String *string;
+    QString res;
+
+    for (auto const &elem : _list) {
+        string = static_cast<PinDecl::String *>(elem);
+        res = res + string->value();
+    }
+    qDebug() << res;
 }
 
 Cat::Cat()

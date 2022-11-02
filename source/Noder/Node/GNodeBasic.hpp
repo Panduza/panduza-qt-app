@@ -47,6 +47,12 @@ class GNodeBasic : public GNode
         void setType(NodeProperty::Type type) override;
 
         template <typename N>
+        N *addInput(void)
+        {
+            return addPin<N>("", PinProperty::Direction::Input);
+        }
+
+        template <typename N>
         N *addInput(const QString &name)
         {
             return addPin<N>(name, PinProperty::Direction::Input);

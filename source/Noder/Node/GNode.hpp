@@ -80,8 +80,6 @@ class GNode : public QGraphicsObject
             struct plugIconData plugNc;
         };
         
-        ~GNode();
-
         void setup(void);
         
         virtual void setType(NodeProperty::Type type);
@@ -89,6 +87,12 @@ class GNode : public QGraphicsObject
         void replacePin(Pin *oldPin, Pin *newPin);
         const NodeProperty::Type &nodeType(void) const {return _type;}
         const QColor &plugColor(PinProperty::Type type);
+
+        template <typename N>
+        N *addOutput(void)
+        {
+            return addPin<N>("", PinProperty::Direction::Output);
+        }
 
         template <typename N>
         N *addOutput(const QString &name)

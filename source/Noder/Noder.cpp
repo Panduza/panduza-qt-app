@@ -63,26 +63,12 @@ PinProperty::Type Noder::panelTypeToPinType(const NoderPanel::Type type)
 
 const QString &Noder::pinTypeToStr(const PinProperty::Type type)
 {
-    static std::unordered_map<PinProperty::Type, QString> map = {
-        {PinProperty::Type::Wildcard, "Wildcard"},
-        {PinProperty::Type::Int, "Integer"},
-        {PinProperty::Type::Float, "Float"},
-        {PinProperty::Type::Bool, "Boolean"},
-        {PinProperty::Type::String, "String"},
-        {PinProperty::Type::Enum, "Enum"},
-        {PinProperty::Type::Array, "Wildcard"},
-        {PinProperty::Type::Interface, "Interface"}
-    };
-    return map[type];
+    return _pinTypeMap[type];
 }
 
-const QString &Noder::pinTypeToDir(const PinProperty::Direction direction)
+const QString &Noder::pinDirToStr(const PinProperty::Direction type)
 {
-    static std::unordered_map<PinProperty::Direction, QString> map = {
-        {PinProperty::Direction::Input, "Input"},
-        {PinProperty::Direction::Output, "Output"}
-    };
-    return map[direction];
+    return _pinDirMap[type];
 }
 
 const QColor &Noder::plugColor(const PinProperty::Type type)
@@ -95,6 +81,7 @@ const QColor &Noder::plugColor(const PinProperty::Type type)
         {PinProperty::Type::String, QColor("#C05DC2")},
         {PinProperty::Type::Enum, QColor("#CE6135")},
         {PinProperty::Type::Interface, QColor("#C8B623")},
+        {PinProperty::Type::Array, QColor("#white")},
     };
     return map[type];
 }
@@ -137,9 +124,42 @@ NoderPanel::Type Noder::varTypeFromName(const QString &name)
     return NoderPanel::Type::Bool;
 }
 
+PinProperty::Type Noder::pinTypeFromName(const QString &name)
+{
+    for (const auto& [key, value] : _pinTypeMap)
+        if (value == name)
+            return key;
+    // Should not be possible
+    return PinProperty::Type::Bool;
+}
+
+PinProperty::Direction Noder::pinDirectionFromName(const QString &name)
+{
+    for (const auto& [key, value] : _pinDirMap)
+        if (value == name)
+            return key;
+    // Should not be possible
+    return PinProperty::Direction::Input;
+}
+
+
 void Noder::forEachVarType(const std::function<void(NoderPanel::Type type)> &f)
 {
     for (auto var : _varTypeMap) {
+        f(var.first);
+    }
+}
+
+void Noder::forEachPinType(const std::function<void(PinProperty::Type type)> &f)
+{
+    for (auto var : _pinTypeMap) {
+        f(var.first);
+    }
+}
+
+void Noder::forEachPinDirection(const std::function<void(PinProperty::Direction direction)> &f)
+{
+    for (auto var : _pinDirMap) {
         f(var.first);
     }
 }

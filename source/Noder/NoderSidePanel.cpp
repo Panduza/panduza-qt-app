@@ -8,10 +8,17 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
     FunctionArea = new NoderFunctionArea(_main);
     VariableArea = new NoderVariableArea(_main);
 
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    PzaSpoiler *functionSpoiler = new PzaSpoiler("Functions", _main);
+    PzaSpoiler *variableSpoiler = new PzaSpoiler("Variables", _main);
 
-    _layout->addWidget(FunctionArea);
-    _layout->addWidget(VariableArea);
+    functionSpoiler->addWidget(FunctionArea);
+    variableSpoiler->addWidget(VariableArea);
+
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    setFixedWidth(500);
+
+    _layout->addWidget(functionSpoiler);
+    _layout->addWidget(variableSpoiler);
     _layout->addStretch(1);
 
     setStyleSheet("background-color: #252525");
@@ -19,171 +26,227 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
     setWidget(_main);
 }
 
-NoderVariableArea::NoderVariableArea(QWidget *parent)
-    : PzaSpoiler("Variables", parent)
+template <class N>
+NoderSidePanelArea<N>::NoderSidePanelArea(QWidget *parent)
+    : PzaWidget(parent)
 {
-    _main = new PzaWidget(this);
-    _varTable = new PzaWidget(_main);
-    _varTableLayout = new QVBoxLayout(_varTable);
-    _propertyArea = new NoderPropertyArea(_main);
-    _defValArea = new NoderDefValArea(_main);
+    _layout = new QVBoxLayout(this);
+    _entryTable = new PzaWidget(this);
+    _entryTableLayout = new QVBoxLayout(_entryTable);
+    _addBtn = new PzaPushButton(this);
 
-    _varTableLayout->setContentsMargins(3, 3, 3, 3);
-    _varTableLayout->setSpacing(0);
+    connect(_addBtn, &PzaPushButton::clicked, this, &NoderSidePanelArea::addEntry);
 
-    connect(_main, &PzaWidget::clicked, this, [&](){
-        selectVar(nullptr);
-    });
-    _layout = new QVBoxLayout(_main);
-    _moreLess = new PzaMoreLess("Add variable", _main);
-
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-
-    _layout->addWidget(_moreLess);
-    _layout->addWidget(_varTable);
-    _layout->addWidget(_propertyArea);
-    _layout->addWidget(_defValArea);
-
-    connect(_moreLess, &PzaMoreLess::more, this, &NoderVariableArea::addVariable);
-    connect(_moreLess, &PzaMoreLess::less, this, &NoderVariableArea::removeVariable);
-   
-    addWidget(_main);
+    _layout->addWidget(_addBtn);
+    _layout->addWidget(_entryTable);
 }
 
-void NoderVariableArea::selectVar(NoderVariable *target)
+template <class N>
+void NoderSidePanelArea<N>::addEntry(void)
 {
-    for (auto var : _varList) {
-        var->setSelected(false);
-    }
-    _selectedVar = target;
-    if (target)
-        target->setSelected(true);
-    _propertyArea->updateProperty(_selectedVar);
-    _defValArea->updateValArea(_selectedVar);
-}
-
-void NoderVariableArea::addVariable(void)
-{
-    NoderVariable *newVar;
-    NoderPanel::Type fromType;
-
-    fromType = (_selectedVar) ? _selectedVar->type() : NoderPanel::Type::Bool;
-
-    newVar = new NoderVariable(fromType, _main);
-
-    _varTableLayout->addWidget(newVar);
-    _varList.push_back(newVar);
-    connect(newVar, &NoderVariable::activate, this, [&, newVar]() {
-        selectVar(newVar);
-    });
-    connect(newVar, &NoderVariable::typeChanged, this, [&, newVar]() {
-        if (newVar->defValTable())
-            _defValArea->del(newVar);
-        newVar->createDefValTable();
-        _defValArea->add(newVar);
-    });
-    _propertyArea->addProperty(newVar);
-    _defValArea->add(newVar);
-    selectVar(newVar);
-}
-
-void NoderVariableArea::removeVariable(void)
-{
-    unsigned long index;
-    NoderVariable *next = nullptr;
-
-    if (_selectedVar == nullptr)
-        return ;
-        
-    _varTableLayout->removeWidget(_selectedVar);
-    index = PzaUtils::IndexInVector<NoderVariable *>(_varList, _selectedVar);
-    PzaUtils::DeleteFromVector<NoderVariable *>(_varList, _selectedVar);
-    _propertyArea->deleteProperty(_selectedVar);
-    _defValArea->del(_selectedVar);
-    _selectedVar->dead();
-    _selectedVar->deleteLater();
-
-    if (index != _varList.size()) {
-        next = _varList.at(index);
-    }
-    else if (_varList.size() > 0) {
-        next = _varList.at(index - 1);
-    }
-    selectVar(next);
-}
-
-NoderPropertyArea::NoderPropertyArea(QWidget *parent)
-    : PzaSpoiler("Properties", parent)
-{
+    N *entry;
     
+    auto getNameInVector = [](N *entry) -> const QString & {
+        return entry->name();
+    };
+
+    const QString &name = PzaUtils::allocateName<N *>(_entryList, _defaultEntryName, getNameInVector);
+
+    entry = new N(this);
+    entry->setName(name);
+
+    connect(entry, &N::removed, this, [&, entry](){
+        removeEntry(entry);
+    });
+    connect(entry, &N::clicked, this, [&, entry]() {
+        selectEntry(entry);
+    });
+
+    _entryList.push_back(entry);
+    _entryTableLayout->addWidget(entry);
+
+    selectEntry(entry);
 }
 
-void NoderPropertyArea::updateProperty(NoderVariable *var)
+template <class N>
+void NoderSidePanelArea<N>::removeEntry(N *target)
 {
-    if (var)
-        setCurrentWidget(var->propTable());
+    if (_selectedEntry == target) {
+        N *next = nullptr;
+        size_t index = PzaUtils::IndexInVector<N *>(_entryList, _selectedEntry) + 1;
+
+        if (index < _entryList.size())
+            next = _entryList.at(index);
+        else if (index < 2)
+            next = nullptr;
+        else if (_entryList.size() > 0)
+            next = _entryList.at(index - 2);
+
+        selectEntry(next);
+    }
+
+    PzaUtils::DeleteFromVector(_entryList, target);
+    target->elem()->deleteLater();
+    target->deleteLater();
 }
 
-void NoderPropertyArea::addProperty(NoderVariable *var)
+template <class N>
+void NoderSidePanelArea<N>::selectEntry(N *target)
 {
-    addWidget(var->propTable());
+    if (_selectedEntry)
+        _selectedEntry->setSelected(false);
+    if (target) {
+        target->setSelected(true);
+    }
+    _selectedEntry = target;
 }
 
-void NoderPropertyArea::deleteProperty(NoderVariable *var)
+NoderFunctionArea::NoderFunctionArea(QWidget *parent)
+    : NoderSidePanelArea<NoderFunctionEntry>(parent)
 {
-    removeWidget(var->propTable());
-}
+    _pinSpoiler = new PzaSpoiler("Pins", this);
+    _pinSpoiler->setVisible(false);
 
-NoderDefValArea::NoderDefValArea(QWidget *parent)
-    : PzaSpoiler("Values", parent)
+    _addBtn->setText("Add function");
+    _defaultEntryName = DEFAULT_FUNCTION_NAME;
+
+    _layout->addWidget(_pinSpoiler);
+};
+
+void NoderFunctionArea::addEntry(void)
 {
+    NoderSidePanelArea::addEntry();
 
+    _selectedEntry->createPinArea();
+    _pinSpoiler->addWidget(_selectedEntry->pinArea());
+
+    if (_pinSpoiler->isVisible() == false)
+        _pinSpoiler->setVisible(true);
 }
 
-void NoderDefValArea::updateValArea(NoderVariable *var)
+void NoderFunctionArea::removeEntry(NoderFunctionEntry *target)
 {
-    if (var)
-        setCurrentWidget(var->defValTable());
+    _pinSpoiler->removeWidget(target->pinArea());
+
+    NoderSidePanelArea::removeEntry(target);
+
+    if (_entryList.size() == 0)
+        _pinSpoiler->setVisible(false);
 }
 
-void NoderDefValArea::add(NoderVariable *var)
+void NoderFunctionArea::selectEntry(NoderFunctionEntry *target)
 {
-    addWidget(var->defValTable());
+    NoderSidePanelArea::selectEntry(target);
+
+    if (target && target->pinArea())
+        _pinSpoiler->setCurrentWidget(target->pinArea());
 }
 
-void NoderDefValArea::del(NoderVariable *var)
+NoderVariableArea::NoderVariableArea(QWidget *parent)
+    : NoderSidePanelArea<NoderVariableEntry>(parent)
 {
-    removeWidget(var->defValTable());
-}
+    _defValArea = new PzaSpoiler("Default Values", this);
+    _defValArea->setVisible(false);
 
-NoderFunctionProperties::NoderFunctionProperties(QWidget *parent)
-    : PzaPopup(parent)
+    _addBtn->setText("Add variable");
+    _defaultEntryName = DEFAULT_VARIABLE_NAME;
+
+    _layout->addWidget(_defValArea);
+};
+
+void NoderVariableArea::addEntry(void)
 {
+    NoderPanel::Type prevType;
+    NoderVariable *variable;
 
+    prevType = (_selectedEntry) ? _selectedEntry->elem()->type() : DEFAULT_VARIABLE_TYPE;
+
+    NoderSidePanelArea::addEntry();
+
+    variable = _selectedEntry->elem();
+    
+    connect(_selectedEntry, &NoderVariableEntry::typeChanged, this, [&, variable]() {
+        if (variable->defValTable()) {
+            _defValArea->removeWidget(variable->defValTable());
+        }
+        variable->createDefValTable();
+        _defValArea->addWidget(variable->defValTable());
+    });
+    _selectedEntry->setType(prevType);
+    _defValArea->addWidget(variable->defValTable());
+
+    if (_defValArea->isVisible() == false)
+        _defValArea->setVisible(true);
 }
 
-NoderFunctionEntry::NoderFunctionEntry(const QString &name, QWidget *parent)
+void NoderVariableArea::removeEntry(NoderVariableEntry *target)
+{
+    NoderSidePanelArea::removeEntry(target);
+
+    if (_entryList.size() == 0)
+        _defValArea->setVisible(false);
+}
+
+void NoderVariableArea::selectEntry(NoderVariableEntry *target)
+{
+    NoderSidePanelArea::selectEntry(target);
+
+    if (target && target->elem()->defValTable())
+        _defValArea->setCurrentWidget(target->elem()->defValTable());
+}
+
+NoderFunctionPinArea::NoderFunctionPinArea(QWidget *parent)
+    : NoderSidePanelArea<NoderPinEntry>(parent)
+{
+    _addBtn->setText("Add pin");
+    _defaultEntryName = DEFAULT_PIN_NAME;
+};
+
+void NoderFunctionPinArea::addEntry(void)
+{
+    NoderSidePanelArea::addEntry();
+       
+    connect(_selectedEntry, &NoderPinEntry::pinChanged, this, [&]() {
+        NoderPinEntry *entry = static_cast<NoderPinEntry *>(sender());
+        pinChanged(entry->elem());
+    });
+
+    _selectedEntry->setType(PinProperty::Type::Bool);
+    _selectedEntry->setDirection(PinProperty::Direction::Input);
+}
+
+void NoderFunctionPinArea::removeEntry(NoderPinEntry *target)
+{
+    NoderSidePanelArea::removeEntry(target);
+}
+
+void NoderFunctionPinArea::selectEntry(NoderPinEntry *target)
+{
+    NoderSidePanelArea::selectEntry(target);
+}
+
+template <class N>
+NoderSidePanelEntry<N>::NoderSidePanelEntry(QWidget *parent)
     : PzaWidget(parent)
 {
     _layout = new QHBoxLayout(this);
     _deleteBtn = new PzaPushButton(this);
     _propBtn = new PzaPushButton(this);
-    _name = new PzaLabel(this);
+    _nameLabel = new PzaLabel(this);
     _propTable = new PzaPropertyTable(this);
-    _propDialog = new PzaPopup("Edit Function", _propTable, this);
-    _function = new NoderFunction();
+    _propPopup = new PzaPopup(this);
+    _elem = new N();
 
-    _propDialog->setValidator();
+    _propPopup->addWidget(_propTable);
+    _propPopup->setValidator();
 
     _propName = _propTable->addProperty<PzaLineEdit>("Name");
-    _propName->setText(name);
-    _function->setName(name);
 
-    connect(_propDialog, &PzaPopup::validated, this, [&]() {
+    connect(_propPopup, &PzaPopup::validated, this, [&]() {
         setName(_propName->text());
     });
 
-    connect(_deleteBtn, &PzaPushButton::clicked, [&](){removed();});
+    connect(_deleteBtn, &PzaPushButton::clicked, [&](){remove();});
 
     _layout->setContentsMargins(0, 0, 0, 0);
     _layout->setSpacing(5);
@@ -191,63 +254,174 @@ NoderFunctionEntry::NoderFunctionEntry(const QString &name, QWidget *parent)
     _propBtn->setFixedSize(20, 20);
     _deleteBtn->setFixedSize(20, 20);
 
-    _propBtn->setMenu(_propDialog);
+    _propBtn->setMenu(_propPopup);
 
-    _layout->addWidget(_name);
+    _layout->addWidget(_nameLabel);
     _layout->addWidget(_propBtn);
     _layout->addWidget(_deleteBtn);
-
-    setFocusProxy(_name);
-
-    NoderFrame::Get()->Graph->newFunction(_function);
 }
 
-NoderFunctionEntry::~NoderFunctionEntry()
+template <class N>
+void NoderSidePanelEntry<N>::setName(const QString &name)
 {
-    _function->deleteLater();
+    _name = name;
+    _elem->setName(name);
+    _nameLabel->setText(name);
+    _propName->setText(name);
 }
 
-NoderFunctionArea::NoderFunctionArea(QWidget *parent)
-    : PzaSpoiler("Function", parent)
+template <class N>
+void NoderSidePanelEntry<N>::setSelected(bool state)
 {
-    _main = new PzaWidget(this);
-    _layout = new QVBoxLayout(_main);
-    _functionTable = new PzaWidget(_main);
-    _functionTableLayout = new QVBoxLayout(_functionTable);
-
-    PzaPushButton *addBtn = new PzaPushButton(_main);
-
-    addBtn->setText("Add function");
-    connect(addBtn, &PzaPushButton::clicked, this, &NoderFunctionArea::addFunction);
-
-    _layout->addWidget(addBtn);
-    _layout->addWidget(_functionTable);
-
-    addWidget(_main);
+    if (state == true) {
+        setStyleSheet("background-color: #1B2426");
+    }
+    else
+        setStyleSheet("background-color: transparent");
 }
 
-void NoderFunctionArea::addFunction(void)
+NoderVariableEntry::NoderVariableEntry(QWidget *parent)
+    : NoderSidePanelEntry<NoderVariable>(parent)
 {
-    auto getNameInVector = [](NoderFunctionEntry *entry) -> const QString & {
-        return entry->function()->name();
-    };
+    _colorFrame = new QFrame(this);
+    _typeLabel = new PzaLabel(this);
 
-    const QString &name = PzaUtils::allocateName<NoderFunctionEntry *>(_functionList, DEFAULT_FUNCTION_NAME, getNameInVector);
+    _colorFrame->setFixedSize(10, 10);
+    _colorFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    NoderFunctionEntry *entry = new NoderFunctionEntry(name, this);
+    _propPopup->addTitle("Edit variable");
 
-    entry->setName(name);
+    _propType = _propTable->addProperty<PzaComboBox>("Type");
+    Noder::Get().forEachVarType([&](NoderPanel::Type type) {
+        _propType->insertItem(0, Noder::Get().varTypeName(type));
+    });
+    connect(_propType, &PzaComboBox::currentIndexChanged, this, [&](int index){
+        setType(Noder::Get().varTypeFromName(_propType->itemText(index)));
+    });
 
-    connect(entry, &NoderFunctionEntry::removed, this, &NoderFunctionArea::removeFunction);
-
-    _functionList.push_back(entry);
-    _functionTableLayout->addWidget(entry);
+    _layout->insertWidget(1, _colorFrame);
+    _layout->insertWidget(2, _typeLabel);
 }
 
-void NoderFunctionArea::removeFunction(void)
+void NoderVariableEntry::setType(NoderPanel::Type type)
 {
-    NoderFunctionEntry *entry = static_cast<NoderFunctionEntry *>(sender());
+    int index = _propType->findText(Noder::Get().varTypeName(type));
+    _propType->setCurrentIndex(index);
 
-    PzaUtils::DeleteFromVector(_functionList, entry);
-    entry->deleteLater();
+    _typeLabel->setText(Noder::Get().varTypeName(type));
+    _colorFrame->setStyleSheet(
+            "background-color: " + Noder::Get().varColor(type).name() + ";"
+            "border-radius: 5px;"
+    );
+    _elem->setType(type);
+    typeChanged();
+}
+
+void NoderVariableEntry::mouseMoveEvent(QMouseEvent *event)
+{
+    (void)event;
+    QDrag *drag = new QDrag(this);
+    PzaMimeData *mimeData = new PzaMimeData;
+
+    mimeData->setData("noder/variable", "");
+    mimeData->setDataPtr(elem());
+    drag->setMimeData(mimeData);
+    drag->setPixmap(_propName->grab());
+    drag->exec();
+}
+
+NoderFunctionEntry::NoderFunctionEntry(QWidget *parent)
+    : NoderSidePanelEntry<NoderFunction>(parent)
+{
+    _propPopup->addTitle("Edit function");
+    NoderFrame::Get()->Graph->newFunction(_elem);
+}
+
+void NoderFunctionEntry::createPinArea(void)
+{
+    _pinArea = new NoderFunctionPinArea(this);
+
+    connect(_pinArea, &NoderFunctionPinArea::pinChanged, this, [&](NoderPin *elem) {
+
+    });
+}
+
+void NoderFunctionEntry::mouseMoveEvent(QMouseEvent *event)
+{
+    (void)event;
+    QDrag *drag = new QDrag(this);
+    PzaMimeData *mimeData = new PzaMimeData;
+
+    mimeData->setData("noder/function", "");
+    mimeData->setDataPtr(elem());
+    drag->setMimeData(mimeData);
+    drag->setPixmap(_propName->grab());
+    drag->exec();
+}
+
+NoderPinEntry::NoderPinEntry(QWidget *parent)
+    : NoderSidePanelEntry<NoderPin>(parent)
+{
+    _propPopup->addTitle("Edit pin");
+
+    _colorFrame = new QFrame(this);
+    _typeLabel = new PzaLabel(this);
+    _directionLabel = new PzaLabel(this);
+
+    _colorFrame->setFixedSize(10, 10);
+    _colorFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    _propType = _propTable->addProperty<PzaComboBox>("Type");
+    Noder::Get().forEachPinType([&](PinProperty::Type type) {
+        _propType->insertItem(0, Noder::Get().pinTypeToStr(type));
+    });
+    connect(_propType, &PzaComboBox::currentIndexChanged, this, [&](int index){
+        setType(Noder::Get().pinTypeFromName(_propType->itemText(index)));
+    });
+
+    _propDirection = _propTable->addProperty<PzaComboBox>("Direction");
+    Noder::Get().forEachPinDirection([&](PinProperty::Direction direction) {
+        _propDirection->insertItem(0, Noder::Get().pinDirToStr(direction));
+    });
+    connect(_propDirection, &PzaComboBox::currentIndexChanged, this, [&](int index){
+        setDirection(Noder::Get().pinDirectionFromName(_propDirection->itemText(index)));
+    });
+
+    _layout->insertWidget(1, _directionLabel);
+    _layout->insertWidget(2, _colorFrame);
+    _layout->insertWidget(3, _typeLabel);
+}
+
+void NoderPinEntry::setType(PinProperty::Type type)
+{
+     int index = _propType->findText(Noder::Get().pinTypeToStr(type));
+    _propType->setCurrentIndex(index);
+
+    _typeLabel->setText(Noder::Get().pinTypeToStr(type));
+    _colorFrame->setStyleSheet(
+            "background-color: " + Noder::Get().plugColor(type).name() + ";"
+            "border-radius: 5px;"
+    );
+    _elem->setType(type);
+    pinChanged();
+}
+
+void NoderPinEntry::setDirection(PinProperty::Direction direction)
+{
+     int index = _propDirection->findText(Noder::Get().pinDirToStr(direction));
+    _propDirection->setCurrentIndex(index);
+
+    _directionLabel->setText(Noder::Get().pinDirToStr(direction));
+    _elem->setDirection(direction);
+    pinChanged();
+}
+
+void NoderPin::createPin(void)
+{
+   // if (_pin)
+    //    _pin->deleteLater();
+
+    //pinChanged();
+
+    //_pin = GNode::addPinFromType();
 }

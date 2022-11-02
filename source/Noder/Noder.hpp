@@ -80,7 +80,7 @@ class Noder : public QObject
 
         Pin *pinTypeToObj(const PinProperty::Type type);
         const QString &pinTypeToStr(const PinProperty::Type type);
-        const QString &pinTypeToDir(const PinProperty::Direction direction);
+        const QString &pinDirToStr(const PinProperty::Direction direction);
         const QColor &plugColor(const PinProperty::Type type);
         const QColor &varColor(const NoderPanel::Type type);
         const QString &varTypeName(const NoderPanel::Type type);
@@ -92,7 +92,11 @@ class Noder : public QObject
         void forEachEnumValues(const QString &name, const std::function<void(const QString &name)> &f);
 
         void forEachVarType(const std::function<void(NoderPanel::Type type)> &f);
+        void forEachPinType(const std::function<void(PinProperty::Type type)> &f);
+        void forEachPinDirection(const std::function<void(PinProperty::Direction direction)> &f);
         NoderPanel::Type varTypeFromName(const QString &name);
+        PinProperty::Type pinTypeFromName(const QString &name);
+        PinProperty::Direction pinDirectionFromName(const QString &name);
         PinProperty::Type panelTypeToPinType(const NoderPanel::Type type);
 
         std::unordered_map<NoderPanel::Type, QString> _varTypeMap = {
@@ -101,6 +105,22 @@ class Noder : public QObject
             {NoderPanel::Type::Float, "Float"},
             {NoderPanel::Type::String, "String"},
             {NoderPanel::Type::Enum,  "Enum"},
+        };
+
+        std::unordered_map<PinProperty::Type, QString> _pinTypeMap = {
+            {PinProperty::Type::Wildcard, "Wildcard"},
+            {PinProperty::Type::Int, "Integer"},
+            {PinProperty::Type::Float, "Float"},
+            {PinProperty::Type::Bool, "Boolean"},
+            {PinProperty::Type::String, "String"},
+            {PinProperty::Type::Enum, "Enum"},
+            {PinProperty::Type::Interface, "Interface"},
+            {PinProperty::Type::Array, "Array"}
+        };
+
+        std::unordered_map<PinProperty::Direction, QString> _pinDirMap = {
+            {PinProperty::Direction::Input, "Input"},
+            {PinProperty::Direction::Output, "Output"},
         };
 
         std::map<QString, std::vector<QString>> _enumMap = {

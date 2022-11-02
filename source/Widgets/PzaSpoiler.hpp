@@ -19,6 +19,8 @@ class PzaSpoiler : public PzaWidget
         void removeWidget(QWidget *w);
         void setCurrentWidget(QWidget *w);
 
+        void removeAllWidgets(void);
+
         const PzaStackedWidget *content(void) {return _content;}
 
     private:

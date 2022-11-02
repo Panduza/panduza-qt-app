@@ -21,36 +21,21 @@ class NoderVariable : public PzaWidget
     Q_OBJECT
 
     public:
-        NoderVariable(NoderPanel::Type type, QWidget *parent = nullptr);
+        NoderVariable(QWidget *parent = nullptr);
 
-        void setSelected(bool state);
         const QString &name() {return _name;}
         NoderPanel::Type type(void) {return _type;}
         void setName(const QString &name);
         void setType(const NoderPanel::Type type);
-        PzaPropertyTable *propTable(void) {return _propTable;}
-        PzaPropertyTable *defValTable(void) {return _defValTable;}
         void createDefValTable(void);
+        PzaPropertyTable *defValTable(void) const {return _defValTable;}
 
-        void mousePressEvent(QMouseEvent *event) override;
-        void mouseMoveEvent(QMouseEvent *event) override;
-    
     private:
         QString _name;
-        PzaLineEdit *_varLabel;
-        QHBoxLayout *_layout;
-        QFrame *_colorFrame;
         NoderPanel::Type _type;
-
-        PzaPropertyTable *_propTable;
-        PzaLabel *_propName = nullptr;
-        PzaLabel *_typeName = nullptr;
-        PzaComboBox *_propType;
-
         PzaPropertyTable *_defValTable = nullptr;
 
     signals:
-        void activate(void);
         void typeChanged(void);
         void nameChanged(const QString &name);
         void dead(void);

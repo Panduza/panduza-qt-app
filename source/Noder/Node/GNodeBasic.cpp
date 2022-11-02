@@ -334,5 +334,5 @@ void GNodeBasic::paint(QPainter *painter, QStyleOptionGraphicsItem const *option
 
 GNodeBasic::~GNodeBasic()
 {
-    _propTable->deleteLater();
+    delete _title;
 }

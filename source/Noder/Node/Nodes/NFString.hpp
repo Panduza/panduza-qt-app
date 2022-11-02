@@ -11,7 +11,7 @@ class Print : public GNodeExec
         void exec() override;
 
     private:
-        PinDecl::String *_string;
+        std::vector<Pin *> _list;
         
 };
 

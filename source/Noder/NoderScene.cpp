@@ -28,7 +28,7 @@ std::vector<GNode *> NoderScene::findInputEventNodes(void)
     GNode *node;
 
     for (auto elem: items()) {
-        node = dynamic_cast<GNodeEvent *>(elem);
+        node = dynamic_cast<GNodeEventStart *>(elem);
         if (node != nullptr) {
             list.push_back(node);
         }

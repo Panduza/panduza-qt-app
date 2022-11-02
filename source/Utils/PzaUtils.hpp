@@ -124,12 +124,14 @@ static QString allocateName(const std::vector<N> &list, const QString &defaultNa
     QString name = defaultName;
     int index = 1;
 
-    for (size_t i = 0; i < list.size(); i++) {
+    for (size_t i = 0; i < list.size();) {
         const QString &tmp = f(list[i]);
         if (tmp == name) {
             name = defaultName + " " + QString::number(index++);
             i = 0;
         }
+        else
+            i++;
     }
     return name;
 };

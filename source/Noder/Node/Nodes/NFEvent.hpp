@@ -3,8 +3,14 @@
 
 #include <GNodeEvent.hpp>
 
-class MainEvent : public GNodeEvent
+class EventScenarioStart : public GNodeEventStart
 {
     public:
-        MainEvent();
+        EventScenarioStart() : GNodeEventStart("Scenario Start") {}
+};
+
+class EventFunctionStart : public GNodeEventStart
+{
+    public:
+        EventFunctionStart() : GNodeEventStart("Function Start") {}
 };
