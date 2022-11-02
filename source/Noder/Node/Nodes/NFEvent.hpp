@@ -12,5 +12,17 @@ class EventScenarioStart : public GNodeEventStart
 class EventFunctionStart : public GNodeEventStart
 {
     public:
-        EventFunctionStart() : GNodeEventStart("Function Start") {}
+        EventFunctionStart() : GNodeEventStart("Function Start")
+        {
+            setEternal(true);
+        }
+};
+
+class EventFunctionEnd : public GNodeEventEnd
+{
+    public:
+        EventFunctionEnd() : GNodeEventEnd("Function End")
+        {
+            setEternal(true);
+        }
 };

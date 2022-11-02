@@ -18,6 +18,8 @@
 #define DEFAULT_PIN_NAME        "New Pin"
 #define DEFAULT_VARIABLE_NAME   "New Variable"
 #define DEFAULT_VARIABLE_TYPE   NoderPanel::Type::Bool
+#define DEFAULT_PIN_TYPE        PinProperty::Type::Bool
+#define DEFAULT_PIN_DIRECTION   PinProperty::Direction::Input
 
 class NoderFunctionPinArea;
 
@@ -29,7 +31,7 @@ class NoderPin : public QObject
         void setName(const QString &name) {_name = name;}
         void setType(PinProperty::Type type) {_type = type;}
         void setDirection(PinProperty::Direction direction) {_direction = direction;}
-        void createPin(void);
+        void setPin(Pin *pin) {_pin = pin;}
 
         const QString &name(void) const {return _name;}
         PinProperty::Type type(void) const {return _type;}
@@ -47,7 +49,7 @@ template <class N>
 class NoderSidePanelEntry : public PzaWidget
 {
     public:
-        void setName(const QString &name);
+        virtual void setName(const QString &name);
         const QString &name(void) {return _name;}
         virtual void setSelected(bool state);
         N *elem(void) const {return _elem;}
@@ -101,6 +103,7 @@ class NoderPinEntry : public NoderSidePanelEntry<NoderPin>
 
         void setType(PinProperty::Type type);
         void setDirection(PinProperty::Direction direction);
+        void setName(const QString &name) override;
         
         void remove(void) override {removed();}
 
@@ -127,6 +130,7 @@ class NoderFunctionEntry : public NoderSidePanelEntry<NoderFunction>
         void remove(void) override {removed();}
         NoderFunctionPinArea *pinArea(void) const {return _pinArea;}
         void createPinArea(void);
+        void updatePin(NoderPin *pin);
 
         void mouseMoveEvent(QMouseEvent *event) override;
 

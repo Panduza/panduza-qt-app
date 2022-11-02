@@ -51,6 +51,8 @@ class GNode : public QGraphicsObject
         void forEachPin(const std::function<void(Pin *pin)> &func);
         void updateLinks(void);
         void setPos(const QPointF &pos);
+        void setEternal(bool state) {_eternal = state;}
+        bool isEternal(void) const {return _eternal;}
 
         void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
         void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -62,6 +64,9 @@ class GNode : public QGraphicsObject
 
         template <typename N>
         static GNode *CreateNode(void) {return new N();}
+        Pin *addPinFromType(PinProperty::Type type, const QString &name, PinProperty::Direction direction, int index = -1);
+        int pinIndex(Pin *pin);
+        void replacePin(Pin *oldPin, Pin *newPin);
 
     protected:
         enum class PlugType {
@@ -84,7 +89,6 @@ class GNode : public QGraphicsObject
         
         virtual void setType(NodeProperty::Type type);
         void deletePin(Pin *pin);
-        void replacePin(Pin *oldPin, Pin *newPin);
         const NodeProperty::Type &nodeType(void) const {return _type;}
         const QColor &plugColor(PinProperty::Type type);
 
@@ -99,8 +103,6 @@ class GNode : public QGraphicsObject
         {
             return addPin<N>(name, PinProperty::Direction::Output);
         }
-
-        Pin *addPinFromType(PinProperty::Type type, const QString &name, PinProperty::Direction direction, int index = -1);
 
         NodeProperty::Type _type;
 
@@ -179,6 +181,7 @@ class GNode : public QGraphicsObject
         int _boxRadius;
         QColor _boxColor;
         QPointF _prevPos;
+        bool _eternal = false;
 
         PzaPropertyTable *_propTable = nullptr;
         PzaLabel *_propType = nullptr;

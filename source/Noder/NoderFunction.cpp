@@ -5,7 +5,6 @@ NoderFunction::NoderFunction(QWidget *parent)
 {
     PzaMenu *menu = new PzaMenu(this);
 
-    PzaMenu *EventMenu = new PzaMenu("Event", menu);
     PzaMenu *BranchMenu = new PzaMenu("Branch", menu);
     PzaMenu *ArithMenu = new PzaMenu("Arithmetic", menu);
     PzaMenu *StringMenu = new PzaMenu("String", menu);
@@ -17,7 +16,6 @@ NoderFunction::NoderFunction(QWidget *parent)
     PzaMenu *IoMenu = new PzaMenu("Io", menu);
     PzaMenu *PsuMenu = new PzaMenu("Power Supply", menu);
  
-    menu->addMenu(EventMenu);
     menu->addMenu(BranchMenu);
     menu->addMenu(ArithMenu);
     menu->addMenu(StringMenu);
@@ -29,7 +27,6 @@ NoderFunction::NoderFunction(QWidget *parent)
     InterfaceMenu->addMenu(IoMenu);
     InterfaceMenu->addMenu(PsuMenu);
 
-    view()->addNodeToMenu(EventMenu, "Function Start", GNode::CreateNode<EventFunctionStart>);
     view()->addNodeToMenu(BranchMenu, "If", GNode::CreateNode<If>);
     view()->addNodeToMenu(BranchMenu, "For", GNode::CreateNode<For>);
     view()->addNodeToMenu(BranchMenu, "For Each Element in Array", GNode::CreateNode<ForEachInArray>);
@@ -49,10 +46,6 @@ NoderFunction::NoderFunction(QWidget *parent)
 
     view()->setMenu(menu);
 
-    _startNode = view()->createNode(GNode::CreateNode<EventFunctionStart>, QPointF(0, 0));
-}
-
-void NoderFunction::updateStartNode(void)
-{
-   // _startNode
+    _startNode = view()->createNode(GNode::CreateNode<EventFunctionStart>, view()->mapToScene(view()->rect().center()));
+    _endNode = view()->createNode(GNode::CreateNode<EventFunctionEnd>, view()->rect().center());
 }

@@ -305,6 +305,14 @@ void GNode::deletePin(Pin *pin)
         removeFromList(pin, _outputPins);
 }
 
+int GNode::pinIndex(Pin *pin)
+{
+    if (pin->isInput())
+        return PzaUtils::IndexInVector<Pin *>(_inputPins, pin);
+    else
+        return PzaUtils::IndexInVector<Pin *>(_outputPins, pin);
+}
+
 void GNode::replacePin(Pin *oldPin, Pin *newPin)
 {
     std::vector<Pin *> oldLinkedPins = oldPin->linkedPins();

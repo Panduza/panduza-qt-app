@@ -204,6 +204,12 @@ NoderFunctionPinArea::NoderFunctionPinArea(QWidget *parent)
 
 void NoderFunctionPinArea::addEntry(void)
 {
+    PinProperty::Type prevType;
+    PinProperty::Direction prevDir;
+
+    prevType = (_selectedEntry) ? _selectedEntry->elem()->type() : DEFAULT_PIN_TYPE;
+    prevDir = (_selectedEntry) ? _selectedEntry->elem()->direction() : DEFAULT_PIN_DIRECTION;
+
     NoderSidePanelArea::addEntry();
        
     connect(_selectedEntry, &NoderPinEntry::pinChanged, this, [&]() {
@@ -211,8 +217,8 @@ void NoderFunctionPinArea::addEntry(void)
         pinChanged(entry->elem());
     });
 
-    _selectedEntry->setType(PinProperty::Type::Bool);
-    _selectedEntry->setDirection(PinProperty::Direction::Input);
+    _selectedEntry->setType(prevType);
+    _selectedEntry->setDirection(prevDir);
 }
 
 void NoderFunctionPinArea::removeEntry(NoderPinEntry *target)
@@ -341,9 +347,27 @@ void NoderFunctionEntry::createPinArea(void)
 {
     _pinArea = new NoderFunctionPinArea(this);
 
-    connect(_pinArea, &NoderFunctionPinArea::pinChanged, this, [&](NoderPin *elem) {
+    connect(_pinArea, &NoderFunctionPinArea::pinChanged, this, &NoderFunctionEntry::updatePin);
+}
 
-    });
+void NoderFunctionEntry::updatePin(NoderPin *pinEntry)
+{
+    Pin *pin;
+    int index = -1;
+
+    if (pinEntry->direction() == PinProperty::Direction::Input) {
+        if (pinEntry->pin()) {
+            index = elem()->startNode()->pinIndex(pinEntry->pin());
+            // index
+            // deletePin
+
+        }
+        pin = elem()->startNode()->addPinFromType(pinEntry->type(), pinEntry->name(), Pin::OppositeDirection(pinEntry->direction()), index);
+        if (pinEntry->pin())
+            elem()->startNode()->replacePin(pinEntry->pin(), pin);
+        
+        pinEntry->setPin(pin);
+    }
 }
 
 void NoderFunctionEntry::mouseMoveEvent(QMouseEvent *event)
@@ -392,6 +416,14 @@ NoderPinEntry::NoderPinEntry(QWidget *parent)
     _layout->insertWidget(3, _typeLabel);
 }
 
+void NoderPinEntry::setName(const QString &name)
+{
+    NoderSidePanelEntry::setName(name);
+
+    if (elem()->pin())
+        elem()->pin()->setName(name);
+}
+
 void NoderPinEntry::setType(PinProperty::Type type)
 {
      int index = _propType->findText(Noder::Get().pinTypeToStr(type));
@@ -414,14 +446,4 @@ void NoderPinEntry::setDirection(PinProperty::Direction direction)
     _directionLabel->setText(Noder::Get().pinDirToStr(direction));
     _elem->setDirection(direction);
     pinChanged();
-}
-
-void NoderPin::createPin(void)
-{
-   // if (_pin)
-    //    _pin->deleteLater();
-
-    //pinChanged();
-
-    //_pin = GNode::addPinFromType();
 }

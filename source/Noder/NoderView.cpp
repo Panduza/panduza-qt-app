@@ -99,12 +99,12 @@ void NoderGraphicsView::keyPressEvent(QKeyEvent *event)
             QList<QGraphicsItem *> items = _scene->selectedItems();
             for (auto item: items) {
                 GNode *node = dynamic_cast<GNode *>(item);
-                if (node) {
+                if (node && node->isEternal() == false) {
                     if (_selectedNode == node)
                         _selectedNode = nullptr;
+                    _scene->removeItem(item);
+                    node->deleteLater();
                 }
-                _scene->removeItem(item);
-                delete item;
             }
             break;
         }
