@@ -99,46 +99,62 @@ class Noder : public QObject
         PinProperty::Direction pinDirectionFromName(const QString &name);
         PinProperty::Type panelTypeToPinType(const NoderPanel::Type type);
 
-        std::unordered_map<NoderPanel::Type, QString> _varTypeMap = {
-            {NoderPanel::Type::Bool, "Boolean"},
-            {NoderPanel::Type::Int,  "Integer"},
-            {NoderPanel::Type::Float, "Float"},
-            {NoderPanel::Type::String, "String"},
-            {NoderPanel::Type::Enum,  "Enum"},
-        };
-
-        std::unordered_map<PinProperty::Type, QString> _pinTypeMap = {
-            {PinProperty::Type::Wildcard, "Wildcard"},
-            {PinProperty::Type::Int, "Integer"},
-            {PinProperty::Type::Float, "Float"},
-            {PinProperty::Type::Bool, "Boolean"},
-            {PinProperty::Type::String, "String"},
-            {PinProperty::Type::Enum, "Enum"},
-            {PinProperty::Type::Interface, "Interface"},
-            {PinProperty::Type::Array, "Array"}
-        };
-
-        std::unordered_map<PinProperty::Direction, QString> _pinDirMap = {
-            {PinProperty::Direction::Input, "Input"},
-            {PinProperty::Direction::Output, "Output"},
-        };
-
-        std::map<QString, std::vector<QString>> _enumMap = {
+        static std::unordered_map<NoderPanel::Type, QString> &varTypeMap(void)
         {
-            "I/O direction",
-            {
-                "Input",
-                "Output"
-            }
-        },
-        {
-            "I/O value",
-            {
-                "Low",
-                "High"
-            }
+            static std::unordered_map<NoderPanel::Type, QString> map = {
+                {NoderPanel::Type::Bool, "Boolean"},
+                {NoderPanel::Type::Int,  "Integer"},
+                {NoderPanel::Type::Float, "Float"},
+                {NoderPanel::Type::String, "String"},
+                {NoderPanel::Type::Enum,  "Enum"},
+            };
+            return map;
         }
-    };
+
+        static std::unordered_map<PinProperty::Type, QString> &pinTypeMap(void)
+        {
+            static std::unordered_map<PinProperty::Type, QString> map = {
+                {PinProperty::Type::Wildcard, "Wildcard"},
+                {PinProperty::Type::Int, "Integer"},
+                {PinProperty::Type::Float, "Float"},
+                {PinProperty::Type::Bool, "Boolean"},
+                {PinProperty::Type::String, "String"},
+                {PinProperty::Type::Enum, "Enum"},
+                {PinProperty::Type::Interface, "Interface"},
+                {PinProperty::Type::Array, "Array"}
+            };
+            return map;
+        }
+
+        static std::unordered_map<PinProperty::Direction, QString> &pinDirMap(void)
+        {
+            static std::unordered_map<PinProperty::Direction, QString> map = {
+                {PinProperty::Direction::Input, "Input"},
+                {PinProperty::Direction::Output, "Output"},
+            };
+            return map;
+        }
+
+        static std::map<QString, std::vector<QString>> &enumMap(void)
+        {
+            static std::map<QString, std::vector<QString>> map = {
+                {
+                    "I/O direction",
+                    {
+                        "Input",
+                        "Output"
+                    }
+                },
+                {
+                    "I/O value",
+                    {
+                        "Low",
+                        "High"
+                    }
+                }
+            };
+            return map;
+        }
 
     private:
         Noder();

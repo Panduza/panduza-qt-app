@@ -26,3 +26,12 @@ class EventFunctionEnd : public GNodeEventEnd
             setEternal(true);
         }
 };
+
+class EventFunctionFinal : public GNodeEvent
+{
+    public:
+        EventFunctionFinal() : GNodeEvent("Function")
+        {
+
+        }
+};

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <GNodeInstance.hpp>
+#include <GNodeExec.hpp>
 #include <NoderVariable.hpp>
+#include <NoderFunction.hpp>
 
 class Instance : public GNodeInstance
 {
@@ -19,4 +21,21 @@ class Instance : public GNodeInstance
     
     private slots:
         void updatePin(void);
+};
+
+class FuncInstance : public GNodeExec
+{
+    Q_OBJECT
+
+    public:
+        FuncInstance();
+
+        void exec() override {}
+        void setFunction(NoderFunction *func);
+
+    private:
+        NoderFunction *_function;
+
+    private slots:
+        void updateNode(void);
 };

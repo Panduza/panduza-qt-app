@@ -35,6 +35,7 @@ class GNode : public QGraphicsObject
         GNode(const QString &name);
 
         const QString &name() const {return _name;}
+        void setUserName(const QString &name);
 
         void process(void);
         virtual void exec(void) {};
@@ -67,6 +68,9 @@ class GNode : public QGraphicsObject
         Pin *addPinFromType(PinProperty::Type type, const QString &name, PinProperty::Direction direction, int index = -1);
         int pinIndex(Pin *pin);
         void replacePin(Pin *oldPin, Pin *newPin);
+        void deletePin(Pin *pin);
+        void deleteValuePins(void);
+        virtual void refreshUserName(const QString &name);
 
     protected:
         enum class PlugType {
@@ -88,7 +92,6 @@ class GNode : public QGraphicsObject
         void setup(void);
         
         virtual void setType(NodeProperty::Type type);
-        void deletePin(Pin *pin);
         const NodeProperty::Type &nodeType(void) const {return _type;}
         const QColor &plugColor(PinProperty::Type type);
 
@@ -178,6 +181,7 @@ class GNode : public QGraphicsObject
         int _entryMiny;
         int _pinBoxOffsetY;
         QString _name;
+        QString _userName;
         int _boxRadius;
         QColor _boxColor;
         QPointF _prevPos;

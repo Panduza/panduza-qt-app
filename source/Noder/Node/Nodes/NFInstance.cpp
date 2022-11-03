@@ -1,4 +1,4 @@
-#include "NInstance.hpp"
+#include "NFInstance.hpp"
 
 Instance::Instance()
     : GNodeInstance()
@@ -70,14 +70,51 @@ void Instance::updatePin(void)
     _pin = newPin;
 
     connect(_var, &NoderVariable::nameChanged, _pin, &Pin::setName);
-    connect(_var, &NoderVariable::dead, this, [&]() {
-        deleteLater();
-    });
 }
 
 void Instance::setVariable(NoderVariable *var)
 {
     _var = var;
     connect(var, &NoderVariable::typeChanged, this, &Instance::updatePin);
+    connect(_var, &NoderVariable::dead, this, [&]() {
+        deleteLater();
+    });
     updatePin();
+}
+
+FuncInstance::FuncInstance()
+    : GNodeExec("")
+{
+
+}
+
+void FuncInstance::setFunction(NoderFunction *func)
+{
+    _function = func;
+    connect(_function, &NoderFunction::updated, this, &FuncInstance::updateNode);
+    connect(_function, &NoderFunction::nameChanged, this, &FuncInstance::refreshUserName);
+    connect(_function, &NoderFunction::dead, this, [&]() {
+        deleteLater();
+    });
+    refreshUserName(_function->name());
+    updateNode();
+}
+
+void FuncInstance::updateNode(void)
+{
+    auto clonePins = [&](GNode *node) {
+        node->forEachPin([&](Pin *pin) {
+            if (pin->type() == PinProperty::Type::Exec)
+                return;
+            const QString &name = pin->name();
+            PinProperty::Type type = pin->type();
+            PinProperty::Direction direction = Pin::OppositeDirection(pin->direction());
+            addPinFromType(type, name, direction);
+        });
+    };
+
+    deleteValuePins();
+
+    clonePins(_function->startNode());
+    clonePins(_function->endNode());
 }

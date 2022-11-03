@@ -115,7 +115,8 @@ class NoderPinEntry : public NoderSidePanelEntry<NoderPin>
         PzaComboBox *_propDirection;
 
     signals:
-        void pinChanged(void);
+        void typeChanged(void);
+        void directionChanged(void);
         void removed(void);
 };
 
@@ -130,7 +131,9 @@ class NoderFunctionEntry : public NoderSidePanelEntry<NoderFunction>
         void remove(void) override {removed();}
         NoderFunctionPinArea *pinArea(void) const {return _pinArea;}
         void createPinArea(void);
-        void updatePin(NoderPin *pin);
+        void updateType(NoderPin *pin);
+        void updateDirection(NoderPin *pin);
+        void removePin(NoderPin *pin);
 
         void mouseMoveEvent(QMouseEvent *event) override;
 
@@ -172,7 +175,9 @@ class NoderFunctionPinArea : public NoderSidePanelArea<NoderPinEntry>
         void selectEntry(NoderPinEntry *target) override;
 
     signals:
-        void pinChanged(NoderPin *elem);
+        void pinRemoved(NoderPin *elem);
+        void typeChanged(NoderPin *elem);
+        void directionChanged(NoderPin *elem);
 };
 
 class NoderVariableArea : public NoderSidePanelArea<NoderVariableEntry>

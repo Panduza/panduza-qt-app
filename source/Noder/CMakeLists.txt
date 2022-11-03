@@ -36,5 +36,5 @@ target_sources(${PROG}
 	Node/Nodes/NFEvent.cpp
 	Node/Nodes/NFMath.cpp
 	Node/Nodes/NFIO.cpp
-	Node/Nodes/NInstance.cpp
+	Node/Nodes/NFInstance.cpp
 )

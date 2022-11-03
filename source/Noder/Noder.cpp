@@ -10,28 +10,28 @@ Noder::Noder()
 
 void Noder::forEachEnum(const std::function<void(const QString &name, const std::vector<QString> &list)> &f)
 {
-    for (auto var : _enumMap) {
+    for (auto const &var : enumMap()) {
         f(var.first, var.second);
     }
 }
 
 void Noder::forEachEnumName(const std::function<void(const QString &name)> &f)
 {
-    for (auto var : _enumMap) {
+    for (auto const &var : enumMap()) {
         f(var.first);
     }
 }
 
 void Noder::forEachEnumValues(const QString &name, const std::function<void(const QString &name)> &f)
 {
-    for (auto var : _enumMap[name]) {
+    for (auto const &var : enumMap()[name]) {
         f(var);
     }
 }
 
 const std::vector<QString> &Noder::enumValues(const QString &name)
 {
-    return _enumMap[name];
+    return enumMap()[name];
 }
 
 Pin *Noder::pinTypeToObj(const PinProperty::Type type)
@@ -63,12 +63,12 @@ PinProperty::Type Noder::panelTypeToPinType(const NoderPanel::Type type)
 
 const QString &Noder::pinTypeToStr(const PinProperty::Type type)
 {
-    return _pinTypeMap[type];
+    return pinTypeMap()[type];
 }
 
 const QString &Noder::pinDirToStr(const PinProperty::Direction type)
 {
-    return _pinDirMap[type];
+    return pinDirMap()[type];
 }
 
 const QColor &Noder::plugColor(const PinProperty::Type type)
@@ -112,12 +112,12 @@ const QString &Noder::nodeTypeName(const NodeProperty::Type type)
 
 const QString &Noder::varTypeName(const NoderPanel::Type type)
 {
-    return _varTypeMap[type];
+    return varTypeMap()[type];
 }
 
 NoderPanel::Type Noder::varTypeFromName(const QString &name)
 {
-    for (const auto& [key, value] : _varTypeMap)
+    for (const auto& [key, value] : varTypeMap())
         if (value == name)
             return key;
     // Should not be possible
@@ -126,7 +126,7 @@ NoderPanel::Type Noder::varTypeFromName(const QString &name)
 
 PinProperty::Type Noder::pinTypeFromName(const QString &name)
 {
-    for (const auto& [key, value] : _pinTypeMap)
+    for (const auto& [key, value] : pinTypeMap())
         if (value == name)
             return key;
     // Should not be possible
@@ -135,7 +135,7 @@ PinProperty::Type Noder::pinTypeFromName(const QString &name)
 
 PinProperty::Direction Noder::pinDirectionFromName(const QString &name)
 {
-    for (const auto& [key, value] : _pinDirMap)
+    for (const auto& [key, value] : pinDirMap())
         if (value == name)
             return key;
     // Should not be possible
@@ -145,21 +145,21 @@ PinProperty::Direction Noder::pinDirectionFromName(const QString &name)
 
 void Noder::forEachVarType(const std::function<void(NoderPanel::Type type)> &f)
 {
-    for (auto var : _varTypeMap) {
+    for (auto const &var : varTypeMap()) {
         f(var.first);
     }
 }
 
 void Noder::forEachPinType(const std::function<void(PinProperty::Type type)> &f)
 {
-    for (auto var : _pinTypeMap) {
+    for (auto const &var : pinTypeMap()) {
         f(var.first);
     }
 }
 
 void Noder::forEachPinDirection(const std::function<void(PinProperty::Direction direction)> &f)
 {
-    for (auto var : _pinDirMap) {
+    for (auto const &var : pinDirMap()) {
         f(var.first);
     }
 }

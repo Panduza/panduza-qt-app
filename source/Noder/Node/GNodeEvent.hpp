@@ -13,3 +13,9 @@ class GNodeEventEnd: public GNodeExec
     protected:
         GNodeEventEnd(const QString &name);
 };
+
+class GNodeEvent: public GNodeExec
+{
+    protected:
+        GNodeEvent(const QString &name);
+};

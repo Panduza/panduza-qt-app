@@ -8,8 +8,7 @@ GNodeBasic::GNodeBasic(const QString &name)
     : GNode(name),
     _spacingY(2),
     _spacingMid(10),
-    _pinBoxIn(0, 0, 0, 0),
-    _userName(name)
+    _pinBoxIn(0, 0, 0, 0)
 {
     _title = new struct title;
     _title->box = QRect(0, 0, 0, 0);
@@ -34,6 +33,12 @@ void GNodeBasic::setUserName(void)
 {
     _userName = _propUserName->text();
     refreshNode();
+}
+
+void GNodeBasic::refreshUserName(const QString &name)
+{
+    GNode::refreshUserName(name);
+    _propUserName->setText(name);
 }
 
 void GNodeBasic::setTitleColor(const QColor &color)
@@ -118,14 +123,14 @@ void GNodeBasic::createProxyMultiPin(struct multiPin *s)
 
 void GNodeBasic::forEachMultiPin(const std::function<void(struct multiPin *s)> &func)
 {
-    for (auto s: _multiPinStructs) {
+    for (auto const &s: _multiPinStructs) {
         func(s);
     }
 }
 
 struct GNodeBasic::multiPin *GNodeBasic::findMultiPinFromList(std::vector<Pin *> *list)
 {
-    for (auto s: _multiPinStructs) {
+    for (auto const &s: _multiPinStructs) {
         if (s->list == list)
             return s;
     }
@@ -155,7 +160,7 @@ void GNodeBasic::pinBoxSize()
         _pinBoxOut.setHeight(_pinBoxOut.height() + 10);
     }
 
-    for (auto s: _multiPinStructs) {
+    for (auto const &s: _multiPinStructs) {
         _pinBoxOut.setWidth(std::max(_pinBoxOut.width(), s->w->sizeHint().width()));
         _pinBoxOut.setHeight(_pinBoxOut.height() + std::max(s->w->sizeHint().height(), _entryMiny) + _spacingY);
     }
@@ -241,7 +246,7 @@ void GNodeBasic::positionEntries(void)
     if (_multiPinStructs.size() > 0)
         pos.setY(pos.y());
 
-    for (auto s: _multiPinStructs) {
+    for (auto const &s: _multiPinStructs) {
         s->proxy->setGeometry(QRect(pos, s->w->size()));
         pos.setY(pos.y() + s->w->size().height() + _spacingY);
         posMaxY = std::max(posMaxY, pos.y());
@@ -276,7 +281,7 @@ void GNodeBasic::setWidgetSize(void)
         size.setHeight(std::max(pin->sizeHint().height(), _entryMiny));
         pin->setSize(size);
     });
-    for (auto s: _multiPinStructs) {
+    for (auto const &s: _multiPinStructs) {
         s->w->setFixedSize(_pinBoxOut.width(), std::max(s->w->sizeHint().height(), _entryMiny));
     }
 }

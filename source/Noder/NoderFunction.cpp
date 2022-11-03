@@ -27,6 +27,7 @@ NoderFunction::NoderFunction(QWidget *parent)
     InterfaceMenu->addMenu(IoMenu);
     InterfaceMenu->addMenu(PsuMenu);
 
+    view()->addNodeToMenu(BranchMenu, "Mdr", GNode::CreateNode<EventFunctionFinal>);
     view()->addNodeToMenu(BranchMenu, "If", GNode::CreateNode<If>);
     view()->addNodeToMenu(BranchMenu, "For", GNode::CreateNode<For>);
     view()->addNodeToMenu(BranchMenu, "For Each Element in Array", GNode::CreateNode<ForEachInArray>);

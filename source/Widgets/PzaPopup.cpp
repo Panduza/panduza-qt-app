@@ -34,7 +34,7 @@ void PzaPopup::removeWidget(QWidget *w)
 {
     QWidgetAction *item;
 
-    for (auto action: actions()) {
+    for (auto const &action: actions()) {
         item = dynamic_cast<QWidgetAction *>(action);
         if (item && item->defaultWidget() == w) {
             removeAction(item);

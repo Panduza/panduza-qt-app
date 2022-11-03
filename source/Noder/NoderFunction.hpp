@@ -20,11 +20,10 @@ class NoderFunction : public NoderView
     public:
         NoderFunction(QWidget *parent = nullptr);
 
-        void setName(const QString &name) {_name = name; nameChanged();}
+        void setName(const QString &name) {_name = name; nameChanged(name);}
         const QString &name(void) const {return _name;}
         GNode *startNode(void) const {return _startNode;}
         GNode *endNode(void) const {return _endNode;}
-        void updateEndNode(void);
 
     private:
         QString _name;
@@ -32,5 +31,7 @@ class NoderFunction : public NoderView
         GNode *_endNode;
     
     signals:
-        void nameChanged(void);
+        void nameChanged(const QString &name);
+        void updated(void);
+        void dead(void);
 };

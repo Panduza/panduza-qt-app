@@ -128,6 +128,8 @@ void NoderFunctionArea::removeEntry(NoderFunctionEntry *target)
 {
     _pinSpoiler->removeWidget(target->pinArea());
 
+    target->elem()->dead();
+
     NoderSidePanelArea::removeEntry(target);
 
     if (_entryList.size() == 0)
@@ -164,7 +166,7 @@ void NoderVariableArea::addEntry(void)
     NoderSidePanelArea::addEntry();
 
     variable = _selectedEntry->elem();
-    
+
     connect(_selectedEntry, &NoderVariableEntry::typeChanged, this, [&, variable]() {
         if (variable->defValTable()) {
             _defValArea->removeWidget(variable->defValTable());
@@ -181,6 +183,8 @@ void NoderVariableArea::addEntry(void)
 
 void NoderVariableArea::removeEntry(NoderVariableEntry *target)
 {
+    target->elem()->dead();
+    
     NoderSidePanelArea::removeEntry(target);
 
     if (_entryList.size() == 0)
@@ -211,18 +215,24 @@ void NoderFunctionPinArea::addEntry(void)
     prevDir = (_selectedEntry) ? _selectedEntry->elem()->direction() : DEFAULT_PIN_DIRECTION;
 
     NoderSidePanelArea::addEntry();
-       
-    connect(_selectedEntry, &NoderPinEntry::pinChanged, this, [&]() {
+
+    connect(_selectedEntry, &NoderPinEntry::typeChanged, this, [&]() {
         NoderPinEntry *entry = static_cast<NoderPinEntry *>(sender());
-        pinChanged(entry->elem());
+        typeChanged(entry->elem());
     });
 
-    _selectedEntry->setType(prevType);
+    connect(_selectedEntry, &NoderPinEntry::directionChanged, this, [&]() {
+        NoderPinEntry *entry = static_cast<NoderPinEntry *>(sender());
+        directionChanged(entry->elem());
+    });
+
     _selectedEntry->setDirection(prevDir);
+    _selectedEntry->setType(prevType);
 }
 
 void NoderFunctionPinArea::removeEntry(NoderPinEntry *target)
 {
+    pinRemoved(target->elem());
     NoderSidePanelArea::removeEntry(target);
 }
 
@@ -312,7 +322,9 @@ NoderVariableEntry::NoderVariableEntry(QWidget *parent)
 void NoderVariableEntry::setType(NoderPanel::Type type)
 {
     int index = _propType->findText(Noder::Get().varTypeName(type));
+    _propType->blockSignals(true);
     _propType->setCurrentIndex(index);
+    _propType->blockSignals(false);
 
     _typeLabel->setText(Noder::Get().varTypeName(type));
     _colorFrame->setStyleSheet(
@@ -347,27 +359,85 @@ void NoderFunctionEntry::createPinArea(void)
 {
     _pinArea = new NoderFunctionPinArea(this);
 
-    connect(_pinArea, &NoderFunctionPinArea::pinChanged, this, &NoderFunctionEntry::updatePin);
+    connect(_pinArea, &NoderFunctionPinArea::typeChanged, this, &NoderFunctionEntry::updateType);
+    connect(_pinArea, &NoderFunctionPinArea::directionChanged, this, &NoderFunctionEntry::updateDirection);
+    connect(_pinArea, &NoderFunctionPinArea::pinRemoved, this, &NoderFunctionEntry::removePin);
 }
 
-void NoderFunctionEntry::updatePin(NoderPin *pinEntry)
+void NoderFunctionEntry::updateType(NoderPin *pinEntry)
 {
-    Pin *pin;
-    int index = -1;
+    Pin *newPin;
+    const QString &name = pinEntry->name();
+    PinProperty::Direction direction = Pin::OppositeDirection(pinEntry->direction());
+    PinProperty::Type type = pinEntry->type();
+    GNode *node;
 
-    if (pinEntry->direction() == PinProperty::Direction::Input) {
-        if (pinEntry->pin()) {
-            index = elem()->startNode()->pinIndex(pinEntry->pin());
-            // index
-            // deletePin
-
-        }
-        pin = elem()->startNode()->addPinFromType(pinEntry->type(), pinEntry->name(), Pin::OppositeDirection(pinEntry->direction()), index);
-        if (pinEntry->pin())
-            elem()->startNode()->replacePin(pinEntry->pin(), pin);
-        
-        pinEntry->setPin(pin);
+    switch (pinEntry->direction()) {
+        case PinProperty::Direction::Input:
+            node = elem()->startNode();
+            break;
+        case PinProperty::Direction::Output:
+            node = elem()->endNode();
+            break;
     }
+
+    if (pinEntry->pin()) {
+        int index = node->pinIndex(pinEntry->pin());
+        newPin = node->addPinFromType(type, name, direction, index);
+        node->replacePin(pinEntry->pin(), newPin);
+    }
+    else {
+        newPin = node->addPinFromType(type, name, direction);
+    }
+
+    pinEntry->setPin(newPin);
+    elem()->updated();
+}
+
+void NoderFunctionEntry::updateDirection(NoderPin *pinEntry)
+{
+    Pin *newPin;
+    PinProperty::Direction newDirection;
+    GNode *oldNode;
+    GNode *newNode;
+
+    switch (pinEntry->direction()) {
+        case PinProperty::Direction::Input:
+            newNode = elem()->startNode();
+            oldNode = elem()->endNode();
+            break;
+        case PinProperty::Direction::Output:
+            newNode = elem()->endNode();
+            oldNode = elem()->startNode();
+            break;
+    }
+    if (!pinEntry->pin()) {
+        // Means that direction has been set for the first time, but not updated.
+        // This happens at initialization.
+        return ;
+    }
+    newDirection = Pin::OppositeDirection(pinEntry->direction());
+    oldNode->deletePin(pinEntry->pin());
+    newPin = newNode->addPinFromType(pinEntry->type(), pinEntry->name(), newDirection);
+    pinEntry->setPin(newPin);
+    elem()->updated();
+}
+
+
+void NoderFunctionEntry::removePin(NoderPin *pinEntry)
+{
+    GNode *node;
+
+    switch (pinEntry->direction()) {
+        case PinProperty::Direction::Input:
+            node = elem()->startNode();
+            break;
+        case PinProperty::Direction::Output:
+            node = elem()->endNode();
+            break;
+    }
+    node->deletePin(pinEntry->pin());
+    elem()->updated();
 }
 
 void NoderFunctionEntry::mouseMoveEvent(QMouseEvent *event)
@@ -426,8 +496,10 @@ void NoderPinEntry::setName(const QString &name)
 
 void NoderPinEntry::setType(PinProperty::Type type)
 {
-     int index = _propType->findText(Noder::Get().pinTypeToStr(type));
+    int index = _propType->findText(Noder::Get().pinTypeToStr(type));
+    _propType->blockSignals(true);
     _propType->setCurrentIndex(index);
+    _propType->blockSignals(false);
 
     _typeLabel->setText(Noder::Get().pinTypeToStr(type));
     _colorFrame->setStyleSheet(
@@ -435,15 +507,18 @@ void NoderPinEntry::setType(PinProperty::Type type)
             "border-radius: 5px;"
     );
     _elem->setType(type);
-    pinChanged();
+    typeChanged();
 }
 
 void NoderPinEntry::setDirection(PinProperty::Direction direction)
 {
-     int index = _propDirection->findText(Noder::Get().pinDirToStr(direction));
+    int index = _propDirection->findText(Noder::Get().pinDirToStr(direction));
+    _propDirection->blockSignals(true);
     _propDirection->setCurrentIndex(index);
+    _propDirection->blockSignals(false);
 
     _directionLabel->setText(Noder::Get().pinDirToStr(direction));
+
     _elem->setDirection(direction);
-    pinChanged();
+    directionChanged();
 }

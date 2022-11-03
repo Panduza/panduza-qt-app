@@ -3,7 +3,7 @@
 #include "Noder.hpp"
 
 #include <GNode.hpp>
-#include <Nodes/NInstance.hpp>
+#include <Nodes/NFInstance.hpp>
 #include <Nodes/NFMath.hpp>
 
 NoderGraphicsView::NoderGraphicsView(QWidget *parent)
@@ -51,18 +51,29 @@ void NoderGraphicsView::dragMoveEvent(QDragMoveEvent *event)
 void NoderGraphicsView::dropEvent(QDropEvent *event)
 {
     const PzaMimeData *mime;
-    NoderVariable *variable;
 
     QGraphicsView::dropEvent(event);
-    if (event->mimeData()->hasFormat("noder/variable") == false)
-        return ;
+    if (event->mimeData()->hasFormat("noder/variable") == true) {
+        NoderVariable *variable;
 
-    mime = static_cast<const PzaMimeData *>(event->mimeData());
-    variable = static_cast<NoderVariable *>(mime->dataPtr());
-    if (variable) {
-        QPointF pos = mapToScene(event->position().toPoint());
-        GNode *node = createNode(GNode::CreateNode<Instance>, pos);
-        static_cast<Instance *>(node)->setVariable(variable);
+        mime = static_cast<const PzaMimeData *>(event->mimeData());
+        variable = static_cast<NoderVariable *>(mime->dataPtr());
+        if (variable) {
+            QPointF pos = mapToScene(event->position().toPoint());
+            GNode *node = createNode(GNode::CreateNode<Instance>, pos);
+            static_cast<Instance *>(node)->setVariable(variable);
+        }
+    }
+    else if (event->mimeData()->hasFormat("noder/function") == true) {
+        NoderFunction *function;
+
+        mime = static_cast<const PzaMimeData *>(event->mimeData());
+        function = static_cast<NoderFunction *>(mime->dataPtr());
+        if (function) {
+            QPointF pos = mapToScene(event->position().toPoint());
+            GNode *node = createNode(GNode::CreateNode<FuncInstance>, pos);
+            static_cast<FuncInstance *>(node)->setFunction(function);
+        }
     }
 }
 
@@ -97,7 +108,7 @@ void NoderGraphicsView::keyPressEvent(QKeyEvent *event)
         case Qt::Key_Delete:
         {
             QList<QGraphicsItem *> items = _scene->selectedItems();
-            for (auto item: items) {
+            for (auto const &item: items) {
                 GNode *node = dynamic_cast<GNode *>(item);
                 if (node && node->isEternal() == false) {
                     if (_selectedNode == node)

@@ -13,6 +13,7 @@ GNode::GNode(const QString &name)
     _entryMiny(25),
     _pinBoxOffsetY(10),
     _name(name),
+    _userName(name),
     _boxRadius(6),
     _boxColor("#353535")
 {
@@ -63,6 +64,12 @@ void GNode::setType(NodeProperty::Type type)
 {
     _type = type;
     _propType->setText(Noder::Get().nodeTypeName(_type));
+}
+
+void GNode::refreshUserName(const QString &name)
+{
+    _userName = name;
+    refreshNode();
 }
 
 struct GNode::plugIcon GNode::initPlugType(PlugType type)
@@ -137,14 +144,14 @@ QByteArray GNode::loadColorNcValue(const PinProperty::Type &type)
 
 void GNode::forEachInputPin(const std::function<void(Pin *pin)> &func)
 {
-    for (auto pin: _inputPins) {
+    for (auto const &pin: _inputPins) {
         func(pin);
     }
 }
 
 void GNode::forEachOutputPin(const std::function<void(Pin *pin)> &func)
 {
-    for (auto pin: _outputPins) {
+    for (auto const &pin: _outputPins) {
         func(pin);
     }
 }
@@ -277,7 +284,7 @@ void GNode::createProxyWidget(Pin *pin)
                 PinDecl::Enum *ePin = static_cast<PinDecl::Enum*>(pin);
                 connect(ePin, &PinDecl::Enum::initialized, this, [&, ePin, combo](){
                     combo->clear();
-                    for (auto item: ePin->list()) {
+                    for (auto const &item: ePin->list()) {
                         combo->addItem(item);
                     }
                 });
@@ -294,15 +301,37 @@ void GNode::createProxyWidget(Pin *pin)
 
 void GNode::deletePin(Pin *pin)
 {
-    auto removeFromList = [&](Pin *pin, std::vector<Pin *>& list) {
+    auto removeFromList = [&](Pin *pin, std::vector<Pin *> &list) {
         auto it = find(list.begin(), list.end(), pin);
-        pin->deleteLater();
         list.erase(it);
+        pin->deleteLater();
     };
     if (pin->isInput())
         removeFromList(pin, _inputPins);
     else
         removeFromList(pin, _outputPins);
+}
+
+void GNode::deleteValuePins(void)
+{
+
+    auto deleteList = [&](std::vector<Pin *> &list) {
+        Pin *pin;
+        auto it = list.begin();
+
+        while (it != list.end()) {
+            pin = *it;
+            if (pin->type() != PinProperty::Type::Exec) {
+                it = list.erase(it);
+                pin->deleteLater();
+            }
+            else
+                it++;
+        }
+    };
+
+    deleteList(_inputPins);
+    deleteList(_outputPins);
 }
 
 int GNode::pinIndex(Pin *pin)
@@ -385,7 +414,7 @@ void GNode::setOnTop(void)
 {
     QList<QGraphicsItem *> hover = collidingItems();
     
-    for (auto item: hover) {
+    for (auto const &item: hover) {
         if (dynamic_cast<GNode *>(item))
             item->setZValue(0);
     }

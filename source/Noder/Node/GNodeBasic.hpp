@@ -25,6 +25,8 @@ class GNodeBasic : public GNode
         const QColor &defaultTitleColor(const NodeProperty::Type &type);
         const QString &userName() const {return _userName;}
 
+        void refreshUserName(const QString &name) override;
+
         QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
         void refreshNode(void) override;
@@ -123,7 +125,6 @@ class GNodeBasic : public GNode
         int _spacingMid;
         QRect _pinBoxIn;
         QRect _pinBoxOut;
-        QString _userName;
         PzaLabel *_propName = nullptr;
         PzaColorBox *_propTitleColor = nullptr;
         PzaLineEdit *_propUserName = nullptr;
@@ -139,6 +140,6 @@ class GNodeBasic : public GNode
         void titleboxSize(void);
         void paint(QPainter *, QStyleOptionGraphicsItem const *opt = 0, QWidget *w = 0) override;
 
-    private slots:
+    public slots:
         void setUserName(void);
 };

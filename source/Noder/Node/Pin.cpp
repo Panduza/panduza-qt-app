@@ -172,7 +172,7 @@ void Pin::forEachLinkedPin(const std::function<void(Pin *pin)> &func)
 
 void Pin::forEachLink(const std::function<void(Link *link)> &func)
 {
-    for (auto link: _links) {
+    for (auto const &link: _links) {
         func(link);
     }
 }

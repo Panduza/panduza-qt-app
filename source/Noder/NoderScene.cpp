@@ -14,7 +14,7 @@ GNode *NoderScene::findNodeAt(QPointF pos)
     GNode *node = nullptr;
 
     list = items(pos);
-    for (auto elem: list) {
+    for (auto const &elem: list) {
         node = dynamic_cast<GNode *>(elem);
         if (node != nullptr)
             break;
@@ -27,7 +27,7 @@ std::vector<GNode *> NoderScene::findInputEventNodes(void)
     std::vector<GNode *> list;
     GNode *node;
 
-    for (auto elem: items()) {
+    for (auto const &elem: items()) {
         node = dynamic_cast<GNodeEventStart *>(elem);
         if (node != nullptr) {
             list.push_back(node);
@@ -53,7 +53,7 @@ void NoderScene::executeScene(void)
 
     inputs = findInputEventNodes();
 
-    for (auto input: inputs) {
+    for (auto const &input: inputs) {
         executeSection(input);
     }
 }

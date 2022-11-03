@@ -38,7 +38,7 @@ void Array::onEventConnect()
 
     listSize = _list.size();
     index = PzaUtils::IndexInVector<Pin *>(_list, to);
-    for (auto pin: _list) {
+    for (auto const &pin: _list) {
         deletePin(pin);
     }
     _list.clear();
@@ -82,7 +82,7 @@ void Array::onEventDisconnect()
     _type = PinProperty::Type::Wildcard;
 
     listSize = _list.size();
-    for (auto pin: _list) {
+    for (auto const &pin: _list) {
         deletePin(pin);
     }
     _list.clear();
