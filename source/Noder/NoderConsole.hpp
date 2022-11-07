@@ -8,10 +8,11 @@
 
 class NoderConsole : public PzaWidget
 {
-    public:
-        NoderConsole(QWidget *parent = nullptr);
+    friend class NoderOutputArea;
 
     private:
+        NoderConsole(QWidget *parent = nullptr);
+
         QVBoxLayout *_layout;
         PzaTextEdit *_console;
         PzaLineEdit *_inputLine;

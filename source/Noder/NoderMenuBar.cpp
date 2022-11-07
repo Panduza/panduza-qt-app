@@ -12,7 +12,7 @@ NoderMenuBar::NoderMenuBar(QWidget *parent)
     PzaMenu *nodeMenu = new PzaMenu("Node", this);
 
     addActionToMenu("Save", fileMenu, [&](){
-        NoderFrame::Get()->SidePanel->save();
+        Noder::Get().Frame->SidePanel.save();
     });
 
    // addActionToMenu("Load", fileMenu);
@@ -30,7 +30,7 @@ NoderMenuBar::NoderMenuBar(QWidget *parent)
     addActionToMenu("Select Same Nodes", selectMenu);
 */
     addActionToMenu("Move", nodeMenu, [&](){
-        NoderFrame::Get()->Graph->getGraphicView()->doAction("move");
+        Noder::Get().Frame->Graph.getGraphicView()->doAction("move");
     });
 /*    addActionToMenu("Find", nodeMenu);
     nodeMenu->addSeparator();
@@ -40,7 +40,7 @@ NoderMenuBar::NoderMenuBar(QWidget *parent)
     addActionToMenu("Delete", nodeMenu);
 */
     addActionToMenu("Delete", nodeMenu, [&](){
-        NoderFrame::Get()->Graph->getGraphicView()->doAction("delete");
+        Noder::Get().Frame->Graph.getGraphicView()->doAction("delete");
     });
 /*  addActionToMenu("Unlink", nodeMenu);
     nodeMenu->addSeparator();

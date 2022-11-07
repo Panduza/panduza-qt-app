@@ -1,4 +1,5 @@
 #include "NoderSidePanel.hpp"
+#include "NoderFrame.hpp"
 
 NoderSidePanel::NoderSidePanel(QWidget *parent)
     : PzaScrollArea(parent)
@@ -403,7 +404,7 @@ NoderFunctionEntry::NoderFunctionEntry(QWidget *parent)
     : NoderSidePanelEntry<NoderFunction>(parent)
 {
     _propPopup->addTitle("Edit function");
-    NoderFrame::Get()->Graph->newFunction(_elem);
+    Noder::Get().Frame->Graph.newFunction(_elem);
 }
 
 void NoderFunctionEntry::createPinArea(void)

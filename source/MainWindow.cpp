@@ -5,7 +5,7 @@ MainWindow::MainWindow()
     : QMainWindow(),
     _mainLayout(&_mainWidget)
 {
-    resize(1920, 1080);
+    resize(800, 600);
 
     loadTheme("DefaultTheme.json");
 

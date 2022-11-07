@@ -5,32 +5,19 @@
 #include <QTabWidget>
 #include <QDockWidget>
 #include <QSplitter>
-
+#include "NoderMenuBar.hpp"
+#include "NoderSidePanel.hpp"
+#include "NoderGraph.hpp"
 #include "Noder.hpp"
-
-class NoderSidePanel;
-class NoderGraph;
-class NoderMenuBar;
 
 class NoderFrame : public PzaWidget
 {
+    friend class Noder;
+    
     public:
-
-        NoderFrame(NoderFrame &other) = delete;
-        void operator=(const NoderFrame &) = delete;
-
-        static NoderFrame *Get(void)
-        {
-            static NoderFrame *frame;
-
-            if (frame == nullptr)
-                frame = new NoderFrame();
-            return frame;
-        }
-
-        NoderSidePanel *SidePanel = nullptr;
-        NoderGraph *Graph = nullptr;
-        NoderMenuBar *MenuBar = nullptr;
+        NoderSidePanel SidePanel;
+        NoderGraph Graph;
+        NoderMenuBar MenuBar;
 
     private:
         NoderFrame();

@@ -71,7 +71,7 @@ class Noder : public QObject
             return _database;
         }
 
-        NoderFrame *Frame = nullptr;
+        NoderFrame *Frame;
         
         Noder(Noder &other) = delete;
         void operator=(const Noder &) = delete;

@@ -2,7 +2,6 @@
 
 #include <QVBoxLayout>
 
-#include "NoderFrame.hpp"
 #include "NoderGraph.hpp"
 #include "NoderVariable.hpp"
 #include "NoderFunction.hpp"
@@ -214,21 +213,14 @@ class NoderSidePanel : public PzaScrollArea
 {
     Q_OBJECT
 
+    friend class NoderFrame;
+
     public:
         NoderSidePanel(NoderSidePanel &other) = delete;
         void operator=(const NoderSidePanel &) = delete;
 
         NoderVariableArea *VariableArea = nullptr;
         NoderFunctionArea *FunctionArea = nullptr;
-
-        static NoderSidePanel *Get(void)
-        {
-            static NoderSidePanel *sidePanel;
-
-            if (sidePanel == nullptr)
-                sidePanel = new NoderSidePanel();
-            return sidePanel;
-        }
 
         void save();
 

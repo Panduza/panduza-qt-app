@@ -1,17 +1,17 @@
 #include "NoderGraph.hpp"
+#include "NoderFrame.hpp"
 
 NoderGraph::NoderGraph(QWidget *parent)
     : PzaSplitter(Qt::Vertical, parent)
 {
     _tab = new PzaTabWidget(this);
-    _outputArea = new NoderOutputArea(this);
 
     setStretchFactor(0, 1);
 
     _tab->addTab(new NoderScenario(this), "Scenario");
 
     addWidget(_tab);
-    addWidget(_outputArea);
+    addWidget(&Output);
 }
 
 void NoderGraph::newFunction(NoderFunction *function)

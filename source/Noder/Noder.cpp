@@ -5,7 +5,7 @@
 
 Noder::Noder()
 {
-    Frame = NoderFrame::Get();
+    Frame = new NoderFrame();
 }
 
 void Noder::forEachEnum(const std::function<void(const QString &name, const std::vector<QString> &list)> &f)

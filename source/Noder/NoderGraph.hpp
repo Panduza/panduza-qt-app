@@ -2,23 +2,25 @@
 
 #include <PzaSplitter.hpp>
 #include <PzaTabWidget.hpp>
-#include "NoderOutputArea.hpp"
 #include "NoderScenario.hpp"
 #include "NoderFunction.hpp"
+#include "NoderOutputArea.hpp"
 
 class NoderGraph : public PzaSplitter
 {
     Q_OBJECT
 
-    public:
-        NoderGraph(QWidget *parent = nullptr);
+    friend class NoderFrame;
 
+    public:
         void setActive(NoderFunction *function);
         NoderGraphicsView *getGraphicView(void);
 
     private:
+        NoderGraph(QWidget *parent = nullptr);
+
+        NoderOutputArea Output;
         PzaTabWidget *_tab;
-        NoderOutputArea *_outputArea;
 
     public slots:
         void newFunction(NoderFunction *scenario);

@@ -5,9 +5,10 @@
 
 class NoderOutputArea : public PzaTabWidget
 {
-    public:
-        NoderOutputArea(QWidget *parent = nullptr);
+    friend class NoderGraph;
 
     private:
-        NoderConsole *_console;
+        NoderOutputArea(QWidget *parent = nullptr);
+
+        NoderConsole Console;
 };
