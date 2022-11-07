@@ -1,58 +1,75 @@
 #include "NoderMenuBar.hpp"
+#include "NoderFrame.hpp"
+#include "NoderGraph.hpp"
+#include "NoderSidePanel.hpp"
 
 NoderMenuBar::NoderMenuBar(QWidget *parent)
     : PzaMenuBar(parent)
 {
-    PzaMenu *menuView = new PzaMenu("View", this);
-    PzaMenu *menuSelect = new PzaMenu("Select", this);
-    PzaMenu *menuNode = new PzaMenu("Node", this);
+    PzaMenu *fileMenu = new PzaMenu("File", this);
+    PzaMenu *viewMenu = new PzaMenu("View", this);
+    PzaMenu *selectMenu = new PzaMenu("Select", this);
+    PzaMenu *nodeMenu = new PzaMenu("Node", this);
 
-    QAction *viewZoomIn = new QAction("Zoom In", menuView);
-    QAction *viewZoomOut = new QAction("Zoom Out", menuView);
-    QAction *viewFit = new QAction("Fit to View", menuView);
+    addActionToMenu("Save", fileMenu, [&](){
+        NoderFrame::Get()->SidePanel->save();
+    });
 
-    QAction *selectAll = new QAction("Select All", menuSelect);
-    QAction *deselectAll = new QAction("Deselect All", menuSelect);
-    QAction *selectLinked = new QAction("Select Linked Nodes", menuSelect);
-    QAction *selectSame = new QAction("Select Same Nodes", menuSelect);
+   // addActionToMenu("Load", fileMenu);
+    /*
 
-    QAction *nodeAdd = new QAction("Add", menuNode);
-    QAction *nodeMove = new QAction("Move", menuNode);
-    QAction *nodeFind = new QAction("Find", menuNode);
-    QAction *nodeCopy = new QAction("Copy", menuNode);
-    QAction *nodePaste = new QAction("Paste", menuNode);
-    QAction *nodeDuplicate = new QAction("Duplicate", menuNode);
-    QAction *nodeDelete = new QAction("Delete", menuNode);
-    QAction *nodeUnlink = new QAction("Unlink", menuNode);
-    QAction *nodeAlignH = new QAction("Align Horizontally", menuNode);
-    QAction *nodeAlignV = new QAction("Align Vertically", menuNode);
+    addActionToMenu("Zoom In", viewMenu);
+    addActionToMenu("Zoom Out", viewMenu);
+    viewMenu->addSeparator();
+    addActionToMenu("Fit to View", viewMenu);
 
-    menuView->addAction(viewZoomIn);
-    menuView->addAction(viewZoomOut);
-    menuView->addSeparator();
-    menuView->addAction(viewFit);
+    addActionToMenu("Select All", selectMenu);
+    addActionToMenu("Deselect All", selectMenu);
+    selectMenu->addSeparator();
+    addActionToMenu("Select Linked Nodes", selectMenu);
+    addActionToMenu("Select Same Nodes", selectMenu);
+*/
+    addActionToMenu("Move", nodeMenu, [&](){
+        NoderFrame::Get()->Graph->getGraphicView()->doAction("move");
+    });
+/*    addActionToMenu("Find", nodeMenu);
+    nodeMenu->addSeparator();
+    addActionToMenu("Copy", nodeMenu);
+    addActionToMenu("Paste", nodeMenu);
+    addActionToMenu("Duplicate", nodeMenu);
+    addActionToMenu("Delete", nodeMenu);
+*/
+    addActionToMenu("Delete", nodeMenu, [&](){
+        NoderFrame::Get()->Graph->getGraphicView()->doAction("delete");
+    });
+/*  addActionToMenu("Unlink", nodeMenu);
+    nodeMenu->addSeparator();
+    addActionToMenu("Align Horizontally", nodeMenu);
+    addActionToMenu("Align Vertically", nodeMenu);
+*/
+    addMenu(fileMenu);
+    addMenu(viewMenu);
+    addMenu(selectMenu);
+    addMenu(nodeMenu);
+}
 
-    menuSelect->addAction(selectAll);
-    menuSelect->addAction(deselectAll);
-    menuSelect->addSeparator();
-    menuSelect->addAction(selectLinked);
-    menuSelect->addAction(selectSame);
+void NoderMenuBar::addActionToMenu(const QString &name, PzaMenu *menu, const std::function<void(void)> &f)
+{
+    QAction *action;
 
-    menuNode->addAction(nodeAdd);
-    menuNode->addAction(nodeMove);
-    menuNode->addAction(nodeFind);
-    menuNode->addSeparator();
-    menuNode->addAction(nodeCopy);
-    menuNode->addAction(nodePaste);
-    menuNode->addAction(nodeDuplicate);
-    menuNode->addAction(nodeDelete);
-    menuNode->addSeparator();
-    menuNode->addAction(nodeUnlink);
-    menuNode->addSeparator();
-    menuNode->addAction(nodeAlignH);
-    menuNode->addAction(nodeAlignV);
+    action = new QAction(name, menu);
+    action->setData(QVariant::fromValue(f));
+    connect(action, &QAction::triggered, this, [f]() {
+        f();
+    });
+    
+    menu->addAction(action);
 
-    addMenu(menuView);
-    addMenu(menuSelect);
-    addMenu(menuNode);
+    /*   QAction *action;
+    
+    action = new QAction(name, toMenu);
+    action->setData(QVariant::fromValue(f));
+    toMenu->addAction(action);
+    connect(action, &QAction::triggered, this, &NoderGraphicsView::createNodeFromMenu);
+*/
 }

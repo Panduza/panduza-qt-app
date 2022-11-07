@@ -69,7 +69,7 @@ void NoderGraphicsView::dropEvent(QDropEvent *event)
 
         mime = static_cast<const PzaMimeData *>(event->mimeData());
         function = static_cast<NoderFunction *>(mime->dataPtr());
-        if (function) {
+        if (function && function->view() != this) {
             QPointF pos = mapToScene(event->position().toPoint());
             GNode *node = createNode(GNode::CreateNode<FuncInstance>, pos);
             static_cast<FuncInstance *>(node)->setFunction(function);
@@ -200,8 +200,51 @@ void NoderGraphicsView::createNodeFromMenu(void)
 {
     QAction *action = static_cast<QAction *>(sender());
     action->data();
-    Noder::t_CreateNode f = action->data().value<Noder::t_CreateNode>();
+    const Noder::t_CreateNode &f = action->data().value<Noder::t_CreateNode>();
     createNode(f, _clickpos);
+}
+
+void NoderGraphicsView::forEachSelected(const std::function<void(QGraphicsItem *item)> &f)
+{
+    for (auto item : _scene->selectedItems()) {
+        f(item);
+    }
+}
+
+void NoderGraphicsView::doAction(const QString &action)
+{
+    static std::map<QString, lol> mapMdr = {
+        {"move", &NoderGraphicsView::moveSelected},
+        {"delete", &NoderGraphicsView::deleteSelected}
+    };
+    
+    (this->*mapMdr[action])();
+}
+
+void NoderGraphicsView::moveSelected(void)
+{
+    qDebug() << "Move not supported for now";
+}
+
+void NoderGraphicsView::deleteSelected(void)
+{
+    forEachSelected([&](QGraphicsItem *item) {
+        if (dynamic_cast<GNode *>(item)) {
+            deleteNode((GNode *)item);
+        }
+        else {
+            _scene->removeItem(item);
+            delete item;
+        }
+    });
+}
+
+void NoderGraphicsView::deleteNode(GNode *node)
+{
+    if (node->isEternal() == false) {
+        _scene->removeItem(node);
+        node->deleteLater();
+    }
 }
 
 void NoderGraphicsView::contextMenuEvent(QContextMenuEvent *event)

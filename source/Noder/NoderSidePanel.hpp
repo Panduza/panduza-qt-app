@@ -184,6 +184,8 @@ class NoderVariableArea : public NoderSidePanelArea<NoderVariableEntry>
 {
     public:
         NoderVariableArea(QWidget *parent = nullptr);
+
+        QJsonArray save(void);
         
         void addEntry(void) override;
         void removeEntry(NoderVariableEntry *target) override;
@@ -197,6 +199,8 @@ class NoderFunctionArea : public NoderSidePanelArea<NoderFunctionEntry>
 {
     public:
         NoderFunctionArea(QWidget *parent = nullptr);
+
+        QJsonArray save(void);
 
         void addEntry(void) override;
         void removeEntry(NoderFunctionEntry *target) override;
@@ -225,6 +229,8 @@ class NoderSidePanel : public PzaScrollArea
                 sidePanel = new NoderSidePanel();
             return sidePanel;
         }
+
+        void save();
 
     private:
         NoderSidePanel(QWidget *parent = nullptr);

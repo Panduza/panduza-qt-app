@@ -36,10 +36,19 @@ class NoderGraphicsView : public QGraphicsView
         void dropEvent(QDropEvent *event) override;
         void dragMoveEvent(QDragMoveEvent *event);
 
+        void forEachSelected(const std::function<void(QGraphicsItem *item)> &f);
+
         void setMoveCanceled(bool state) {_moveCanceled = state;}
         void setMenu(PzaMenu *menu) {_viewMenu = menu;}
         void addNodeToMenu(PzaMenu *toMenu, const QString &name, const Noder::t_CreateNode &f);
         GNode *createNode(const Noder::t_CreateNode &f, const QPointF &pos = QPointF(0, 0));
+        void deleteNode(GNode *node);
+        void moveSelected(void);
+        void deleteSelected(void);
+
+        typedef void (NoderGraphicsView::*lol)();
+
+        void doAction(const QString &action);
 
     private:
         QPointF _clickpos;

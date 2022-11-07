@@ -28,3 +28,14 @@ void NoderGraph::setActive(NoderFunction *function)
     int index = _tab->indexOf(function);
     _tab->setCurrentIndex(index);
 }
+
+NoderGraphicsView *NoderGraph::getGraphicView(void)
+{
+    NoderView *elem;
+
+    elem = dynamic_cast<NoderView *>(_tab->currentWidget());
+    if (!elem)
+        return nullptr;
+
+    return elem->view();
+}

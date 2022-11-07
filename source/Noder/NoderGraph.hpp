@@ -14,6 +14,7 @@ class NoderGraph : public PzaSplitter
         NoderGraph(QWidget *parent = nullptr);
 
         void setActive(NoderFunction *function);
+        NoderGraphicsView *getGraphicView(void);
 
     private:
         PzaTabWidget *_tab;

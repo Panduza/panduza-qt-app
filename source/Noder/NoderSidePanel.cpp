@@ -26,6 +26,24 @@ NoderSidePanel::NoderSidePanel(QWidget *parent)
     setWidget(_main);
 }
 
+void NoderSidePanel::save(void)
+{
+    QFile file("/home/agouby/toto.json");
+
+    file.open(QIODevice::ReadWrite | QIODevice::Truncate);
+
+    QJsonDocument doc;
+    QJsonObject json;
+
+    json["Variables"] = VariableArea->save();
+    json["Functions"] = FunctionArea->save();
+    //doc.setObject(FunctionArea->save());
+
+    doc.setObject(json);
+
+    file.write(doc.toJson());
+}
+
 template <class N>
 NoderSidePanelArea<N>::NoderSidePanelArea(QWidget *parent)
     : PzaWidget(parent)
@@ -113,6 +131,22 @@ NoderFunctionArea::NoderFunctionArea(QWidget *parent)
     _layout->addWidget(_pinSpoiler);
 };
 
+QJsonArray NoderFunctionArea::save(void)
+{
+    QJsonArray array;
+
+    for (auto const &item : _entryList) {
+        QJsonObject json;
+        NoderFunction *func = item->elem();
+
+        json["name"] = func->name();
+
+        array.append(json);
+    }
+
+    return array;
+}
+
 void NoderFunctionArea::addEntry(void)
 {
     NoderSidePanelArea::addEntry();
@@ -155,6 +189,23 @@ NoderVariableArea::NoderVariableArea(QWidget *parent)
 
     _layout->addWidget(_defValArea);
 };
+
+QJsonArray NoderVariableArea::save(void)
+{
+    QJsonArray array;
+
+    for (auto const &item : _entryList) {
+        NoderVariable *var = item->elem();
+        QJsonObject json;
+
+        json["name"] = var->name();
+        json["type"] = Noder::Get().varTypeName(var->type());
+
+        array.append(json);
+    }
+
+    return array;
+}
 
 void NoderVariableArea::addEntry(void)
 {
