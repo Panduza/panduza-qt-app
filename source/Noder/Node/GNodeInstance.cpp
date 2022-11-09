@@ -111,7 +111,7 @@ void GNodeInstance::paint(QPainter *painter, QStyleOptionGraphicsItem const *opt
     drawBoxes(painter);
 
     forEachOutputPin([&](Pin *pin) {
-        drawValuePlug(painter, pin);
+        drawValuePlug(painter, static_cast<PinValue *>(pin));
         return ;
     });
 }

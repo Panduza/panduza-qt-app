@@ -7,14 +7,14 @@ GNodeExec::GNodeExec(const QString &name, NodeExecDirection direction)
 
     switch (direction) {
         case NodeExecDirection::Bidirectionnal:
-            _execIn = addInput<PinDecl::Exec>();
-            _execOut = addOutput<PinDecl::Exec>();
+            _execIn = addInput<PinExec>();
+            _execOut = addOutput<PinExec>();
             break;
         case NodeExecDirection::Input:
-            _execIn = addInput<PinDecl::Exec>();
+            _execIn = addInput<PinExec>();
             break;
         case NodeExecDirection::Output:
-            _execOut = addOutput<PinDecl::Exec>();
+            _execOut = addOutput<PinExec>();
             break;
         default:
             break;

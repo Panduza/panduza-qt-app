@@ -179,8 +179,8 @@ void Link::paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWid
         else {
             QLinearGradient gradient(_inpos, _outpos);
 
-            col_in = _inPin->plugColor();
-            col_out = _outPin->plugColor();
+            col_in = static_cast<PinValue *>(_inPin)->plugColor();
+            col_out = static_cast<PinValue *>(_outPin)->plugColor();
             gradient.setColorAt(0, col_in);
             gradient.setColorAt(1, col_out);
             pen.setBrush(QBrush(gradient));

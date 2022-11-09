@@ -29,28 +29,6 @@ GNode::GNode(const QString &name)
 
     setOnTop();
 
-    if (_mapPlugFiles.empty()) {
-        _mapPlugFiles[PlugType::Array] = initPlugType(PlugType::Array);
-        _mapPlugFiles[PlugType::Exec] = initPlugType(PlugType::Exec);
-        _mapPlugFiles[PlugType::Value] = initPlugType(PlugType::Value);
-
-        _mapPlugColoredCIcon[PinProperty::Type::Wildcard] = loadColorCValue(PinProperty::Type::Wildcard);
-        _mapPlugColoredCIcon[PinProperty::Type::Int] = loadColorCValue(PinProperty::Type::Int);
-        _mapPlugColoredCIcon[PinProperty::Type::Bool] = loadColorCValue(PinProperty::Type::Bool);
-        _mapPlugColoredCIcon[PinProperty::Type::Float] = loadColorCValue(PinProperty::Type::Float);
-        _mapPlugColoredCIcon[PinProperty::Type::String] = loadColorCValue(PinProperty::Type::String);
-        _mapPlugColoredCIcon[PinProperty::Type::Enum] = loadColorCValue(PinProperty::Type::Enum);
-        _mapPlugColoredCIcon[PinProperty::Type::Interface] = loadColorCValue(PinProperty::Type::Interface);
-
-        _mapPlugColoredNcIcon[PinProperty::Type::Wildcard] = loadColorNcValue(PinProperty::Type::Wildcard);
-        _mapPlugColoredNcIcon[PinProperty::Type::Int] = loadColorNcValue(PinProperty::Type::Int);
-        _mapPlugColoredNcIcon[PinProperty::Type::Bool] = loadColorNcValue(PinProperty::Type::Bool);
-        _mapPlugColoredNcIcon[PinProperty::Type::Float] = loadColorNcValue(PinProperty::Type::Float);
-        _mapPlugColoredNcIcon[PinProperty::Type::String] = loadColorNcValue(PinProperty::Type::String);
-        _mapPlugColoredNcIcon[PinProperty::Type::Enum] = loadColorNcValue(PinProperty::Type::Enum);
-        _mapPlugColoredNcIcon[PinProperty::Type::Interface] = loadColorNcValue(PinProperty::Type::Interface);
-    }
-
     _propTable = new PzaPropertyTable();
 }
 
@@ -70,76 +48,6 @@ void GNode::refreshUserName(const QString &name)
 {
     _userName = name;
     refreshNode();
-}
-
-struct GNode::plugIcon GNode::initPlugType(PlugType type)
-{
-    struct GNode::plugIcon s;
-    struct GNode::plugIconData dataNc;
-    struct GNode::plugIconData dataC;
-
-    switch (type) {
-        case PlugType::Array:
-            dataC.filename = ":/images/noder/plug_array.svg";
-            dataNc.filename = ":/images/noder/plug_array.svg";
-            break;
-        case PlugType::Exec:
-            dataC.filename = ":/images/noder/plug_exec_c.svg";
-            dataNc.filename = ":/images/noder/plug_exec_nc.svg";
-            break;
-        case PlugType::Value:
-            dataC.filename = ":/images/noder/plug_value_c.svg";
-            dataNc.filename = ":/images/noder/plug_value_nc.svg";
-            break;
-    }
-
-    dataC.data = loadPlugIcon(dataC.filename);
-    dataNc.data = loadPlugIcon(dataNc.filename);
-
-    s.plugC = dataC;
-    s.plugNc = dataNc;
-    
-    return s;
-}
-
-QString GNode::loadPlugIcon(const QString &filename)
-{
-    QFile file(filename);
-
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        qDebug() << "Could not open" << filename;
-        return nullptr;
-    }
-    QTextStream in(&file);
-    QString text = in.readAll();
-    file.close();
-    return text;
-}
-
-QByteArray GNode::loadColorValue(const PinProperty::Type &type, bool linked)
-{
-    QString xml;
-    QColor color;
-
-    color = Noder::Get().plugColor(type);
-    color = Noder::Get().plugColor(type);
-    if (linked)
-        xml = _mapPlugFiles[PlugType::Value].plugC.data;
-    else
-        xml = _mapPlugFiles[PlugType::Value].plugNc.data;
-    xml.replace("fill:#ffffff", "fill:" + color.name());
-    return xml.toUtf8();
-}
-
-QByteArray GNode::loadColorCValue(const PinProperty::Type &type)
-{
-    return loadColorValue(type, 1);
-}
-
-QByteArray GNode::loadColorNcValue(const PinProperty::Type &type)
-{
-    return loadColorValue(type, 0);
-
 }
 
 void GNode::forEachInputPin(const std::function<void(Pin *pin)> &func)
@@ -168,133 +76,26 @@ void GNode::setScene(NoderScene *scene)
     _scene = scene;
 }
 
-Pin *GNode::addPinFromType(PinProperty::Type type, const QString &name, PinProperty::Direction direction, int index)
+PinValue *GNode::addPinFromType(NoderVar::Type type, const QString &name, PinProperty::Direction direction, int index)
 {
-    Pin *pin = nullptr;
+    PinValue *pin = nullptr;
 
     switch (type) {
-        case PinProperty::Type::Bool:       pin = addPin<PinDecl::Bool>(name, direction, index); break ;
-        case PinProperty::Type::Float:      pin = addPin<PinDecl::Float>(name, direction, index); break ;
-        case PinProperty::Type::Int:        pin = addPin<PinDecl::Int>(name, direction, index); break ;
-        case PinProperty::Type::String:     pin = addPin<PinDecl::String>(name, direction, index); break ;
-        case PinProperty::Type::Wildcard:   pin = addPin<PinDecl::Wildcard>(name, direction, index); break ;
-        case PinProperty::Type::Enum:       pin = addPin<PinDecl::Enum>(name, direction, index); break ;
-        case PinProperty::Type::Array:      pin = addPin<PinDecl::Array>(name, direction, index); break ;
-        case PinProperty::Type::Interface:  pin = addPin<PinDecl::Interface>(name, direction, index); break ;
-        default:                            pin = nullptr; break ;
+        case NoderVar::Type::Bool:       pin = addPin<PinDecl::Bool>(name, direction, index); break ;
+        case NoderVar::Type::Float:      pin = addPin<PinDecl::Float>(name, direction, index); break ;
+        case NoderVar::Type::Int:        pin = addPin<PinDecl::Int>(name, direction, index); break ;
+        case NoderVar::Type::String:     pin = addPin<PinDecl::String>(name, direction, index); break ;
+        case NoderVar::Type::Wildcard:   pin = addPin<PinDecl::Wildcard>(name, direction, index); break ;
+        case NoderVar::Type::Enum:       pin = addPin<PinDecl::Enum>(name, direction, index); break ;
+        case NoderVar::Type::Array:      pin = addPin<PinDecl::Array>(name, direction, index); break ;
+        case NoderVar::Type::Interface:  pin = addPin<PinDecl::Interface>(name, direction, index); break ;
     }
     return pin;
 }
 
-void GNode::createProxyWidget(Pin *pin)
+void GNode::addProxyWidget(Pin *pin)
 {
-    PzaLabel *label;
-
-    pin->setProxy(new QGraphicsProxyWidget(this));
-    pin->setGrid(new QGridLayout(pin));
-    pin->grid()->setContentsMargins(0, 0, 0, 0);
-    pin->grid()->setHorizontalSpacing(5);
-    pin->grid()->setVerticalSpacing(0);
-
-    label = new PzaLabel(pin->name(), pin);
-    if (_type == NodeProperty::Type::Instance) {
-        label->setProperty("pzalabel", "instance");
-        QFont font = label->font();
-        font.setItalic(true);
-        label->setFont(font);
-    }
-    connect(pin, &Pin::nameChanged, label, [&, label, pin](const QString &name) {
-        label->setText(name);
-        pin->adjustSize();
-        refreshNode();
-    });
-    
-    label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    pin->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    if (pin->isOutput())
-        pin->grid()->addWidget(label, 0, 0, Qt::AlignRight);
-    else
-        pin->grid()->addWidget(label, 0, 0, Qt::AlignLeft);
-
-    if (pin->isInput()) {
-        switch (pin->type()) {
-            case PinProperty::Type::Bool:
-            {
-                PzaCheckBox *checkbox = new PzaCheckBox(pin);
-                checkbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-                pin->grid()->setColumnStretch(1, 1);
-                pin->grid()->addWidget(checkbox, 0, 1);
-                connect(pin, &Pin::askWidget, this, [pin, checkbox]() {
-                    pin->setValue(checkbox->isChecked());
-                });
-                break ;
-            }
-            case PinProperty::Type::Int:
-            {
-                PzaSpinBox *valuebox = new PzaSpinBox(pin);
-                PinDecl::Int *iPin = static_cast<PinDecl::Int*>(pin);
-                valuebox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-                valuebox->setMinimum(iPin->min());
-                valuebox->setMaximum(iPin->max());
-                valuebox->setFixedWidth(100);
-                pin->grid()->addWidget(valuebox, 0, 1);
-                connect(pin, &Pin::askWidget, this, [pin, valuebox]() {
-                    pin->setValue(valuebox->value());
-                });
-                break ;
-            }
-            case PinProperty::Type::Float:
-            {
-                PzaDoubleSpinBox *valuebox = new PzaDoubleSpinBox(pin);
-                PinDecl::Float *fPin = static_cast<PinDecl::Float*>(pin);
-                valuebox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-                valuebox->setMinimum(fPin->min());
-                valuebox->setMaximum(fPin->max());
-                valuebox->setFixedWidth(100);
-                pin->grid()->addWidget(valuebox, 0, 1);
-                connect(pin, &Pin::askWidget, this, [pin, valuebox]() {
-                    pin->setValue(valuebox->value());
-                });
-                break ;
-            }
-            case PinProperty::Type::String:
-            {
-                PzaLineEdit *txtbox = new PzaLineEdit(pin);
-                txtbox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-                txtbox->setFixedWidth(100);
-                pin->grid()->addWidget(txtbox, 0, 1);
-                connect(pin, &Pin::askWidget, this, [pin, txtbox]() {
-                    pin->setValue(txtbox->text());
-                });
-                break ;
-            }
-            case PinProperty::Type::Enum:
-            {
-                PzaComboBox *combo = new PzaComboBox(pin);
-                combo->setFixedWidth(100);
-                connect(combo, &PzaComboBox::clicked, this, [&, pin](){
-                    forEachInputPin([](Pin *pin)
-                    {
-                        if (dynamic_cast<PinDecl::Enum *>(pin)) {
-                            pin->proxy()->setZValue(0);
-                        }
-                    });
-                    pin->proxy()->setZValue(1);
-                });
-                PinDecl::Enum *ePin = static_cast<PinDecl::Enum*>(pin);
-                connect(ePin, &PinDecl::Enum::initialized, this, [&, ePin, combo](){
-                    combo->clear();
-                    for (auto const &item: ePin->list()) {
-                        combo->addItem(item);
-                    }
-                });
-                pin->grid()->addWidget(combo, 0, 1);
-                break ;
-            }
-            default:
-                break ;
-        }
-    }
+    pin->proxy()->setParentItem(this);
     pin->proxy()->setWidget(pin);
     refreshNode();
 }
@@ -447,27 +248,36 @@ void GNode::setPinPlugzone(Pin *pin, const QPoint &origin)
     pin->setPlugzone(QRect(pos.x(), pos.y(), _plugzone, _plugzone));
 }
 
-void GNode::drawValuePlug(QPainter *painter, Pin *pin)
+void GNode::drawValuePlug(QPainter *painter, PinValue *pin)
 {
     QSvgRenderer svgr;
 
     if (pin->linked())
-        svgr.load(_mapPlugColoredCIcon[pin->type()]);
+        svgr.load(Noder::PlugValue(pin->valueType(), true));
     else
-        svgr.load(_mapPlugColoredNcIcon[pin->type()]);
+        svgr.load(Noder::PlugValue(pin->valueType(), false));
     svgr.render(painter, pin->plugzoneIcon());
 }
 
-void GNode::drawArrayPlug(QPainter *painter, Pin *pin)
+void GNode::drawExecPlug(QPainter *painter, PinExec *pin)
 {
     QSvgRenderer svgr;
-    QString xml;
 
-    xml = _mapPlugFiles[PlugType::Array].plugC.data;
-    const QColor &color = Noder::Get().plugColor(static_cast<PinDecl::Array *>(pin)->elemType());
-    xml.replace("fill:#ffffff", "fill:" + color.name());
+     if (pin->linked())
+        svgr.load(Noder::PlugExec(true));
+    else
+        svgr.load(Noder::PlugExec(false));
+    svgr.render(painter, pin->plugzone());
+}
 
-    svgr.load(xml.toUtf8());
+void GNode::drawArrayPlug(QPainter *painter, PinDecl::Array *pin)
+{
+    QSvgRenderer svgr;
+
+    if (pin->linked())
+        svgr.load(Noder::PlugArray(pin->valueType(), true));
+    else
+        svgr.load(Noder::PlugArray(pin->valueType(), false));
     svgr.render(painter, pin->plugzoneIcon());
 }
 
@@ -476,17 +286,6 @@ void GNode::setPos(const QPointF &pos)
     QGraphicsItem::setPos(pos);
 
     updateLinks();
-}
-
-void GNode::drawExecPlug(QPainter *painter, Pin *pin)
-{
-    QSvgRenderer svgr;
-
-     if (pin->linked())
-        svgr.load(_mapPlugFiles[PlugType::Exec].plugC.data.toUtf8());
-    else
-        svgr.load(_mapPlugFiles[PlugType::Exec].plugNc.data.toUtf8());
-    svgr.render(painter, pin->plugzone());
 }
 
 void GNode::process(void)

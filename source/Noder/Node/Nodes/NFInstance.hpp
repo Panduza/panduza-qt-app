@@ -2,7 +2,7 @@
 
 #include <GNodeInstance.hpp>
 #include <GNodeExec.hpp>
-#include <NoderVariable.hpp>
+#include <NoderSPVariable.hpp>
 #include <NoderFunction.hpp>
 
 class Instance : public GNodeInstance
@@ -13,11 +13,11 @@ class Instance : public GNodeInstance
         Instance();
 
         void exec() override;
-        void setVariable(NoderVariable *ref);
+        void setVariable(NoderSPVariable *ref);
 
     private:
-        Pin *_pin = nullptr;
-        NoderVariable *_var;
+        PinValue *_pin = nullptr;
+        NoderSPVariable *_var;
     
     private slots:
         void updatePin(void);

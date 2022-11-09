@@ -5,3 +5,9 @@ PzaPushButton::PzaPushButton(QWidget *parent)
 {
     setAutoDefault(true);
 }
+
+PzaPushButton::PzaPushButton(const QString &name, QWidget *parent)
+    : PzaPushButton(parent)
+{
+    setText(name);
+}

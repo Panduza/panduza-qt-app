@@ -14,7 +14,7 @@
 #include <PzaMimeData.hpp>
 #include <PzaScrollArea.hpp>
 #include <PzaSpoiler.hpp>
-#include "NoderVariable.hpp"
+#include "NoderSPVariable.hpp"
 
 class NoderGraphicsView : public QGraphicsView
 {

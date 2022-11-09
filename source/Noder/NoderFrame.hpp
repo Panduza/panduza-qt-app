@@ -6,7 +6,7 @@
 #include <QDockWidget>
 #include <QSplitter>
 #include "NoderMenuBar.hpp"
-#include "NoderSidePanel.hpp"
+#include "NoderSP.hpp"
 #include "NoderGraph.hpp"
 #include "Noder.hpp"
 
@@ -15,7 +15,7 @@ class NoderFrame : public PzaWidget
     friend class Noder;
     
     public:
-        NoderSidePanel SidePanel;
+        NoderSP SidePanel;
         NoderGraph Graph;
         NoderMenuBar MenuBar;
 

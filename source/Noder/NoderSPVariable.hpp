@@ -15,30 +15,22 @@
 #include <PzaDoubleSpinBox.hpp>
 #include <PzaMimeData.hpp>
 #include <PzaComboBox.hpp>
+#include <PzaPushButton.hpp>
 
-class NoderVariable : public PzaWidget
+class NoderSPVariable : public PzaWidget
 {
     Q_OBJECT
 
     public:
-        NoderVariable(QWidget *parent = nullptr);
-
-        const QString &name() {return _name;}
-        NoderPanel::Type type(void) {return _type;}
-        void setName(const QString &name);
-        void setType(const NoderPanel::Type type);
-        void createDefValTable(void);
-        PzaPropertyTable *defValTable(void) const {return _defValTable;}
+        NoderSPVariable(QWidget *parent = nullptr);
+        
+        const QString &name(void) const {return _name;}
+        void setName(const QString &name) {_name = name;}
 
     private:
         QString _name;
-        NoderPanel::Type _type;
-        PzaPropertyTable *_defValTable = nullptr;
 
     signals:
-        void typeChanged(void);
-        void nameChanged(const QString &name);
-        void dead(void);
 };
 
 class NoderValBool : public PzaPropertyTable
@@ -116,13 +108,10 @@ class NoderValEnum : public PzaPropertyTable
     public:
         NoderValEnum(QWidget *parent = nullptr);
 
-        const QString &enumName(void) {return _enumName;}
         const QString &enumValue(void) {return _enumValue;}
     
     private:
-        QString _enumName;
         QString _enumValue;
-        PzaComboBox *_enumNameBox;
         PzaComboBox *_enumValuesBox;
     
     private slots:
@@ -131,4 +120,12 @@ class NoderValEnum : public PzaPropertyTable
     
     signals:
         void enumNameChanged(const QString &name);
+};
+
+class NoderValArray : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        NoderValArray(QWidget *parent = nullptr);
 };

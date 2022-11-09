@@ -65,7 +65,7 @@ class GNode : public QGraphicsObject
 
         template <typename N>
         static GNode *CreateNode(void) {return new N();}
-        Pin *addPinFromType(PinProperty::Type type, const QString &name, PinProperty::Direction direction, int index = -1);
+        PinValue *addPinFromType(NoderVar::Type type, const QString &name, PinProperty::Direction direction, int index = -1);
         int pinIndex(Pin *pin);
         void replacePin(Pin *oldPin, Pin *newPin);
         void deletePin(Pin *pin);
@@ -73,27 +73,12 @@ class GNode : public QGraphicsObject
         virtual void refreshUserName(const QString &name);
 
     protected:
-        enum class PlugType {
-            Value = 0,
-            Array,
-            Exec
-        };
-
-        struct plugIconData {
-            QString filename;
-            QString data;
-        };
-
-        struct plugIcon {
-            struct plugIconData plugC;
-            struct plugIconData plugNc;
-        };
+        
         
         void setup(void);
         
         virtual void setType(NodeProperty::Type type);
         const NodeProperty::Type &nodeType(void) const {return _type;}
-        const QColor &plugColor(PinProperty::Type type);
 
         template <typename N>
         N *addOutput(void)
@@ -111,7 +96,7 @@ class GNode : public QGraphicsObject
 
         QRectF boundingRect() const override { return _nodebox; }
         
-        void createProxyWidget(Pin *pin);
+        void addProxyWidget(Pin *pin);
         void setOnTop(void);
         virtual void pinBoxSize(void) = 0;
         virtual void resizeBoxes(void) = 0;
@@ -120,14 +105,10 @@ class GNode : public QGraphicsObject
         virtual void drawBoxes(QPainter *painter) = 0;
         inline bool needSpacing(void) {return (_inputPins.size() > 0 && _outputPins.size() > 0);}
         void setPinPlugzone(Pin *pin, const QPoint &origin);
-        QString loadPlugIcon(const QString &filename);
-        struct plugIcon initPlugType(PlugType type);
-        QByteArray loadColorValue(const PinProperty::Type &type, bool linked);
-        QByteArray loadColorCValue(const PinProperty::Type &type);
-        QByteArray loadColorNcValue(const PinProperty::Type &type);
-        void drawValuePlug(QPainter *painter, Pin *pin);
-        void drawArrayPlug(QPainter *painter, Pin *pin);
-        void drawExecPlug(QPainter *painter, Pin *pin);
+
+        void drawValuePlug(QPainter *painter, PinValue *pin);
+        void drawArrayPlug(QPainter *painter, PinDecl::Array *pin);
+        void drawExecPlug(QPainter *painter, PinExec *pin);
 
         template <typename N>
         N *_addPin(const QString &name, PinProperty::Direction direction, int index = -1)
@@ -153,7 +134,9 @@ class GNode : public QGraphicsObject
             }
             pin->setNode(this);
             pin->setDirection(direction);
-            pin->setPlugColor();
+            pin->setupProxyWidget();
+            if (direction == PinProperty::Direction::Input)
+                pin->setupWidgets();
             pin->setName(name);
             return pin;
         }
@@ -162,13 +145,9 @@ class GNode : public QGraphicsObject
         N *addPin(const QString &name, PinProperty::Direction direction, int index = -1)
         {
             auto pin = _addPin<N>(name, direction, index);
-            createProxyWidget(pin);
+            addProxyWidget(pin);
             return pin;
         }
-
-        static inline std::unordered_map<PlugType, struct plugIcon> _mapPlugFiles;
-        static inline std::unordered_map<PinProperty::Type, QByteArray> _mapPlugColoredNcIcon;
-        static inline std::unordered_map<PinProperty::Type, QByteArray> _mapPlugColoredCIcon;
 
         NoderScene *_scene;
         std::vector<Pin *> _inputPins;
@@ -190,6 +169,9 @@ class GNode : public QGraphicsObject
         PzaPropertyTable *_propTable = nullptr;
         PzaLabel *_propType = nullptr;
         PzaColorBox *_propBoxColor = nullptr;
+
+    private:
+        
 
     public slots:
         void setColor(const QColor &color);

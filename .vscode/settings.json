@@ -99,7 +99,12 @@
         "qtextedit": "cpp",
         "any": "cpp",
         "fstream": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "qevent": "cpp",
+        "qactionevent": "cpp",
+        "csignal": "cpp",
+        "source_location": "cpp",
+        "qtreewidget": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

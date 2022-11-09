@@ -1,3 +1,4 @@
+
 #include <Pin.hpp>
 #include <GNode.hpp>
 #include <Link.hpp>
@@ -7,12 +8,14 @@ using namespace PinDecl;
 Pin::Pin()
 {
     setStyleSheet("background-color: transparent");
+
+    
 }
 
 void Pin::setName(const QString &name)
 {
     _name = name;
-    nameChanged(_name);
+    _label->setText(name);
 }
 
 void Pin::hideWidgets(void)
@@ -44,11 +47,6 @@ void Pin::mousePressEvent(QMouseEvent *event)
     // If we click an a widget that supports it, like a button, the event will be catched.
     // But, if the click happens on a label for example, we should notify the node.
     event->ignore();
-}
-
-bool Pin::isCompatible(Pin *to)
-{
-    return PzaUtils::IsInVector<PinProperty::Type>(compatibles(), to->type());
 }
 
 void Pin::CreateLink(Pin *from)
@@ -126,7 +124,7 @@ void Pin::removeLink(Link *link)
 void Pin::removeLinks(void)
 {
     forEachLink([](Link *link) {
-        delete link;
+        link->deleteLater();
     });
 }
 
@@ -138,7 +136,7 @@ void Pin::disconnectLink(const QPointF &pos)
     link = _links.front();
 
     from = link->oppositePin(this);
-    delete link;
+    link->deleteLater();
 
     CreateLink(from, pos);
 }
@@ -177,36 +175,93 @@ void Pin::forEachLink(const std::function<void(Link *link)> &func)
     }
 }
 
+void Pin::setupProxyWidget(void)
+{
+    _proxy = new QGraphicsProxyWidget();
+    _grid = new QGridLayout(this);
+
+    _grid->setContentsMargins(0, 0, 0, 0);
+    _grid->setHorizontalSpacing(5);
+    _grid->setVerticalSpacing(0);
+
+    _label = new PzaLabel(this);
+    _label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    if (isInput())
+        _grid->addWidget(_label, 0, 0, Qt::AlignLeft);
+    else
+        _grid->addWidget(_label, 0, 0, Qt::AlignRight);
+}
+
 Pin::~Pin()
 {
     _dead = true;
     forEachLink([&](Link *link) {
-        delete link;
+        link->deleteLater();
     });
 }
 
-Wildcard::Wildcard()
+PinValue::PinValue()
 {
-    _type = PinProperty::Type::Wildcard;
+    _type = PinProperty::Type::Value;
 }
 
-Float::Float(double value, double min, double max, unsigned int decimals)
-    : _value(value),
-    _min(min),
-    _max(max),
-    _decimals(decimals)
+bool PinValue::isCompatible(Pin *to)
 {
-    _type = PinProperty::Type::Float;
+    if (to->type() == _type)
+        return PzaUtils::IsInVector<NoderVar::Type>(compatibles(), static_cast<PinValue *>(to)->valueType());
+    return false;
+}
+
+PinValue *PinValue::PinTypeToObj(const NoderVar::Type type)
+{
+    switch (type) {
+        case NoderVar::Type::Bool:       return new PinDecl::Bool();
+        case NoderVar::Type::Float:      return new PinDecl::Float();
+        case NoderVar::Type::Int:        return new PinDecl::Int();
+        case NoderVar::Type::String:     return new PinDecl::String();
+        case NoderVar::Type::Wildcard:   return new PinDecl::Wildcard();
+        case NoderVar::Type::Enum:       return new PinDecl::Enum();
+        case NoderVar::Type::Array:      return new PinDecl::Array();
+        case NoderVar::Type::Interface:  return new PinDecl::Interface();
+    }
+    return nullptr;
+}
+
+PinExec::PinExec()
+{
+    _type = PinProperty::Type::Exec;
+}
+
+bool PinExec::isCompatible(Pin *to)
+{
+    return (to->type() == _type);
+}
+
+Float::Float()
+    : PinValue()
+{
+    _valueType = NoderVar::Type::Float;
+}
+
+void Float::setupWidgets(void)
+{
+    Pin::setupWidgets();
+
+    _box = new PzaDoubleSpinBox(this);
+    _box->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    _box->setFixedWidth(100);
+    _grid->addWidget(_box, 0, 1);
 }
 
 void Float::setValue(const int value)
 {
-    _value = value;
+    setValue((double)value);
 }
 
 void Float::setValue(const bool value)
 {
-    _value = value;
+    setValue((double)value);
 }
 
 void Float::setValue(const QString &value)
@@ -216,27 +271,35 @@ void Float::setValue(const QString &value)
 
     res = value.toDouble(&ok);
     if (ok)
-        _value = res;
+        setValue(res);
     else
         qWarning() << "Input string" << value << "cannot be converted to float.. The result will be undefined";
 }
 
-Int::Int(int value, int min, int max)
-    : _value(value),
-    _min(min),
-    _max(max)
+Int::Int()
+    : PinValue()
 {
-    _type = PinProperty::Type::Int;
+    _valueType = NoderVar::Type::Int;
+}
+
+void Int::setupWidgets(void)
+{
+    Pin::setupWidgets();
+    
+    _box = new PzaSpinBox(this);
+    _box->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    _box->setFixedWidth(100);
+    _grid->addWidget(_box, 0, 1);
 }
 
 void Int::setValue(const double value)
 {
-    _value = value;
+    setValue((int)value);
 }
 
 void Int::setValue(const bool value)
 {
-    _value = value;
+    setValue((bool)value);
 }
 
 void Int::setValue(const QString &value)
@@ -246,25 +309,35 @@ void Int::setValue(const QString &value)
 
     res = value.toInt(&ok);
     if (ok)
-        _value = res;
+        setValue(res);
     else
         qWarning() << "Input string" << value << "cannot be converted to an integer.. The result will be undefined";
 }
 
-Bool::Bool(bool value)
-    : _value(value)
+Bool::Bool()
+    : PinValue()
 {
-    _type = PinProperty::Type::Bool;
+    _valueType = NoderVar::Type::Bool;
+}
+
+void Bool::setupWidgets(void)
+{
+    Pin::setupWidgets();
+    
+    _box = new PzaCheckBox(this);
+    _box->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    _grid->setColumnStretch(1, 1);
+    _grid->addWidget(_box, 0, 1);
 }
 
 void Bool::setValue(const double value)
 {
-    _value = value;
+    setValue((bool)value);
 }
 
 void Bool::setValue(const int value)
 {
-    _value = value;
+    setValue((bool)value);
 }
 
 void Bool::setValue(const QString &value)
@@ -272,40 +345,51 @@ void Bool::setValue(const QString &value)
     const QString &str = value.toLower().trimmed();
 
     if (str == "true")
-        _value = true;
+        setValue(true);
     else
-        _value = false;
+        setValue(false);
 }
 
-String::String(const QString &value)
-    : _value(value)
+String::String()
+    : PinValue()
 {
-    _type = PinProperty::Type::String;
+    _valueType = NoderVar::Type::String;
 }
 
-void String::setValue(const QString &value)
+void String::setupWidgets(void)
 {
-    _value = value;
+    Pin::setupWidgets();
+    
+    _box = new PzaLineEdit(this);
+    _box->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    _box->setFixedWidth(100);
+    _grid->addWidget(_box, 0, 1);
 }
 
 void String::setValue(const int value)
 {
-    _value = QString::number(value);
+    setValue(QString::number(value));
 }
 
 void String::setValue(const double value)
 {
-    _value = QString::number(value);
+    setValue(QString::number(value));
 }
 
 void String::setValue(const bool value)
 {
-    _value = (value) ? "true" : "false";
+    (value) ? setValue("true") : setValue("false");
 }
 
 Enum::Enum()
+    : PinValue()
 {
-    _type = PinProperty::Type::Enum;
+    _valueType = NoderVar::Type::Enum;
+}
+
+void Enum::setupWidgets(void)
+{
+    Pin::setupWidgets();
 }
 
 void Enum::modifyEnumName(const QString &name)
@@ -314,7 +398,7 @@ void Enum::modifyEnumName(const QString &name)
     forEachLink([&](Link *link) {
         Pin *opposite = link->oppositePin(this);
         if (!isCompatible(opposite))
-            delete link;            
+            link->deleteLater();            
     });
 }
 
@@ -329,7 +413,7 @@ bool Enum::isCompatible(Pin *to)
 {
     PinDecl::Enum *toEnum;
 
-    if (!Pin::isCompatible(to))
+    if (!PinValue::isCompatible(to))
         return false;
 
     toEnum = static_cast<PinDecl::Enum *>(to);
@@ -337,28 +421,29 @@ bool Enum::isCompatible(Pin *to)
 }
 
 Array::Array()
+    : PinValue()
 {
-    _type = PinProperty::Type::Array;
+    _valueType = NoderVar::Type::Array;
 }
 
 bool Array::isCompatible(Pin *to)
 {
-    Pin *elem;
-    Pin *toElem;
+    PinValue *elem;
+    PinValue *toElem;
     PinDecl::Array *toArray;
     bool ret = false;
 
-    if (!Pin::isCompatible(to))
+    if (!PinValue::isCompatible(to))
         return false;
 
     toArray = static_cast<PinDecl::Array *>(to);
-    elem = Noder::Get().pinTypeToObj(elemType());
-    toElem = Noder::Get().pinTypeToObj(toArray->elemType());
+    elem = PinValue::PinTypeToObj(elemType());
+    toElem = PinValue::PinTypeToObj(toArray->elemType());
 
     ret = elem->isCompatible(toElem);
 
-    delete elem;
-    delete toElem;
+    elem->deleteLater();
+    toElem->deleteLater();
 
     return ret;
 }
@@ -368,7 +453,7 @@ void Array::onEventConnect(void)
     PinDecl::Array *target;
 
     target = dynamic_cast<PinDecl::Array *>(linkedPins().front());
-    if (target == nullptr || target->elemType() == PinProperty::Type::Wildcard)
+    if (target == nullptr || target->elemType() == NoderVar::Type::Wildcard)
         return ;
     setElemType(target->elemType());
 
@@ -383,14 +468,10 @@ void Array::onEventDisconnect(void)
     }
 }
 
-Exec::Exec()
+Interface::Interface()
+    : PinValue()
 {
-    _type = PinProperty::Type::Exec;
-}
-
-PinDecl::Interface::Interface()
-{
-    _type = PinProperty::Type::Interface;
+    _valueType = NoderVar::Type::Interface;
 }
 
 bool PinDecl::Interface::isCompatible(Pin *to)

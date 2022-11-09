@@ -10,10 +10,10 @@ target_sources(${PROG}
 	NoderFunction.cpp
 	NoderScenario.cpp
 	NoderMenuBar.cpp
-	NoderSidePanel.cpp
+	NoderSP.cpp
+	NoderSPVariable.cpp
 	NoderView.cpp
 	NoderScene.cpp
-	NoderVariable.cpp
 	NoderConsole.cpp
 	NoderOutputArea.cpp
 	NoderStyle.cpp

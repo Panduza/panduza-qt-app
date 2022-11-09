@@ -2,7 +2,7 @@
 
 Array::Array()
     : GNodeOp("Array"),
-    _type(PinProperty::Type::Wildcard)
+    _type(NoderVar::Type::Wildcard)
 {
     addMultiInput<PinDecl::Wildcard>("", &_list, 2);
     _result = addOutput<PinDecl::Array>("Result");
@@ -17,18 +17,19 @@ void Array::onEventConnect()
 {
     int index;
     int listSize;
-    Pin *from = nullptr;
-    Pin *to = nullptr;
+    PinValue *from = nullptr;
+    PinValue *to = nullptr;
     struct multiPin *s;
 
-    if (_type != PinProperty::Type::Wildcard)
+    if (_type != NoderVar::Type::Wildcard)
         return ;
 
     forEachInputPin([&](Pin *pin) {
+        PinValue *valuePin = static_cast<PinValue *>(pin);
         if (pin->linked()) {
-            _type = pin->type();
-            from = pin->linkedPins().front();
-            to = pin;
+            _type = valuePin->valueType();
+            from = static_cast<PinValue *>(pin->linkedPins().front());
+            to = static_cast<PinValue *>(pin);
             return ;
         }
     });
@@ -37,23 +38,23 @@ void Array::onEventConnect()
         return ;
 
     listSize = _list.size();
-    index = PzaUtils::IndexInVector<Pin *>(_list, to);
+    index = PzaUtils::IndexInVector<PinValue *>(_list, to);
     for (auto const &pin: _list) {
         deletePin(pin);
     }
     _list.clear();
 
-    _type = from->type();
+    _type = from->valueType();
 
     for (int i = 0; i < listSize; i++) {
-        Pin *pin;
+        PinValue *pin;
 
-        pin = addPinFromType(from->type(), " " + QString::number(i), PinProperty::Direction::Input);
+        pin = addPinFromType(from->valueType(), " " + QString::number(i), PinProperty::Direction::Input);
         if (i == index)
             Pin::CreateLink(from, pin);
         _list.push_back(pin);
     }
-   
+
     _result->setElemType(_type);
 
     s = findMultiPinFromList(&_list);
@@ -79,7 +80,7 @@ void Array::onEventDisconnect()
     if (!empty)
         return ;
 
-    _type = PinProperty::Type::Wildcard;
+    _type = NoderVar::Type::Wildcard;
 
     listSize = _list.size();
     for (auto const &pin: _list) {
@@ -88,7 +89,7 @@ void Array::onEventDisconnect()
     _list.clear();
 
     for (unsigned int i = 0; i < listSize; i++) {
-        Pin *pin = addPinFromType(_type, " " + QString::number(i), PinProperty::Direction::Input);
+        PinValue *pin = addPinFromType(_type, " " + QString::number(i), PinProperty::Direction::Input);
         _list.push_back(pin);
     }
 
@@ -99,7 +100,6 @@ void Array::onEventDisconnect()
         s->type = _type;
 
     _result->removeLinks();
-
 }
 
 Array::~Array()

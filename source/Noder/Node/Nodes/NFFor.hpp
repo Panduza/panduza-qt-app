@@ -13,8 +13,8 @@ class For : public GNodeBranch
     private:
         PinDecl::Int *_start;
         PinDecl::Int *_end;
-        PinDecl::Exec *_scope;
-        PinDecl::Exec *_done;
+        PinExec *_scope;
+        PinExec *_done;
         PinDecl::Int *_index;
 };
 
@@ -30,7 +30,7 @@ class ForEachInArray : public GNodeBranch
     
     private:
         PinDecl::Array *_array;
-        Pin *_elem;
-        PinDecl::Exec *_scope;
-        PinDecl::Exec *_done;
+        PinValue *_elem;
+        PinExec *_scope;
+        PinExec *_done;
 };

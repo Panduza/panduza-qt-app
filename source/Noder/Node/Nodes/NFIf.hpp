@@ -12,6 +12,6 @@ class If : public GNodeBranch
     
     private:
         PinDecl::Bool *_cond;
-        PinDecl::Exec *_true;
-        PinDecl::Exec *_false;
+        PinExec *_true;
+        PinExec *_false;
 };

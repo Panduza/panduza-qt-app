@@ -1,8 +1,7 @@
 #pragma once
 
 #include <QDebug>
-#include <QGridLayout>
-#include <PzaProperty.hpp>
+#include <QFormLayout>
 #include <PzaLabel.hpp>
 #include <PzaLineEdit.hpp>
 
@@ -14,17 +13,22 @@ class PzaPropertyTable : public PzaWidget
         template<typename T>
         T *addProperty(const QString &name = "")
         {
-            int row = _grid->rowCount();
-            T *widget = new T();
+            T *widget = new T(this);
+            PzaLabel *label = new PzaLabel(name, this);
 
-            if (name != "") {
-                PzaLabel *label = new PzaLabel(name, this);
-                _grid->addWidget(label, row, 0);
-            }
-            _grid->addWidget(widget, row, 1);
+            label->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+            widget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+            _layout->addRow(label, widget);
             return widget;
         }
 
+        template<typename T>
+        void deleteProperty(T *widget)
+        {
+            _layout->removeRow(widget);
+        }
+
     protected:
-        QGridLayout *_grid;
+        QFormLayout *_layout;
 };

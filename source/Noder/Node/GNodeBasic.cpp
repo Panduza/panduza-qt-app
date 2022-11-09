@@ -74,8 +74,8 @@ const QColor &GNodeBasic::defaultTitleColor(const NodeProperty::Type &type)
 void GNodeBasic::addPintoMultiPin(struct multiPin *s)
 {
     int index;
-    Pin *pin;
-    Pin *last;
+    PinValue *pin;
+    PinValue *last;
     int size;
 
     size = s->list->size();
@@ -106,7 +106,7 @@ void GNodeBasic::createProxyMultiPin(struct multiPin *s)
 
     connect(moreLess, &PzaMoreLess::less, this, [&, s]{
         int index;
-        Pin *last;
+        PinValue *last;
 
         if ((int)s->list->size() == s->min)
             return ;
@@ -114,7 +114,7 @@ void GNodeBasic::createProxyMultiPin(struct multiPin *s)
         index = PzaUtils::IndexInVector<Pin *>(_inputPins, last);
         if (index == -1)
             return ;
-        PzaUtils::DeleteFromVector<Pin *>(*s->list, last);
+        PzaUtils::DeleteFromVector<PinValue *>(*s->list, last);
 
         deletePin(last);
     });
@@ -128,7 +128,7 @@ void GNodeBasic::forEachMultiPin(const std::function<void(struct multiPin *s)> &
     }
 }
 
-struct GNodeBasic::multiPin *GNodeBasic::findMultiPinFromList(std::vector<Pin *> *list)
+struct GNodeBasic::multiPin *GNodeBasic::findMultiPinFromList(std::vector<PinValue *> *list)
 {
     for (auto const &s: _multiPinStructs) {
         if (s->list == list)
@@ -324,14 +324,15 @@ void GNodeBasic::paint(QPainter *painter, QStyleOptionGraphicsItem const *option
 
     forEachPin([&](Pin *pin) {
         switch (pin->type()) {
-            case PinProperty::Type::Array:
-                drawArrayPlug(painter, pin);
-                break;
             case PinProperty::Type::Exec:
-                drawExecPlug(painter, pin);
+                drawExecPlug(painter, static_cast<PinExec *>(pin));
                 break;
-            default:
-                drawValuePlug(painter, pin);
+            case PinProperty::Type::Value:
+                PinValue *valuePin = static_cast<PinValue *>(pin);
+                if (valuePin->valueType() == NoderVar::Type::Array)
+                    drawArrayPlug(painter, static_cast<PinDecl::Array *>(valuePin));
+                else
+                    drawValuePlug(painter, valuePin);
                 break;
         }
     });

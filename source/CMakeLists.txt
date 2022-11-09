@@ -20,7 +20,6 @@ target_sources(${PROG}
 	Widgets/PzaSpoiler.cpp
 	Widgets/PzaMoreLess.cpp
 	Widgets/PzaLineEdit.cpp
-	Widgets/PzaProperty.cpp
 	Widgets/PzaLabel.cpp
 	Widgets/PzaPropertyTable.cpp
 	Widgets/PzaCheckBox.cpp
@@ -37,5 +36,9 @@ target_sources(${PROG}
 	Widgets/PzaTabWidget.cpp
 	Widgets/PzaTextEdit.cpp
 	Widgets/PzaPushButton.cpp
+	Widgets/PzaToolButton.cpp
 	Widgets/PzaPopup.cpp
+	Widgets/PzaTreeWidget.cpp
+	Widgets/PzaTreeWidgetItem.cpp
+	Widgets/PzaNameEntry.cpp
 )

@@ -10,8 +10,8 @@ class GNodeBasic : public GNode
         struct multiPin {
             int min;
             int max;
-            PinProperty::Type type;
-            std::vector<Pin *> *list;
+            NoderVar::Type type;
+            std::vector<PinValue *> *list;
             QGraphicsProxyWidget *proxy;
             PzaWidget *w;
             QString name;
@@ -61,9 +61,9 @@ class GNodeBasic : public GNode
         }
 
         template <typename N>
-        void addMultiInput(const QString &name, const QString &pinName, std::vector<Pin *> *list, int min, int max)
+        void addMultiInput(const QString &name, const QString &pinName, std::vector<PinValue *> *list, int min, int max)
         {
-            Pin *basePin;
+            PinValue *basePin;
             struct GNodeBasic::multiPin *s;
 
             if (min < 1)
@@ -78,7 +78,7 @@ class GNodeBasic : public GNode
 
 
             basePin = addPin<N>(pinName + " " + QString::number(0), PinProperty::Direction::Input);
-            s->type = basePin->type();
+            s->type = basePin->valueType();
             list->push_back(basePin);
 
             for (int i = 1; i < min; i++)
@@ -87,37 +87,37 @@ class GNodeBasic : public GNode
             _multiPinStructs.push_back(s);
         }
         template <typename N>
-        void addMultiInput(const QString &name, const QString &pinName, std::vector<Pin *> *list, unsigned int min)
+        void addMultiInput(const QString &name, const QString &pinName, std::vector<PinValue *> *list, unsigned int min)
         {
             addMultiInput<N>(name, pinName, list, min, -1);
         }
         template <typename N>
-        void addMultiInput(const QString &pinName, std::vector<Pin *> *list)
+        void addMultiInput(const QString &pinName, std::vector<PinValue *> *list)
         {
             addMultiInput<N>("", pinName, list, 2);
         }
         template <typename N>
-        void addMultiInput(const QString &pinName, std::vector<Pin *> *list, unsigned int min)
+        void addMultiInput(const QString &pinName, std::vector<PinValue *> *list, unsigned int min)
         {
             addMultiInput<N>("", pinName, list, min, -1);
         }
         template <typename N>
-        void addMultiInput(std::vector<Pin *> *list, unsigned int min)
+        void addMultiInput(std::vector<PinValue *> *list, unsigned int min)
         {
             addMultiInput<N>("", list, min, -1);
         }
         template <typename N>
-        void addMultiInput(std::vector<Pin *> *list, unsigned int min, unsigned int max)
+        void addMultiInput(std::vector<PinValue *> *list, unsigned int min, unsigned int max)
         {
             addMultiInput<N>("", list, min, max);
         }
         template <typename N>
-        void addMultiInput(std::vector<Pin *> *list)
+        void addMultiInput(std::vector<PinValue *> *list)
         {
             addMultiInput<N>("", "", list, 2, -1);
         }
 
-        struct multiPin *findMultiPinFromList(std::vector<Pin *> *list);
+        struct multiPin *findMultiPinFromList(std::vector<PinValue *> *list);
 
     private:
         struct title *_title = nullptr;

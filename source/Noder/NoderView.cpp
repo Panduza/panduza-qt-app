@@ -54,10 +54,10 @@ void NoderGraphicsView::dropEvent(QDropEvent *event)
 
     QGraphicsView::dropEvent(event);
     if (event->mimeData()->hasFormat("noder/variable") == true) {
-        NoderVariable *variable;
+        NoderSPVariable *variable;
 
         mime = static_cast<const PzaMimeData *>(event->mimeData());
-        variable = static_cast<NoderVariable *>(mime->dataPtr());
+        variable = static_cast<NoderSPVariable *>(mime->dataPtr());
         if (variable) {
             QPointF pos = mapToScene(event->position().toPoint());
             GNode *node = createNode(GNode::CreateNode<Instance>, pos);

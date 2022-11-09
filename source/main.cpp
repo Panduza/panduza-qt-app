@@ -14,8 +14,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("panduza.io");
     QCoreApplication::setApplicationName("Panduza Application");
 
-
-
     MainWindow win;
 
     win.show();

@@ -3,8 +3,8 @@
 If::If()
     : GNodeBranch("If")
 {
-    _true = addOutput<PinDecl::Exec>("True");
-    _false = addOutput<PinDecl::Exec>("False");
+    _true = addOutput<PinExec>("True");
+    _false = addOutput<PinExec>("False");
     _cond = addInput<PinDecl::Bool>("Condition");
 }
 

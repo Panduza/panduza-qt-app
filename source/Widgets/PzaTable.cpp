@@ -3,5 +3,5 @@
 PzaTable::PzaTable(QWidget *parent)
     : QTableWidget(parent)
 {
-    setStyleSheet("background-color:red");
+
 }

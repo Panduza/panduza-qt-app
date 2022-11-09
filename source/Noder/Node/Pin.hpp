@@ -5,19 +5,26 @@
 #include <PzaWidget.hpp>
 #include <QGridLayout>
 
+#include <PzaDoubleSpinBox.hpp>
+#include <PzaSpinBox.hpp>
+#include <PzaCheckBox.hpp>
+#include <PzaLabel.hpp>
+#include <PzaLineEdit.hpp>
 #include <PzaLimits.hpp>
 #include <Interface/Interface.hpp>
 #include <Noder.hpp>
+#include "NoderVar.hpp"
 
 class GNode;
 class Link;
+class PinValue;
 
-#define COMPATIBLE_TYPES(...) \
-const inline std::vector<PinProperty::Type> &compatibles() override \
-{ \
-    static std::vector<PinProperty::Type> map = {_type, __VA_ARGS__}; \
-    return map; \
-}
+#define COMPATIBLE_TYPES(...)                                                  \
+    const inline std::vector<NoderVar::Type> &compatibles() override           \
+    {                                                                          \
+        static std::vector<NoderVar::Type> map = {_valueType, __VA_ARGS__}; \
+        return map;                                                            \
+    }
 
 class Pin : public PzaWidget
 {
@@ -27,13 +34,11 @@ class Pin : public PzaWidget
         const QString &name() const {return _name;}
         const PinProperty::Type &type() {return _type;}
         const PinProperty::Direction &direction() const {return _direction;}
-        const virtual inline std::vector<PinProperty::Type> &compatibles(void) = 0;
-        virtual void onEventConnect(void) {};
-        virtual void onEventDisconnect(void) {};
+        virtual void onEventConnect(void) {}
+        virtual void onEventDisconnect(void) {}
         GNode *node(void) const {return _node;}
 
         QGraphicsProxyWidget *proxy() const {return _proxy;}
-        QGridLayout *grid() const {return _grid;}
         const QPoint &pos() const {return _pos;}
         const QPointF &scenePos() const {return _scenePos;}
         const QSize &size() const {return _size;}
@@ -42,11 +47,9 @@ class Pin : public PzaWidget
 
         bool dead(void) {return _dead;}
 
-        void setPos(const QPoint &pos) {_pos = pos;}
-        void setScenePos(const QPointF &pos) {_scenePos = pos;}
-        void setProxy(QGraphicsProxyWidget *proxy) {_proxy = proxy;}
-        void setGrid(QGridLayout *grid) {_grid = grid;}
-        void setSize(const QSize &size) {_size = size;}
+        void setPos(const QPoint &pos) { _pos = pos; }
+        void setScenePos(const QPointF &pos) { _scenePos = pos; }
+        void setSize(const QSize &size) { _size = size; }
         void setPlugzone(const QRectF &plug)
         {
             QPointF center;
@@ -70,50 +73,32 @@ class Pin : public PzaWidget
         void connectLink(Link *link);
         void moveLinks(void);
         void disconnectLink(const QPointF &pos);
-        std::vector<GNode *> &linkedNodes(void) {return _linkedNodes;}
-        std::vector<Pin *> &linkedPins(void) {return _linkedPins;}
+        std::vector<GNode *> &linkedNodes(void) { return _linkedNodes; }
+        std::vector<Pin *> &linkedPins(void) { return _linkedPins; }
         void forEachLinkedPin(const std::function<void(Pin *pin)> &func);
         void forEachLinkedNode(const std::function<void(GNode *node)> &func);
-        const QColor &plugColor(void) {return _plugColor;}
-        virtual void setPlugColor(void) {_plugColor = Noder::Get().plugColor(_type);}
-        void setNode(GNode *node) {_node = node;}
+        void setNode(GNode *node) { _node = node; }
         void removeLink(Link *link);
         void removeLinks(void);
-        bool isInput(void) {return _direction == PinProperty::Direction::Input;}
-        bool isOutput(void) {return _direction == PinProperty::Direction::Output;}
-
-        static PinProperty::Direction OppositeDirection(PinProperty::Direction direction)
+        bool isInput(void) { return _direction == PinProperty::Direction::Input; }
+        bool isOutput(void) { return _direction == PinProperty::Direction::Output; }
+        static PinProperty::Direction OppositeDirection(PinProperty::Direction dir)
         {
-            if (direction == PinProperty::Direction::Input)
+            if (dir == PinProperty::Direction::Input)
                 return PinProperty::Direction::Output;
-            else
-                return PinProperty::Direction::Input;
+            return PinProperty::Direction::Input;
         }
+
+        virtual void setupProxyWidget(void);
+        virtual void setupWidgets(void) {}
 
         void hideWidgets(void);
         void showWidgets(void);
         void setName(const QString &name);
-        void setDirection(PinProperty::Direction direction) {_direction = direction;}
+        void setDirection(PinProperty::Direction direction) { _direction = direction; }
 
-        virtual bool isCompatible(Pin *to);
+        virtual bool isCompatible(Pin *to) = 0;
 
-        virtual void setValue(const bool val) {(void)val;qDebug() << "Wooh bad idea";};
-        virtual void setValue(const double val) {(void)val;qDebug() << "Wooh bad idea";};
-        virtual void setValue(const int val) {(void)val;qDebug() << "Wooh bad idea";};
-        virtual void setValue(const QString &val) {(void)val;qDebug() << "Wooh bad idea";};
-        virtual void setValue(const std::vector<Pin *> &val) {(void)val;qDebug() << "Wooh bad idea";};
-        virtual void setValue(PzaInterface::Interface *val) {(void)val;qDebug() << "Wooh bad idea";};
-        //virtual void setValue(Interface *val) {qDebug() << "Wooh bad idea";};
-
-        template<typename T>
-        void sendValue(T val) {
-            if (linked()) {
-                forEachLinkedPin([val](Pin *pin){
-                    pin->setValue(val);
-                });
-            }
-        }
-        
         ~Pin();
 
     protected:
@@ -134,267 +119,309 @@ class Pin : public PzaWidget
         std::vector<Link *> _links;
         std::vector<GNode *> _linkedNodes;
         std::vector<Pin *> _linkedPins;
-        QColor _plugColor;
+        PzaLabel *_label;
 
         void forEachLink(const std::function<void(Link *link)> &func);
 
     private:
         bool _dead = false;
-
-    signals:
-        void askWidget(void);
-        void nameChanged(const QString &name);
 };
 
-namespace PinDecl {
-
-class Wildcard : public Pin
+class PinValue : public Pin
 {
     public:
-        Wildcard();
+        PinValue();
 
-    private:
-        COMPATIBLE_TYPES
-        (
-            PinProperty::Type::Bool,
-            PinProperty::Type::Int,
-            PinProperty::Type::Float,
-            PinProperty::Type::String,
-            PinProperty::Type::Enum,
-            PinProperty::Type::Interface
-        )
-};
+        const NoderVar::Type &valueType(void) const {return _valueType;}
+        virtual const QColor &plugColor(void) const {return Noder::Get().varTypeColor(_valueType);}
+        static PinValue *PinTypeToObj(const NoderVar::Type type);
 
-class Float : public Pin
-{
-    public:
-        Float(double value = 0.f, double min = _Float_MIN, double max = _Float_MAX, unsigned int decimals = 2);
+        bool isCompatible(Pin *to) override;
 
-        void setValue(const double value) override {_value = value;}
-        void setValue(const int val) override;
-        void setValue(const bool val) override;
-        void setValue(const QString &val) override;
+        const virtual inline std::vector<NoderVar::Type> &compatibles(void) {
+            static std::vector<NoderVar::Type> map = {}; \
+            return map; 
+        };
 
-        void setMin(const double value) {_min = value;}
-        void setMax(const double value) {_max = value;}
-        void setDecimals(const unsigned int value) {_decimals = value;}
-
-        double value(void) const {return _value;}
-        double min(void) const {return _min;}
-        double max(void) const {return _max;}
-        unsigned int decimals(void) const {return _decimals;}
-
-        double value(void)
+        virtual void setValue(const bool val)
         {
-            if (!linked())
-                askWidget();
-            return _value;
+            (void)val;
+            qDebug() << "Wooh bad idea";
+        };
+        virtual void setValue(const double val)
+        {
+            (void)val;
+            qDebug() << "Wooh bad idea";
+        };
+        virtual void setValue(const int val)
+        {
+            (void)val;
+            qDebug() << "Wooh bad idea";
+        };
+        virtual void setValue(const QString &val)
+        {
+            (void)val;
+            qDebug() << "Wooh bad idea";
+        };
+        virtual void setValue(const std::vector<PinValue *> &val)
+        {
+            (void)val;
+            qDebug() << "Wooh bad idea";
+        };
+        virtual void setValue(PzaInterface::Interface *val)
+        {
+            (void)val;
+            qDebug() << "Wooh bad idea";
+        };
+
+        template <typename T>
+        void sendValue(T val)
+        {
+            if (linked())
+            {
+                forEachLinkedPin([val](Pin *pin) {
+                    static_cast<PinValue *>(pin)->setValue(val);
+                });
+            }
         }
 
-    private:
-        COMPATIBLE_TYPES
-        (
-            PinProperty::Type::Bool,
-            PinProperty::Type::Int,
-            PinProperty::Type::String
-        )
-        double _value;
-        double _min;
-        double _max;
-        unsigned int _decimals;
+    protected:
+        NoderVar::Type _valueType;
 };
 
-class Int : public Pin
+class PinExec : public Pin
 {
     public:
-        Int(int value = 0, int min = _Int_MIN, int max = _Int_MAX);
+        PinExec();
 
-        void setValue(const int value) override {_value = value;}
+        bool isCompatible(Pin *to) override;
+
+    private:
+
+};
+
+namespace PinDecl
+{
+    class Wildcard : public PinValue
+    {
+        private:
+            COMPATIBLE_TYPES
+            (
+                NoderVar::Type::Bool,
+                NoderVar::Type::Int,
+                NoderVar::Type::Float,
+                NoderVar::Type::String,
+                NoderVar::Type::Enum,
+                NoderVar::Type::Interface
+            )
+    };
+
+    class Float : public PinValue
+    {
+        public:
+            Float();
+
+            void setupWidgets(void) override;
+
+            const NoderVarBase &data(void) const { return _data; }
+
+            void setValue(const double value) override { _data.setValue(value); }
+            void setValue(const int val) override;
+            void setValue(const bool val) override;
+            void setValue(const QString &val) override;
+
+            double value(void)
+            {
+                if (linked())
+                    return _data.value();
+                return _box->value();
+            }
+
+        private:
+            COMPATIBLE_TYPES
+            (
+                NoderVar::Type::Bool,
+                NoderVar::Type::Int,
+                NoderVar::Type::String
+            )
+            NoderVarFloat _data;
+            PzaDoubleSpinBox *_box;
+    };
+
+    class Int : public PinValue
+    {
+    public:
+        Int();
+
+        void setupWidgets(void) override;
+        
+        const NoderVarBase &data(void) const { return _data; }
+
+        void setValue(const int value) override {_data.setValue(value);}
         void setValue(const double val) override;
         void setValue(const bool val) override;
         void setValue(const QString &val) override;
-
-        void setMin(const int value) {_min = value;}
-        void setMax(const int value) {_max = value;}
-
-        int value(void) const {return _value;}
-        int min(void) const {return _min;}
-        int max(void) const {return _max;}
 
         int value(void)
         {
-            if (!linked())
-                askWidget();
-            return _value;
+            if (linked())
+                return _data.value();
+            return _box->value();
         }
 
     private:
         COMPATIBLE_TYPES
         (
-            PinProperty::Type::Float,
-            PinProperty::Type::Bool,
-            PinProperty::Type::String
+            NoderVar::Type::Float,
+            NoderVar::Type::Bool,
+            NoderVar::Type::String
         )
-        int _value;
-        int _min;
-        int _max;
-};
+        NoderVarInt _data;
+        PzaSpinBox *_box;
+    };
 
-class Bool : public Pin
-{
-    public:
-        Bool(bool value = false);
+    class Bool : public PinValue
+    {
+        public:
+            Bool();
 
-        void setValue(const bool value) override {_value = value;}
+            void setupWidgets(void) override;
 
-        void setValue(const double val) override;
-        void setValue(const int val) override;
-        void setValue(const QString &val) override;
+            const NoderVarBase &data(void) const {return _data;}
 
-        bool value(void)
-        {
-            if (!linked())
-                askWidget();
-            return _value;
-        }
+            void setValue(const bool value) override {_data.setValue(value);}
 
-    private:
-        COMPATIBLE_TYPES
-        (
-            PinProperty::Type::Float,
-            PinProperty::Type::Int,
-            PinProperty::Type::String
-        )
-        bool _value;
-};
+            void setValue(const double val) override;
+            void setValue(const int val) override;
+            void setValue(const QString &val) override;
 
-class String : public Pin
-{
-    public:
-        String(const QString &value = "");
+            bool value(void)
+            {
+                if (linked())
+                    return _data.value();
+                return _box->isChecked();
+            }
 
-        void setValue(const QString &value) override;
-        void setValue(const double value) override;
-        void setValue(const int value) override;
-        void setValue(const bool value) override;
+        private:
+            COMPATIBLE_TYPES
+            (
+                NoderVar::Type::Float,
+                NoderVar::Type::Int,
+                NoderVar::Type::String
+            )
+            NoderVarBool _data;
+            PzaCheckBox *_box;
+    };
 
-        const QString &value(void)
-        {
-            if (!linked())
-                askWidget();
-            return _value;
-        }
+    class String : public PinValue
+    {
+        public:
+            String();
 
-    private:
-        COMPATIBLE_TYPES
-        (
-            PinProperty::Type::Float,
-            PinProperty::Type::Int,
-            PinProperty::Type::Bool
-        )
-        QString _value;
-};
+            void setupWidgets(void) override;
 
-class Enum : public Pin
-{
-    Q_OBJECT
-    
-    public:
-        Enum();
+            const NoderVarBase &data(void) const {return _data;}
 
-        const QString &enumName(void) {return _enumName;}
-        void initialize(const QString &name);
-        const std::vector<QString> &list(void) {return _list;}
+            void setValue(const QString &value) {_data.setValue(value);}
+            void setValue(const double value) override;
+            void setValue(const int value) override;
+            void setValue(const bool value) override;
 
-        bool isCompatible(Pin *pin) override;
+            const QString value(void)
+            {
+                if (linked())
+                    return _data.value();
+                return _box->text();
+            }
 
-    private:
-        COMPATIBLE_TYPES
-        (
-        )
+        private:
+            COMPATIBLE_TYPES
+            (
+                NoderVar::Type::Float,
+                NoderVar::Type::Int,
+                NoderVar::Type::Bool
+            )
+            NoderVarString _data;
+            PzaLineEdit *_box;
+    };
 
-        QString _enumName;
-        std::vector<QString> _list;
+    class Enum : public PinValue
+    {
+        Q_OBJECT
 
-    public slots:
-        void modifyEnumName(const QString &name);
+        public:
+            Enum();
 
-    signals:
-        void initialized(void);
-};
+            void setupWidgets(void) override;
 
-class Array : public Pin
-{
-    public:
-        Array();
+            const QString &enumName(void) {return _enumName;}
+            void initialize(const QString &name);
+            const std::vector<QString> &list(void) {return _list;}
 
-        const auto &list(void) {return _list;}
-        const PinProperty::Type &elemType(void) {return _elemType;}
+            bool isCompatible(Pin *pin) override;
 
-        bool isCompatible(Pin *pin) override;
+        private:
+            COMPATIBLE_TYPES()
 
-        void setValue(const std::vector<Pin *> &vec) override
-        {
-            _list = vec;
-        }
+            QString _enumName;
+            std::vector<QString> _list;
 
-        void setElemType(const PinProperty::Type &type)
-        {
-            _elemType = type;
-            setPlugColor();
-        }
+        public slots:
+            void modifyEnumName(const QString &name);
 
-        void setOriginalType(const PinProperty::Type &type)
-        {
-            _oriElemType = type;
-            _elemType = type;
-        }
+        signals:
+            void initialized(void);
+    };
 
-        void onEventConnect(void) override;
-        void onEventDisconnect(void) override;
-        virtual void setPlugColor(void) {_plugColor = Noder::Get().plugColor(_elemType);}
+    class Array : public PinValue
+    {
+        public:
+            Array();
 
-    private:
-        COMPATIBLE_TYPES
-        (
-        )
+            const auto &list(void) {return _list;}
+            const NoderVar::Type &elemType(void) {return _elemType;}
+            bool isCompatible(Pin *pin) override;
+            void setValue(const std::vector<PinValue *> &vec) override
+            {
+                _list = vec;
+            }
+            void setElemType(const NoderVar::Type &type)
+            {
+                _elemType = type;
+            }
+            void setOriginalType(const NoderVar::Type &type)
+            {
+                _oriElemType = type;
+                _elemType = type;
+            }
+            void onEventConnect(void) override;
+            void onEventDisconnect(void) override;
 
-        PinProperty::Type _oriElemType = PinProperty::Type::Wildcard;
-        PinProperty::Type _elemType = PinProperty::Type::Wildcard;
-        std::vector
-        <
-            Pin *
-        > _list;
-};
+            const QColor &plugColor(void) const override {return Noder::Get().varTypeColor(_elemType);}
 
-class Exec : public Pin
-{
-    public:
-        Exec();
+        private:
+            COMPATIBLE_TYPES()
 
-    private:
-        COMPATIBLE_TYPES
-        (
-        )
-};
+            NoderVar::Type _oriElemType = NoderVar::Type::Wildcard;
+            NoderVar::Type _elemType = NoderVar::Type::Wildcard;
+            std::vector<PinValue *> _list;
+    };
 
-class Interface : public Pin
-{
-    public:
-        Interface();
+    class Interface : public PinValue
+    {
+        public:
+            Interface();
 
-        PzaInterface::Interface *object(void) {return _object;}
+            PzaInterface::Interface *object(void) { return _object; }
 
-        bool isCompatible(Pin *pin) override;
+            bool isCompatible(Pin *pin) override;
 
-        void setValue(PzaInterface::Interface *val) override {_object = val;}
+            void setValue(PzaInterface::Interface *val) override { _object = val; }
 
-    private:
-        COMPATIBLE_TYPES
-        (
-        )
-        
-        PzaInterface::Interface *_object = nullptr;
-};
+        private:
+            COMPATIBLE_TYPES()
+
+            PzaInterface::Interface *_object = nullptr;
+    };
 
 }

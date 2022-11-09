@@ -1,9 +1,11 @@
 #include "PzaPopup.hpp"
 
 PzaPopup::PzaPopup(QWidget *parent)
-    : PzaMenu(parent)
+    : QMenu()
 {
+    _layout = new QVBoxLayout(this);
 
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 PzaPopup::PzaPopup(const QString &name, QWidget *parent)
@@ -14,47 +16,35 @@ PzaPopup::PzaPopup(const QString &name, QWidget *parent)
 
 void PzaPopup::addTitle(const QString &name)
 {
-    QAction *title = new QAction(name, this);
-    title->setEnabled(false);
-    insertAction(actions().at(0), title);
+   _layout->insertWidget(0, new PzaLabel(name));
 }
 
 void PzaPopup::addWidget(QWidget *w)
 {
-    QWidgetAction *action = new QWidgetAction(this);
-
-    action->setDefaultWidget(w);
     if (_validator)
-        insertAction(_validator, action);
+        _layout->insertWidget(_layout->indexOf(_validator), w);
     else
-        addAction(action);
+        _layout->addWidget(w);
+
+    adjustSize();
+    update();
 }
 
 void PzaPopup::removeWidget(QWidget *w)
 {
-    QWidgetAction *item;
-
-    for (auto const &action: actions()) {
-        item = dynamic_cast<QWidgetAction *>(action);
-        if (item && item->defaultWidget() == w) {
-            removeAction(item);
-        }
-    }
+    _layout->removeWidget(w);
 }
 
 void PzaPopup::setValidator(void)
 {
-    _validator = new QWidgetAction(this);
-    PzaPushButton *ok = new PzaPushButton(this);
+    _validator = new PzaPushButton(this);
 
-    ok->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    ok->setText("Ok");
+    _validator->setText("Ok");
 
-    connect(ok, &PzaPushButton::clicked, this, [&]() {
+    connect(_validator, &PzaPushButton::clicked, this, [&]() {
         close();
         validated();
     });
 
-    _validator->setDefaultWidget(ok);
-    addAction(_validator);
+    _layout->addWidget(_validator);
 }

@@ -1,11 +1,13 @@
 #pragma once
 
 #include <QWidgetAction>
+#include <QVBoxLayout>
 
 #include <PzaPushButton.hpp>
 #include <PzaMenu.hpp>
+#include <PzaLabel.hpp>
 
-class PzaPopup : public PzaMenu
+class PzaPopup : public QMenu
 {
     Q_OBJECT
 
@@ -20,7 +22,8 @@ class PzaPopup : public PzaMenu
         void setValidator(void);
 
     private:
-        QWidgetAction *_validator = nullptr;
+        QVBoxLayout *_layout;
+        PzaPushButton *_validator = nullptr;
 
     signals:
         void validated(void);

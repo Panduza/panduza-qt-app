@@ -6,8 +6,8 @@ For::For()
 {
     _start = addInput<PinDecl::Int>("Start");
     _end = addInput<PinDecl::Int>("End");
-    _scope = addOutput<PinDecl::Exec>("Scope");
-    _done = addOutput<PinDecl::Exec>("Done");
+    _scope = addOutput<PinExec>("Scope");
+    _done = addOutput<PinExec>("Done");
     _index = addOutput<PinDecl::Int>("Index");
 }
 
@@ -39,8 +39,8 @@ ForEachInArray::ForEachInArray()
     : GNodeBranch("For Each Element in Array")
 {
     _array = addInput<PinDecl::Array>("Array");
-    _scope = addOutput<PinDecl::Exec>("Scope");
-    _done = addOutput<PinDecl::Exec>("Done");
+    _scope = addOutput<PinExec>("Scope");
+    _done = addOutput<PinExec>("Done");
     _elem = addOutput<PinDecl::Wildcard>("Element");
 }
 
@@ -52,31 +52,31 @@ GNode *ForEachInArray::branch(void)
     end = _array->list().size();
     for (unsigned int i = 0; i < end; i++) {
         switch(_array->elemType()) {
-            case PinProperty::Type::Bool:
+            case NoderVar::Type::Bool:
             {
                 PinDecl::Bool *pin = static_cast<PinDecl::Bool *>(_array->list().at(i));
                 _elem->sendValue(pin->value());
                 break;
             }
-            case PinProperty::Type::Int:
+            case NoderVar::Type::Int:
             {
                 PinDecl::Int *pin = static_cast<PinDecl::Int *>(_array->list().at(i));
                 _elem->sendValue(pin->value());
                 break;
             }
-            case PinProperty::Type::Float:
+            case NoderVar::Type::Float:
             {
                 PinDecl::Float *pin = static_cast<PinDecl::Float *>(_array->list().at(i));
                 _elem->sendValue(pin->value());
                 break;
             }
-            case PinProperty::Type::String:
+            case NoderVar::Type::String:
             {
                 PinDecl::String *pin = static_cast<PinDecl::String *>(_array->list().at(i));
                 _elem->sendValue(pin->value());
                 break;
             }
-            case PinProperty::Type::Enum:
+            case NoderVar::Type::Enum:
             {
                 //PinDecl::Enum *pin = static_cast<PinDecl::Enum *>(_array->list().at(0));
                 //_elem->sendValue(pin->value());
@@ -99,9 +99,9 @@ GNode *ForEachInArray::branch(void)
 
 void ForEachInArray::onEventConnect(void)
 {
-    PinProperty::Type type;
+    NoderVar::Type type;
 
-    if (_elem->type() != PinProperty::Type::Wildcard)
+    if (_elem->valueType() != NoderVar::Type::Wildcard)
         return ;
 
     type = _array->elemType();
@@ -115,5 +115,5 @@ void ForEachInArray::onEventDisconnect(void)
         return ;
     }
     deletePin(_elem);
-    _elem = addPinFromType(PinProperty::Type::Wildcard, "Element", PinProperty::Direction::Output);
+    _elem = addPinFromType(NoderVar::Type::Wildcard, "Element", PinProperty::Direction::Output);
 }
