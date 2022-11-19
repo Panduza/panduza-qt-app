@@ -16,21 +16,51 @@ void AdminConnection::setSystemWorker(SystemWorker* worker)
 
 // ============================================================================
 //
-void AdminConnection::execInstallSshServer()
+void AdminConnection::copyWorkspacePlatformToRemote()
 {
-
-    concurrentRun(std::bind(&SystemWorker::execInstallSshServer, _worker));
-
+    concurrentRun(std::bind(&SystemWorker::copyWorkspacePlatformToRemote, _worker));
 }
 
 // ============================================================================
 //
-void AdminConnection::execUninstallSshServer()
+void AdminConnection::execSshServerInstall()
 {
+    concurrentRun(std::bind(&SystemWorker::execSshServerInstall, _worker));
+}
 
+// ============================================================================
+//
+void AdminConnection::execSshServerUninstall()
+{
+    concurrentRun(std::bind(&SystemWorker::execSshServerUninstall, _worker));
+}
 
-    concurrentRun(std::bind(&SystemWorker::execUninstallSshServer, _worker));
- 
+// ============================================================================
+//
+void AdminConnection::execInstallDocker()
+{
+    concurrentRun(std::bind(&SystemWorker::execInstallDocker, _worker));
+}
+
+// ============================================================================
+//
+void AdminConnection::execStartPlatform()
+{
+    concurrentRun(std::bind(&SystemWorker::execStartPlatform, _worker));
+}
+
+// ============================================================================
+//
+void AdminConnection::execStopPlatform()
+{
+    concurrentRun(std::bind(&SystemWorker::execStopPlatform, _worker));
+}
+
+// ============================================================================
+//
+void AdminConnection::execAutodetectPlatform()
+{
+    concurrentRun(std::bind(&SystemWorker::execAutodetectPlatform, _worker));
 }
 
 // ============================================================================

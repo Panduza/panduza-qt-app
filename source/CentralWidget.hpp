@@ -33,7 +33,7 @@ class CentralWidget : public QWidget
             main_layout->addWidget(&mSplitter);
 
             auto tabs = new PzaTabWidget();
-            tabs->addTab(new NoderFrame(nullptr), "Noder");
+            tabs->addTab(Noder::Get().Frame, "Noder");
             tabs->addTab(new AdminFrame(), "Admin");
 
 

@@ -1,5 +1,5 @@
 
-add_subdirectory(platform)
+add_subdirectory(workspace)
 add_subdirectory(connection)
 
 target_include_directories(${PROG} PRIVATE "./")

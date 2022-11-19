@@ -76,8 +76,28 @@ public:
     }
 
 
-    void execInstallSshServer();
-    void execUninstallSshServer();
+    // 
+    void copyWorkspacePlatformToRemote();
+
+
+
+    void execCheck();
+    void execInstall();
+    void execUninstall();
+    
+
+
+    void execSshServerCheck();
+    void execSshServerInstall();
+    void execSshServerUninstall();
+
+
+    void execInstallDocker();
+
+    void execStartPlatform();
+    void execStopPlatform();
+    void execAutodetectPlatform();
+
 
 public slots:
 

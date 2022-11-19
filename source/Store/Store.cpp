@@ -11,6 +11,7 @@
 //
 Store::Store()
     : QObject()
+    , workspace(this)
 {
 
     
@@ -30,6 +31,10 @@ void Store::open()
 {
     // Load active connection with the first server
     connection.active.copyFrom( *connection.library.connection(0) );
+
+
+    workspace.etc.tree.loadFromWorkspace();
+    workspace.etc.platform.import();
 }
 
 // ============================================================================

@@ -1,4 +1,5 @@
-add_subdirectory("Platform")
+add_subdirectory("CfgTreeEditor")
+add_subdirectory("System")
 
 target_include_directories(${PROG} PRIVATE "./")
 

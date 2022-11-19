@@ -10,8 +10,7 @@
 #include <QTextEdit>
 
 #include "NoderView.hpp"
-#include "NoderSidePanel.hpp"
-#include <PanduzaEngine.hpp>
+#include "NoderSP.hpp"
 #include <PzaMenuBar.hpp>
 #include <PzaMenu.hpp>
 
@@ -19,7 +18,7 @@
 
 
 class TabSystem;
-class TabPlatform;
+class CfgTreeEditor;
 class TabData;
 
 
@@ -38,9 +37,8 @@ class AdminFrame : public QWidget
 
     TabSystem* mTabTool;
 
-    TabPlatform* mTabPlatform;
+    CfgTreeEditor* mCfgTreeEditor;
 
-    TabData* mTabData;
 
 };
 

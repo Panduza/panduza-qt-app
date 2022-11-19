@@ -41,4 +41,5 @@ target_sources(${PROG}
 	Widgets/PzaTreeWidget.cpp
 	Widgets/PzaTreeWidgetItem.cpp
 	Widgets/PzaNameEntry.cpp
+	Widgets/PzaAdminButton.cpp
 )

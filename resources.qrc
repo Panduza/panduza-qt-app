@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>styles/DefaultTheme.json</file>
+        <file alias="styles/base">rsc/styles/base.qss</file>
+
         <file>images/noder/checkbox/unchecked.png</file>
         <file>images/noder/checkbox/checked.png</file>
         <file>images/noder/checkbox/hover.png</file>
@@ -17,6 +19,16 @@
         <file>images/noder/plug_array.svg</file>
 
 
+        <file>rsc/files/mosquitto.conf</file>
         <file>rsc/files/panduza.service</file>
+
+        <file alias="img_tree">rsc/images/tree_editor/tree.png</file>
+        <file alias="image/cyborg-face">rsc/images/tree_editor/cyborg-face.png</file>
+        <file alias="image/save">rsc/images/tree_editor/save.png</file>
+
+        
+        
+
+        
     </qresource>
 </RCC>

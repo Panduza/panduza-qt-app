@@ -72,7 +72,7 @@ TabWorkspace::TabWorkspace(QWidget *parent)
     lay->addWidget(change_workspace_button);
 
 
-    connect( &Store::Get().workspace, &WorkspaceInfo::updateddd, this, &TabWorkspace::updateView );
+    connect( &Store::Get().workspace, &Workspace::updated, this, &TabWorkspace::updateView );
 
     qDebug() << "init ok";
 }

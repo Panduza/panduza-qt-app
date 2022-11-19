@@ -62,10 +62,18 @@ public:
     bool execAdminPasswordCheck();
 
 
-    void execInstallSshServer();
-    void execUninstallSshServer();
-    
 
+    void copyWorkspacePlatformToRemote();
+
+
+    void execSshServerInstall();
+    void execSshServerUninstall();
+    
+    void execInstallDocker();
+
+    void execStartPlatform();
+    void execStopPlatform();
+    void execAutodetectPlatform();
 
 public slots:
 
@@ -95,6 +103,7 @@ private:
     int cmdAsSudo(const QString& command, bool catch_streams = true);
 
 
+    int execute(const QString& command, bool as_sudo = true, bool catch_streams = true, int timeout_ms = 30000, const QList<QPair<QString, QString> >& env = QList<QPair<QString, QString> >());
 
 };
 

@@ -4,6 +4,21 @@ project(${PROG} LANGUAGES CXX)
 
 set(PROG panduza-qt-app)
 
+# External dependencies
+include(FetchContent)
+set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_LIST_DIR}/../tools)
+set(FETCHCONTENT_QUIET FALSE)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/dependencies.cmake)
+
+
+
+
+
+
+FetchContent_MakeAvailable(yaml-cpp)
+
+
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -30,6 +45,10 @@ add_executable(${PROG})
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/source")
 
+
+target_include_directories(${PROG} PRIVATE "${yaml-cpp_SOURCE_DIR}/include" )
+
+
 target_sources(${PROG}
 	PRIVATE
 	${INCLUDE}
@@ -43,6 +62,7 @@ target_link_libraries(${PROG}
 	Qt${QT_VERSION_MAJOR}::Svg
 	Qt${QT_VERSION_MAJOR}::Concurrent
 	ssh
+	yaml-cpp
 )
 
 install(TARGETS ${PROG})

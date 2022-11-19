@@ -4,7 +4,7 @@
 #include <QObject>
 
 // Panduza
-#include "WorkspaceInfo.hpp"
+#include "workspace/Workspace.hpp"
 
 #include "connection/ConnectionInfo.hpp"
 #include "connection/ConnectionLibrary.hpp"
@@ -13,9 +13,11 @@
 #include "connection/AdminConnection.hpp"
 #include "connection/LocalWorker.hpp"
 
-#include "platform/Platform.hpp"
 
 /**
+ * @defgroup ModuleStore Store
+ * @addtogroup ModuleStore
+ * 
  * @brief Shared data object for the application
  * 
  * The is the main singleton that gather data that must be shared across all the view of the application
@@ -26,6 +28,7 @@ class Store : public QObject
     Q_OBJECT
 
     public:
+
         /**
          * @brief Singleton Instance Getter
          */
@@ -33,6 +36,11 @@ class Store : public QObject
             static Store Instance;
             return Instance;
         }
+
+        /**
+         * @brief Workspace object
+         */
+        Workspace workspace;
 
         /**
          * @brief Connections store
@@ -56,16 +64,11 @@ class Store : public QObject
 
 
 
-        Platform platform;
-
-
-        WorkspaceInfo workspace;
 
         /**
          * @brief Start store interactions with the application
          */
         void open();
-
 
     private:
 

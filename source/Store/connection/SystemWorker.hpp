@@ -74,8 +74,16 @@ public:
 
 
 
-    virtual void execInstallSshServer() = 0;
-    virtual void execUninstallSshServer() = 0;
+    virtual void copyWorkspacePlatformToRemote() = 0;
+
+    virtual void execSshServerInstall() = 0;
+    virtual void execSshServerUninstall() = 0;
+
+    virtual void execInstallDocker() = 0;
+
+    virtual void execStartPlatform() = 0;
+    virtual void execStopPlatform() = 0;
+    virtual void execAutodetectPlatform() = 0;
 
 
     bool popSystemMessage(SystemMessage& msg)

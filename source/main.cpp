@@ -1,9 +1,12 @@
+// Qt
+#include <QDebug>
 #include <QApplication>
-#include "MainWindow.hpp"
-
 
 // Panduza
+#include "MainWindow.hpp"
 #include <Store/Store.hpp>
+
+
 
 
 int main(int argc, char *argv[])
@@ -13,6 +16,18 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Panduza");
     QCoreApplication::setOrganizationDomain("panduza.io");
     QCoreApplication::setApplicationName("Panduza Application");
+
+
+    // DOES NOT WORK HERE
+    // QFile file(":/styles/base");
+    // if (!file.open(QIODevice::ReadOnly)) {
+    //     qWarning() << "Could not open file !!!";
+    //     return 1;
+    // }
+    // auto content = QLatin1String((file.readAll()));
+    // qDebug() << content;
+    // app.setStyleSheet(content);
+
 
     MainWindow win;
 
