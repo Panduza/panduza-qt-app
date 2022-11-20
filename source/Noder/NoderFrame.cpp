@@ -11,8 +11,6 @@ NoderFrame::NoderFrame()
     _layout->setContentsMargins(0, 0, 0, 5);
     _layout->setSpacing(0);
 
-    mainFrame->setStyleSheet("background-color: #181818;");
-
     mainFrame->addWidget(&SidePanel);
     mainFrame->addWidget(&Graph);
     mainFrame->setStretchFactor(1, 1);

@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>styles/DefaultTheme.json</file>
         <file alias="styles/base">rsc/styles/base.qss</file>
 
         <file>images/noder/checkbox/unchecked.png</file>

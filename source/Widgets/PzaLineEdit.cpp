@@ -3,19 +3,6 @@
 PzaLineEdit::PzaLineEdit(QWidget *parent)
     : QLineEdit(parent)
 {
-    setStyleSheet(
-        "QLineEdit {"
-        "   border: 1px solid #3C3C3C;"
-        "   border-radius: 2px;"
-        "   color: #DCDCDC;"
-        "   background-color: #191919;"
-        "   padding: 3px;"
-        "}"
-        "QLineEdit::hover {"
-        "   color: #EFEFEF;"
-        "   background-color: #282828;"
-        "}"
-    );
     connect(this, &QLineEdit::editingFinished, this, [&](){
         clearFocus();
     });

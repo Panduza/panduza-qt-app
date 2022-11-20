@@ -18,12 +18,6 @@ class MainWindow : public QMainWindow
     private:
         PzaWidget _mainWidget;
         QVBoxLayout _mainLayout;
-        QColor _backgroundcol;
-
 
         void loadCssStyleFile(const QString& filename);
-
-        void loadTheme(QString filename);
-        void setBackgroundCol(QString color);
-        QColor backgroundCol() const { return _backgroundcol; };
 };

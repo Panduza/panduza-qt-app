@@ -5,10 +5,6 @@ PzaColorBox::PzaColorBox(QWidget *parent)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setFixedSize(30, 20);
-    setStyleSheet(
-    "   border: 1px solid gray;"
-    "   border-radius: 4px;"
-    );
 }
 
 void PzaColorBox::mousePressEvent(QMouseEvent *event)
@@ -27,10 +23,5 @@ void PzaColorBox::mousePressEvent(QMouseEvent *event)
 void PzaColorBox::setColor(const QColor &color)
 {
     _color = color;
-    setStyleSheet(
-    "   border: 1px solid gray;"
-    "   border-radius: 4px;"
-    "   background-color: " + color.name()
-    );
     colorChanged(color);
 }

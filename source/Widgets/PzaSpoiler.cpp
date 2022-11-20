@@ -8,15 +8,8 @@ PzaSpoiler::PzaSpoiler(QWidget *parent)
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     
     _layout = new QVBoxLayout(this);
-    _header = new QToolButton(this);
+    _header = new PzaToolButton(this);
     _content = new PzaStackedWidget(this);
-
-    _header->setAutoRaise(true);
-
-    _header->setStyleSheet(
-        "color: #DCDCDC;"
-        "font: 14px;"
-    );
 
     _layout->setContentsMargins(0, 0, 0, 0);
 

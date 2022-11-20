@@ -3,7 +3,7 @@
 PzaToolButton::PzaToolButton(QWidget *parent)
     : QToolButton(parent)
 {
-
+    setAutoRaise(true);
 }
 
 PzaToolButton::PzaToolButton(const QString &name, QWidget *parent)

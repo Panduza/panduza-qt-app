@@ -22,8 +22,6 @@ NoderSP::NoderSP(QWidget *parent)
     _layout->addWidget(variableSpoiler);
     _layout->addStretch(1);
 
-    setStyleSheet("background-color: #252525");
-
     setWidget(_main);
 }
 
@@ -507,10 +505,10 @@ template <class N>
 void NoderSPEntry<N>::setSelected(bool state)
 {
     if (state == true) {
-        setStyleSheet("background-color: #1B2426");
+      //  setStyleSheet("background-color: #1B2426");
     }
-    else
-        setStyleSheet("background-color: transparent");
+    //else
+    //    setStyleSheet("background-color: transparent");
 }
 
 NoderFunctionEntry::NoderFunctionEntry(QWidget *parent)

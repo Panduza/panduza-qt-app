@@ -16,7 +16,6 @@ target_sources(${PROG}
 	NoderScene.cpp
 	NoderConsole.cpp
 	NoderOutputArea.cpp
-	NoderStyle.cpp
 
 	Node/GNode.cpp
 	Node/Pin.cpp

@@ -1,5 +1,4 @@
 #include "NoderView.hpp"
-#include "NoderStyle.hpp"
 #include "Noder.hpp"
 
 #include <GNode.hpp>
@@ -16,9 +15,6 @@ NoderGraphicsView::NoderGraphicsView(QWidget *parent)
 
     setAcceptDrops(true);
 
-    _style = NoderStyle("DefaultTheme.json");
-
-    setBackgroundBrush(QBrush(_style.backgroundCol()));
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
     setRenderHint(QPainter::Antialiasing);
@@ -292,7 +288,6 @@ void NoderGraphicsView::drawBackground(QPainter *painter, const QRectF &r)
     gridbr = QPoint(std::floor(realbr.x() / gridStep + 1), std::floor(realbr.y() / gridStep + 1));
     ellispe = QRectF(realtl, realbr);
     pen.setWidth(1.0 / transform().m11());
-    pen.setColor(_style.gridCol());
 
     for (int y = gridtl.y(); y <= gridbr.y(); y++) {
         for (int x = gridtl.x(); x <= gridbr.x(); x++) {
@@ -320,8 +315,6 @@ NoderViewPanel::NoderViewPanel(NoderGraphicsView *view, QWidget *parent)
     _main = new PzaWidget(this);
     _layout = new QVBoxLayout(_main);
     _nodeArea = new PzaSpoiler("Node Properties", this);
-
-    _main->setStyleSheet("background-color: #252525");
 
     connect(view, &NoderGraphicsView::nodeCreated, _nodeArea, [&](const GNode *node) {
         _nodeArea->addWidget(node->propTable());

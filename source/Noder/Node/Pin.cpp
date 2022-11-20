@@ -5,11 +5,12 @@
 
 using namespace PinDecl;
 
-Pin::Pin()
-{
-    setStyleSheet("background-color: transparent");
+#include "MainWindow.hpp"
 
-    
+Pin::Pin()
+    : PzaWidget()
+{
+
 }
 
 void Pin::setName(const QString &name)

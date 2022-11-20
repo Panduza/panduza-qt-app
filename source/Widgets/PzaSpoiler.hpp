@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <PzaWidget.hpp>
 #include <QVBoxLayout>
-#include <QToolButton>
+#include <PzaToolButton.hpp>
 #include <PzaStackedWidget.hpp>
 
 class PzaSpoiler : public PzaWidget
@@ -26,7 +26,7 @@ class PzaSpoiler : public PzaWidget
     private:
         bool _fold;
         PzaStackedWidget *_content;
-        QToolButton *_header;
+        PzaToolButton *_header;
         QVBoxLayout *_layout;
 
     private slots:

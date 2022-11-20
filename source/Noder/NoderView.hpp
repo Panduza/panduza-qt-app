@@ -7,7 +7,6 @@
 #include <QTreeWidget>
 #include <QHeaderView>
 
-#include "NoderStyle.hpp"
 #include "NoderScene.hpp"
 #include <PzaMenu.hpp>
 #include <PzaSplitter.hpp>
@@ -53,7 +52,6 @@ class NoderGraphicsView : public QGraphicsView
     private:
         QPointF _clickpos;
         NoderScene *_scene = nullptr;
-        NoderStyle _style;
         GNode *_selectedNode = nullptr;
         bool _moveCanceled = false;
         PzaMenu *_viewMenu = nullptr;

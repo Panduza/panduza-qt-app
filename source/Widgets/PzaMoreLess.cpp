@@ -20,28 +20,6 @@ PzaMoreLess::PzaMoreLess(QWidget *parent)
     _layout->setSpacing(7);
     _layout->setContentsMargins(0, 0, 0, 0);
 
-    setStyleSheet(
-        "PzaWidget {"
-        "   background-color: transparent;"
-        "}"
-        "QPushButton {"
-        "   max-width: 14px;"
-        "   max-height: 14px;"
-        "}"
-        "QPushButton#more {"
-        "   border-image: url(:/images/noder/plus.png) 0 0 0 0 stretch;"
-        "}"
-        "QPushButton#less {"
-        "    border-image: url(:/images/noder/minus.png) 0 0 0 0 stretch;"
-        "}"
-        "QPushButton#more::hover {"
-        "   border-image: url(:/images/noder/plus_hover.png) 0 0 0 0 stretch;"
-        "}"
-        "QPushButton#less::hover {"
-        "    border-image: url(:/images/noder/minus_hover.png) 0 0 0 0 stretch;"
-        "}"
-    );
-
     _layout->addWidget(_more);
     _layout->addWidget(_less);
 }

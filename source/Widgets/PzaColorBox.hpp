@@ -2,7 +2,6 @@
 
 #include <QColorDialog>
 #include <PzaWidget.hpp>
-#include <QLabel>
 #include <QDialog>
 
 class PzaColorBox : public PzaWidget

@@ -8,8 +8,6 @@ PzaNameEntry::PzaNameEntry(QWidget *parent)
 
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    _lineEdit->setStyleSheet("background-color: black");
-
     connect(_lineEdit, &PzaLineEdit::editingFinished, this, [&](){
         newNameRequested(_lineEdit->text());
     });

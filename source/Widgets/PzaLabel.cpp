@@ -5,16 +5,6 @@ PzaLabel::PzaLabel(const QString &name, QWidget *parent)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMaximumWidth(200);
-    setStyleSheet(
-        "QLabel {"
-        "   color: #DCDCDC;"
-        "   background-color: transparent;"
-        "   font: 14px;"
-        "}"
-        "QLabel[pzalabel=instance] {"
-            "font-style: italic;"
-        "}"
-    );
 }
 
 void PzaLabel::mousePressEvent(QMouseEvent *event)
