@@ -13,23 +13,25 @@
 
 
 #include <Store/workspace/etcpza/cfgtree/CfgBroker.hpp>
+#include <Store/workspace/etcpza/cfgtree/CfgInterface.hpp>
 
 
 /**
  *
  * 
  */
-class ItemEditor : public QWidget
+class ItemEditorView : public QWidget
 {
     public:
 
         /**
          *
          */
-        ItemEditor(QWidget *parent = nullptr);
+        ItemEditorView(QWidget *parent = nullptr);
 
 
         void loadItem(const CfgBroker::ShPtr& broker_item);
+        void loadItem(const CfgInterface::ShPtr& interface_item);
 
     private:
     

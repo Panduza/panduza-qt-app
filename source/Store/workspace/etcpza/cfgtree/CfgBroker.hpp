@@ -81,7 +81,7 @@ class CfgBroker : public QObject
         /**
          * @brief Request the creation of a new interface at the end of the list
          */
-        CfgInterface::ShPtr insertInterface(int row = 0, bool emitSignal = true);
+        CfgInterface::ShPtr insertInterface(int row = 0, CfgInterface* instance = nullptr, bool signal_forward = true);
 
         //
         // COMPARAISON

@@ -1,6 +1,7 @@
 #pragma once
 
 // Qt
+#include <QDebug>
 #include <QObject>
 #include <QJsonObject>
 
@@ -39,7 +40,7 @@ class CfgInterface : public QObject
         CfgInterface(const CfgInterface& from, QObject* parent = nullptr)
             : QObject(parent)
         {
-            _obj = from._obj;
+            _obj = QJsonObject(from._obj);
         }
 
         /**
@@ -88,7 +89,7 @@ class CfgInterface : public QObject
         /**
          * @brief Internal data object setter
          */
-        void setJsonObject(const QJsonObject& obj, bool emitSignal = true) { _obj = obj; if(emitSignal) emit updated(); }
+        void setJsonObject(const QJsonObject& obj) { _obj = obj; updated(); }
 
         /**
          * @brief Check if 2 objects are equal

@@ -198,7 +198,7 @@ CfgTreeEditor::CfgTreeEditor(QWidget *parent)
     auto middle_bar = new QWidget();
     auto middle_bar_layout = new QVBoxLayout(middle_bar);
     middle_bar_layout->addLayout(hm);
-    middle_bar_layout->addWidget(&_itemEditor);
+    middle_bar_layout->addWidget(&_ItemEditorView);
 
     // Splitter
     _splitter.addWidget(left_bar);
@@ -312,7 +312,7 @@ void CfgTreeEditor::showCfgTreeItem(const QModelIndex& index)
     switch(item->type())
     {
         case CfgTreeTreeItem::TypeBroker:
-            _itemEditor.loadItem( item->ptrBroker() );
+            _ItemEditorView.loadItem( item->ptrBroker() );
             break;
 
         case CfgTreeTreeItem::TypeInterface:
