@@ -2,6 +2,7 @@
 #include <Pin.hpp>
 #include <GNode.hpp>
 #include <Link.hpp>
+#include <Store.hpp>
 
 using namespace PinDecl;
 
@@ -10,7 +11,8 @@ using namespace PinDecl;
 Pin::Pin()
     : PzaWidget()
 {
-
+    setObjectName("pin");
+    Store::Get().style.bindStyleSheet(this);
 }
 
 void Pin::setName(const QString &name)

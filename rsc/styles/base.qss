@@ -5,6 +5,16 @@ QWidget
     color: #EFEFEF;
 }
 
+QWidget#pin
+{
+   background-color: transparent;
+}
+
+QLabel
+{
+   background-color: transparent;
+}
+
 QPushButton
 {
    color: #EFEFEF;

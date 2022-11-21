@@ -13,6 +13,7 @@
 #include "connection/AdminConnection.hpp"
 #include "connection/LocalWorker.hpp"
 
+#include "Style.hpp"
 
 /**
  * @defgroup ModuleStore Store
@@ -62,8 +63,7 @@ class Store : public QObject
             
         } worker;
 
-
-
+        Style style;
 
         /**
          * @brief Start store interactions with the application

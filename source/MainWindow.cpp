@@ -18,8 +18,6 @@ MainWindow::MainWindow()
 
 
     // qDebug() << styleSheet();
-    loadCssStyleFile(":/styles/base");
-
 
     resize(800, 600);
 
@@ -42,8 +40,7 @@ MainWindow::MainWindow()
     // Open data store
     Store::Get().open();
 
-
-
+    Store::Get().style.bindStyleSheet(this);
 
     QTimer::singleShot(0, [this](){
 
@@ -67,18 +64,6 @@ MainWindow::MainWindow()
 
 
 
-}
-
-void MainWindow::loadCssStyleFile(const QString& filename)
-{
-    QFile file(filename);
-
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "Could not open file" << filename;
-        return;
-    }
-    
-    setStyleSheet(file.readAll());
 }
 
 MainWindow::~MainWindow()

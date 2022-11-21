@@ -10,6 +10,7 @@ target_sources(${PROG}
 	Machine.cpp
 	Broker.cpp
 	Interface/Interface.cpp
+	Style.cpp
 
 	Store.cpp
 )
