@@ -10,7 +10,7 @@
 #include <QTextEdit>
 
 #include "NoderView.hpp"
-#include "NoderSP.hpp"
+#include "NoderSidePanel.hpp"
 #include <PzaMenuBar.hpp>
 #include <PzaMenu.hpp>
 
