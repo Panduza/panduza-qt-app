@@ -25,6 +25,10 @@ CfgTreeEditor::CfgTreeEditor(QWidget *parent)
 
 
 
+
+
+
+
     // auto save_button = new QPushButton("Save Tree");
     // ll->addWidget(save_button);
     // connect(save_button, &QPushButton::clicked, [this]() {
@@ -134,13 +138,6 @@ CfgTreeEditor::CfgTreeEditor(QWidget *parent)
 
 
 
-    // connect(&_scanInterfacesBt, &QPushButton::clicked, [this]() {
-        
-    //     Store::Get().connection.admin.execAutodetectPlatform();
-
-    // });
-
-    
 
 
     // Disable buttons
@@ -214,7 +211,7 @@ CfgTreeEditor::CfgTreeEditor(QWidget *parent)
     main_layout->setSpacing(0);
     main_layout->setContentsMargins(0, 0, 0, 0);
 
-    // When the user click n the save button
+    // When the user click on the save button
     connect(&_saveCfgTreeBt, &QPushButton::clicked, [this]() {
         // Save action on the store model will cause an update event
         // Tree model must ignore this signal to aoid a regeneration
@@ -224,6 +221,17 @@ CfgTreeEditor::CfgTreeEditor(QWidget *parent)
             _errorDialog.showMessage(Store::Get().workspace.etc.tree.errString());
         }
         _cfgTreeModel.unlockExternalSync();
+    });
+
+    // When the user click on the scan interface button
+    connect(_scanInterfacesBt.internalComponent(), &QPushButton::clicked, [this]() {
+
+        _scanInterfacesBt.setEnabled(false);
+        Store::Get().connection.admin.execAutodetectPlatform([this](){
+            qDebug() << "end !!!";
+            _scanInterfacesBt.setEnabled(true);
+        });
+
     });
 
     // Adapt the state of the save button when the tree is updated

@@ -58,9 +58,9 @@ void AdminConnection::execStopPlatform()
 
 // ============================================================================
 //
-void AdminConnection::execAutodetectPlatform()
+void AdminConnection::execAutodetectPlatform(std::function<void(void)> then_operation)
 {
-    concurrentRun(std::bind(&SystemWorker::execAutodetectPlatform, _worker));
+    concurrentRun(std::bind(&SystemWorker::execAutodetectPlatform, _worker), then_operation);
 }
 
 // ============================================================================
@@ -87,7 +87,7 @@ void AdminConnection::start()
 
 // ============================================================================
 //
-void AdminConnection::concurrentRun(std::function<void(void)> worker_operation)
+void AdminConnection::concurrentRun(std::function<void(void)> worker_operation, std::function<void(void)> then_operation)
 {
     // Start the connection
     auto future = QtConcurrent::run(
@@ -105,11 +105,13 @@ void AdminConnection::concurrentRun(std::function<void(void)> worker_operation)
             
             worker_operation();
     }).then(
-        [this]() {
+        [this, then_operation]() {
             _working = false;
             qDebug() << "LEAVE";
 
             _execMutex.unlock();
             // === UNLOCK
+
+            then_operation();
     });
 }

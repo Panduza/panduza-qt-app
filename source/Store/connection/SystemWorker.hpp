@@ -83,6 +83,10 @@ public:
 
     virtual void execStartPlatform() = 0;
     virtual void execStopPlatform() = 0;
+
+    /**
+     * @brief FROM AdminConnection
+     */
     virtual void execAutodetectPlatform() = 0;
 
 
