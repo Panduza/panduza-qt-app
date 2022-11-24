@@ -14,10 +14,17 @@
 
 
 /**
- * @brief Side bar that gather widgets to interact with the store
+ * @brief Side bar main widget
+ * @addtogroup StoreBarModule
+ * 
+ * This bar is located on the right of the window
  * 
  * This side bar is composed of multiple tabs for each aspect of the store
- *
+ * 
+ * - Target server information (address and logins to access the server)
+ * - Workspace tree files
+ * - Interfaces
+ * 
  */
 class StoreBar : public QWidget
 {

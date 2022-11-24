@@ -5,9 +5,9 @@
 #include <QDir>
 #include <QPair>
 #include <QFile>
-#include <QProcess>
 #include <QDebug>
 #include <QThread>
+#include <QProcess>
 
 
 #define AS_USER false
@@ -15,6 +15,9 @@
 
 #define CATCH_STREAMS true
 #define DO_NOT_CATCH_STREAMS false
+
+// Uncomment this to enable debug local to this file
+#define LOCAL_DEBUG
 
 // ============================================================================
 //
@@ -154,10 +157,10 @@ void LocalWorker::execStopPlatform()
 //
 void LocalWorker::execAutodetectPlatform()
 {
-    execute("docker pull ghcr.io/panduza/panduza-py-platform:latest", AS_USER, CATCH_STREAMS, 1000000);
-    execute("docker pull ghcr.io/panduza/panduza-cxx-platform:latest", AS_USER, CATCH_STREAMS, 1000000);
+    // execute("docker pull ghcr.io/panduza/panduza-py-platform:latest", AS_USER, CATCH_STREAMS, 1000000);
+    // execute("docker pull ghcr.io/panduza/panduza-cxx-platform:latest", AS_USER, CATCH_STREAMS, 1000000);
 
-    // execute("echo $AUTODETECT", AS_USER, CATCH_STREAMS);
+
     execute("docker-compose --project-directory /etc/panduza up", AS_USER, CATCH_STREAMS, 10000000,
         { {"AUTODETECT", "1"} }
     );
@@ -259,19 +262,31 @@ int LocalWorker::cmdAsSudo(const QString& command, bool catch_streams)
 //
 int LocalWorker::execute(const QString& command, bool as_sudo, bool catch_streams, int timeout_ms, const QList<QPair<QString, QString> >& envs)
 {
+    // Debug
+    #ifdef LOCAL_DEBUG
+    qDebug() << "LocalWorker::execute(" << command << ", as_sudo=" << as_sudo << ", catch_streams=" << catch_streams << ")";
+    #endif
+
+    // Create the processor
     QProcess process;
 
+    // Connect to stream events
     if(catch_streams)
     {
-        // Connect to stream events
         connect(&process, &QProcess::readyReadStandardError, [this, &process](){
-            pushSystemMessage(SystemMessage(SystemStreamStdErr, process.readAllStandardError()));
+            auto data = process.readAllStandardOutput();
+            #ifdef LOCAL_DEBUG
+            qDebug() << "stderr - " << data;
+            #endif
+            pushSystemMessage(SystemMessage(SystemStreamStdErr, data));
         });
         connect(&process, &QProcess::readyReadStandardOutput, [this, &process](){
-            pushSystemMessage(SystemMessage(SystemStreamStdOut, process.readAllStandardOutput()));
+            auto data = process.readAllStandardOutput();
+            #ifdef LOCAL_DEBUG
+            qDebug() << "stdout - " << data;
+            #endif
+            pushSystemMessage(SystemMessage(SystemStreamStdOut, data));
         });
-
-        // Start event
         pushSystemMessage(SystemMessage(SystemStreamBegCmd, command.toUtf8()));
     }
 

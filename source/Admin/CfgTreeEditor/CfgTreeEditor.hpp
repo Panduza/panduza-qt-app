@@ -20,7 +20,7 @@
 
 #include <PzaAdminButton.hpp>
 
-#include "ItemEditor/ItemEditor.hpp"
+#include "ItemEditor/ItemEditorView.hpp"
 
 
 #include <Utils/QYaml.hpp>
@@ -93,7 +93,7 @@ class CfgTreeEditor : public QWidget
         /**
          * @brief Central item editor
          */
-        ItemEditor _itemEditor;
+        ItemEditorView _ItemEditorView;
 
 
 

@@ -25,8 +25,7 @@ CfgBroker::CfgBroker(const CfgBroker& from, QObject* parent)
     _interfaces.clear();
     for(const auto& i : from._interfaces)
     {
-        auto copy = CfgInterface::ShPtr(new CfgInterface(*i));
-        _interfaces << copy;
+        insertInterface(_interfaces.size(), new CfgInterface(*i));
     }
 }
 
@@ -42,7 +41,7 @@ void CfgBroker::loadFromJson(const QJsonObject& obj)
     auto iface_array = obj["interfaces"].toArray();
     for(const auto& iface : iface_array)
     {
-        auto instance = insertInterface(false);
+        auto instance = insertInterface(_interfaces.size());
         instance->setJsonObject(iface.toObject());
     }
 }
@@ -66,15 +65,27 @@ void CfgBroker::saveToJson(QJsonObject& obj)
 
 // ============================================================================
 // 
-CfgInterface::ShPtr CfgBroker::insertInterface(int row, bool emitSignal)
+CfgInterface::ShPtr CfgBroker::insertInterface(int row, CfgInterface* instance, bool signal_forward)
 {
-    auto new_iface = CfgInterface::ShPtr(new CfgInterface());
-    connect(new_iface.data(), &CfgInterface::updated, [this](){ emit updated(); });
+    // Create the interface
+    CfgInterface* new_ = instance;
+    if(instance == nullptr)
+    {
+        new_ = new CfgInterface();
+    }
+    auto new_iface = CfgInterface::ShPtr(new_);
+
+    // Connect if required
+    if(signal_forward)
+    {
+        connect(new_iface.data(), &CfgInterface::updated, [this](){ emit updated(); });
+    }
+
+    // Insert interface and alert the application
     _interfaces.insert(row, new_iface);
-    if(emitSignal) emit updated();
+    emit updated();
     return new_iface;
 }
-
 
 // ============================================================================
 //
@@ -83,6 +94,7 @@ bool CfgBroker::operator==(const CfgBroker& other)
     // Check name
     if(_name != other._name) return false;
     if(_addr != other._addr) return false;
+    if(_port != other._port) return false;
 
     // Quick check on sizes
     if(_interfaces.size() != other._interfaces.size()) return false;
@@ -95,7 +107,7 @@ bool CfgBroker::operator==(const CfgBroker& other)
         // Check if brokers are equals
         if( (**it_a) != (**it_b) )
         {
-            return true;
+            return false;
         }
 
         // Move forward

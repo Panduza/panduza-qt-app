@@ -5,7 +5,7 @@
 
 target_sources(${PROG}
 	PRIVATE
-    ItemEditor.cpp
+    ItemEditorView.cpp
 
     IeBroker.cpp
 )

@@ -7,3 +7,8 @@ doxygen:
   - documentation/*
   - '*/features/*'
   - 'build/*'
+doxyfile:
+  DISTRIBUTE_GROUP_DOC: 'YES'
+  EXTRACT_PRIVATE: 'YES'
+  HIDE_UNDOC_MEMBERS: 'YES'
+  INTERNAL_DOCS: 'YES'

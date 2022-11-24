@@ -96,7 +96,18 @@ public:
 
     void execStartPlatform();
     void execStopPlatform();
-    void execAutodetectPlatform();
+
+    /**
+     * @brief Execute the device auto-detection on the system
+     * 
+     * This function must perform the following operations:
+     * 
+     * - start platform auto-detection on the system
+     * - copy platform auto-detect files from the system back to the workspace 
+     * 
+     * @param then_operation function that must be performed after the auto-detection 
+     */
+    void execAutodetectPlatform(std::function<void(void)> then_operation = std::function<void(void)>());
 
 
 public slots:
@@ -127,7 +138,7 @@ private:
     void setErrString(const QString& err = tr("No Problem"));
 
 
-    void concurrentRun(std::function<void(void)> function);
+    void concurrentRun(std::function<void(void)> function, std::function<void(void)> then_operation = std::function<void(void)>());
 
 
     /**

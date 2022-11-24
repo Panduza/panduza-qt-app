@@ -1,0 +1,5 @@
+/**
+ * @defgroup StoreBarModule Store Bar
+ * @brief Widget side bar that gather tab widgets that propose an interaction with the store
+ * 
+ */
