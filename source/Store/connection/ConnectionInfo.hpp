@@ -62,6 +62,7 @@ class ConnectionInfo : public QObject
         void setName(const QString& v) { mName = v; emit updated(*this); }
         void setHostLocation(HostLocation v) { mHostLocation = v; emit updated(*this); }
         void setHostAddress(const QString& v) { mHostAddress = v; emit updated(*this); }
+        void setMqttPort(int v) { mMqttPort = v; emit updated(*this); }
         void setSshPort(int v) { mSshPort = v; emit updated(*this); }
         void setSshUsername(const QString& v) { mSshUsername = v; emit updated(*this); }
         void setSshPassword(const QString& v) { mSshPassword = v; emit updated(*this); }

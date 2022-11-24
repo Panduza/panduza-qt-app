@@ -38,10 +38,10 @@ TabServer::TabServer(QWidget *parent)
 void TabServer::exportToStore()
 {
     // log
-    // qDebug() << "pok";
+    // qDebug() << "TabServer::exportToStore";
 
     // Copy local data into the store
-    Store::Get().connection.active.copyFrom(mLocalConnectionInfo);
+    Store::Get().connection.active.copyFrom(_localConnectionInfo);
 
     // Check again if the button must be enabled
     updateApplyButton();
@@ -52,9 +52,9 @@ void TabServer::exportToStore()
 void TabServer::importFromStore()
 {
     // Copy from the store
-    mLocalConnectionInfo.copyFrom(Store::Get().connection.active);
+    _localConnectionInfo.copyFrom(Store::Get().connection.active);
 
-    //
+    // Refresh internal widgets
     updateWidgetWithLocalData();
 }
 
@@ -119,63 +119,70 @@ void TabServer::refreshServerComboBoxFromServerLibrary()
 void TabServer::updateWidgetWithLocalData()
 {
     // Log
-    // qDebug() << "updateWidgetWithLocalData";
+    // qDebug() << "TabServer::updateWidgetWithLocalData";
 
+    // === ID
     // Combobox to select the server
-    // Disconnect to avoid infinite loop
+    // Disconnect then reconnect to avoid infinite loop
     mConnectionCb.disconnect(this);
-    mConnectionCb.setCurrentIndex(mLocalConnectionInfo.id());
+    mConnectionCb.setCurrentIndex(_localConnectionInfo.id());
     connect(&mConnectionCb, &QComboBox::currentIndexChanged, this, &TabServer::loadServerFromIndex);
 
-    // 
-    mNameLe.setText( mLocalConnectionInfo.name() );
+    // === NAME
+    mNameLe.setText(_localConnectionInfo.name());
 
-    // 
-    mMqttPortLe.setText( QString::number(mLocalConnectionInfo.mqttPort()) );
-
-    // 
-    mSshPortLe.setText( QString::number(mLocalConnectionInfo.sshPort()) );
-    mSshUsernameLe.setText( mLocalConnectionInfo.sshUsername() );
-    mSshPasswordLe.setText( mLocalConnectionInfo.sshPassword() );
-
-    // 
-    if(mLocalConnectionInfo.hostLocation() == HostLocationLocal)
+    // === HOST LOCATION
+    // qDebug() << "_localConnectionInfo.hostLocation() == " << _localConnectionInfo.hostLocation();
+    mHostLocationCb.disconnect(this);
+    mHostLocationCb.setCurrentIndex(static_cast<int>(_localConnectionInfo.hostLocation()));
+    connect(&mHostLocationCb, &QComboBox::currentIndexChanged, this, &TabServer::loadServerFromIndex);
+    updateHostAddressRow();
+    if(_localConnectionInfo.hostLocation() == HostLocationLocal)
     {
         mGroupAdminSsh->hide();
         mGroupAdminLocal->show();
         if(mHostAddressLe) mHostAddressLe->hide();
     }
-    else if(mLocalConnectionInfo.hostLocation() == HostLocationRemote)
+    else if(_localConnectionInfo.hostLocation() == HostLocationRemote)
     {
         mGroupAdminSsh->show();
         mGroupAdminLocal->hide();
         if(mHostAddressLe) mHostAddressLe->show();
     }
 
+    // === MQTT
+    mMqttPortLe.setText(QString::number(_localConnectionInfo.mqttPort()));
 
-    updateHostAddressRow();
+    // === SSH
+    mSshPortLe.setText(QString::number(_localConnectionInfo.sshPort()));
+    mSshUsernameLe.setText(_localConnectionInfo.sshUsername());
+    mSshPasswordLe.setText(_localConnectionInfo.sshPassword());
 
     // Check again if the button must be enabled
     updateApplyButton();
 }
 
 // ============================================================================
-//
+
 void TabServer::updateHostAddressRow(const QString &text)
 {
     Q_UNUSED(text);
-    if(mLocalConnectionInfo.hostLocation() == HostLocationLocal && mHostAddressLe)
+    if(_localConnectionInfo.hostLocation() == HostLocationLocal && mHostAddressLe)
     {
         mConnectionFormLy.removeRow(2);
         // After this point the widget mHostAddressLe is deleted
         // So set it to null
         mHostAddressLe = nullptr;
     }
-    else if(mLocalConnectionInfo.hostLocation() == HostLocationRemote && !mHostAddressLe)
+    else if(_localConnectionInfo.hostLocation() == HostLocationRemote && !mHostAddressLe)
     {
         mHostAddressLe = new PzaLineEdit();
+
+        connect(mHostAddressLe, &QLineEdit::textChanged, [this](const QString &text){ _localConnectionInfo.setHostAddress(text); });
+        connect(mHostAddressLe, &QLineEdit::textChanged, this, &TabServer::updateApplyButton);
+
         mConnectionFormLy.insertRow(2, new PzaLabel("Address"), mHostAddressLe);
-        mHostAddressLe->setText( mLocalConnectionInfo.hostAddress() );
+        mHostAddressLe->setText( _localConnectionInfo.hostAddress() );
     }
 }
 
@@ -189,46 +196,47 @@ void TabServer::configureInternalWidgets()
     connect(&mConnectionCb, &QComboBox::currentIndexChanged, this, &TabServer::loadServerFromIndex);
 
     // === NAME
-    connect(&mNameLe, &QLineEdit::textChanged, [this](const QString &text){ mLocalConnectionInfo.setName(text); });
+    connect(&mNameLe, &QLineEdit::textChanged, [this](const QString &text){ _localConnectionInfo.setName(text); });
     connect(&mNameLe, &QLineEdit::textChanged, this, &TabServer::updateApplyButton);
 
-    // === HOST
-    connect(mHostAddressLe, &QLineEdit::textChanged, [this](const QString &text){ mLocalConnectionInfo.setHostAddress(text); });
-    connect(mHostAddressLe, &QLineEdit::textChanged, this, &TabServer::updateApplyButton);
-
-    // === ADMIN MODE
+    // === HOST LOCATION
     // Configure the combobox to choose between ssh or local admin mode
     mHostLocationCb.addItems({ tr("This Computer"), tr("Remote Server") });
     connect(&mHostLocationCb, &QComboBox::currentIndexChanged, [this](int index) {
         switch(index)
         {
             case 0:
-                mLocalConnectionInfo.setHostLocation(HostLocationLocal);
+                _localConnectionInfo.setHostLocation(HostLocationLocal);
                 break;
             case 1:
-                mLocalConnectionInfo.setHostLocation(HostLocationRemote);
+                _localConnectionInfo.setHostLocation(HostLocationRemote);
                 break;
         }
         updateWidgetWithLocalData();
     });
 
+    // === MQTT PORT
+    mMqttPortLe.setValidator( new QIntValidator(0, 50000, this) );
+    connect(&mMqttPortLe, &QLineEdit::textChanged, [this](const QString &text){ _localConnectionInfo.setMqttPort(text.toInt()); });
+    connect(&mMqttPortLe, &QLineEdit::textChanged, this, &TabServer::updateApplyButton);
+
     // === SSH PORT
     mSshPortLe.setValidator( new QIntValidator(0, 50000, this) );
-    connect(&mSshPortLe, &QLineEdit::textChanged, [this](const QString &text){ mLocalConnectionInfo.setSshPort(text.toInt()); });
+    connect(&mSshPortLe, &QLineEdit::textChanged, [this](const QString &text){ _localConnectionInfo.setSshPort(text.toInt()); });
     connect(&mSshPortLe, &QLineEdit::textChanged, this, &TabServer::updateApplyButton);
 
     // === SSH USERNAME
-    connect(&mSshUsernameLe, &QLineEdit::textChanged, [this](const QString &text){ mLocalConnectionInfo.setSshUsername(text); });
+    connect(&mSshUsernameLe, &QLineEdit::textChanged, [this](const QString &text){ _localConnectionInfo.setSshUsername(text); });
     connect(&mSshUsernameLe, &QLineEdit::textChanged, this, &TabServer::updateApplyButton);
 
     // === SSH PASSWORD
     mSshPasswordLe.setEchoMode(QLineEdit::Password);
-    connect(&mSshPasswordLe, &QLineEdit::textChanged, [this](const QString &text){ mLocalConnectionInfo.setSshPassword(text); });
+    connect(&mSshPasswordLe, &QLineEdit::textChanged, [this](const QString &text){ _localConnectionInfo.setSshPassword(text); });
     connect(&mSshPasswordLe, &QLineEdit::textChanged, this, &TabServer::updateApplyButton);
 
     // === LOCAL PASSWORD
     mLocalPasswordLe.setEchoMode(QLineEdit::Password);
-    connect(&mLocalPasswordLe, &QLineEdit::textChanged, [this](const QString &text){ mLocalConnectionInfo.setLocalPassword(text); });
+    connect(&mLocalPasswordLe, &QLineEdit::textChanged, [this](const QString &text){ _localConnectionInfo.setLocalPassword(text); });
     connect(&mLocalPasswordLe, &QLineEdit::textChanged, this, &TabServer::updateApplyButton);
 
     // === APPLY
@@ -269,8 +277,7 @@ QWidget* TabServer::composeGroupCommon()
     // Main layout
     auto group = new QGroupBox(tr("Connection"));
     group->setLayout(l1);
-    return group;
-    
+    return group;    
 }
 
 // ============================================================================

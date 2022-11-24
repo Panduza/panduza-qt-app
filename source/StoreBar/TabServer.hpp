@@ -17,9 +17,12 @@
 
 /**
  * @brief Widget that allow the user to configure the server address and credentials
- *
+ * @addtogroup StoreBarModule
  * 
+ * Most of the configuration of the layout is performed in the constructor
  * 
+ * An internal member _localConnectionInfo manage data locally used by the widget.
+ * Methods importFromStore and exportToStore allow the internal data to be synchronized with the store data.
  */
 class TabServer : public QWidget
 {
@@ -71,7 +74,7 @@ class TabServer : public QWidget
         void updateApplyButton(const QString &text = "");
 
         /**
-         * @brief
+         * @brief Show or hide the host address row
          */
         void updateHostAddressRow(const QString &text = "");
 
@@ -85,7 +88,7 @@ class TabServer : public QWidget
          */
         bool localConnectionInfoEqualToStore()
         {
-            return (Store::Get().connection.active == mLocalConnectionInfo);
+            return (Store::Get().connection.active == _localConnectionInfo);
         }
 
         /**
@@ -93,7 +96,7 @@ class TabServer : public QWidget
          *
          * Widget works on this object until the user request the export into the store
          */
-        ConnectionInfo mLocalConnectionInfo;
+        ConnectionInfo _localConnectionInfo;
 
         // --------------------------------------------------------------------
         // LAYOUT INIT ONLY
