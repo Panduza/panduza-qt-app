@@ -23,6 +23,7 @@ class Link : public QGraphicsObject
         Pin *inPin(void) {return _inPin;}
         Pin *outPin(void) {return _outPin;}
         Pin *oppositePin(const Pin *pin) {return (pin == _inPin) ? _outPin : _inPin;}
+        void kill(void);
 
     private:
         void mousePressEvent(QGraphicsSceneMouseEvent * event) override;

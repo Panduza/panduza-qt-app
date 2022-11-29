@@ -97,14 +97,29 @@ static void ReplaceKeyInStdMap(std::map<N, T> &map, const N &key, const N &newKe
 template<typename N>
 static void DeleteFromVector(std::vector<N> &vec, const N &item) {
     auto it = std::find(vec.begin(), vec.end(), item);
-    if (it != vec.end()) {
-        int i = it - vec.begin();
-        vec.erase(vec.begin() + i);
+    if (it != vec.end())
+        vec.erase(it);
+}
+
+template<typename N>
+static void ForEachDeleteInVector(std::vector<N> &vec, const std::function<void(const N &elem)> &f) {
+    for (auto it = vec.begin(); it != vec.end();) {
+        f(*it);
+        it = vec.erase(it);
     }
 }
 
 template<typename N>
-static QString allocateName(std::map<QString, N> &list, const QString &defaultName)
+static void ForEachDeletedInVector(std::vector<N> &vec, const std::function<void(const N &elem)> &f) {
+    int len = vec.size();
+    for (int i = 0; i < len; i++) {
+        f(vec[0]);
+    }
+}
+
+
+template<typename N>
+static QString AllocateName(const std::map<QString, N> &list, const QString &defaultName)
 {
     QString name = defaultName;
     int i = 1;
@@ -119,7 +134,7 @@ static QString allocateName(std::map<QString, N> &list, const QString &defaultNa
 };
 
 template<typename N>
-static QString allocateName(const std::vector<N> &list, const QString &defaultName, const std::function<const QString &(const N &entry)> &f)
+static QString AllocateName(const std::vector<N> &list, const QString &defaultName, const std::function<const QString &(const N &entry)> &f)
 {
     QString name = defaultName;
     int index = 1;

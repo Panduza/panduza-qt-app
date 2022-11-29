@@ -18,6 +18,6 @@ class GNodeExec : public GNodeBasic
         void evaluateOperations(GNode *node);
     
     private:
-        PinExec *_execIn = nullptr;
-        PinExec *_execOut = nullptr;
+        PinDecl::Exec *_execIn = nullptr;
+        PinDecl::Exec *_execOut = nullptr;
 };

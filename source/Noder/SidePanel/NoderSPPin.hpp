@@ -3,7 +3,7 @@
 #include <PzaComboBox.hpp>
 #include <Pin.hpp>
 #include "NoderSidePanel.hpp"
-#include "NoderSPVarDrop.hpp"
+#include "NoderSPVarPicker.hpp"
 
 class NoderSPDirBox : public PzaComboBox
 {
@@ -17,27 +17,24 @@ class NoderSPDirBox : public PzaComboBox
         void directionChanged(PinProperty::Direction dir);
 };
 
-class NoderSPPinEntry : public NoderSPEntry<PinValue>
+class NoderSPPinEntry : public NoderSPEntry<PinVariable>
 {
     Q_OBJECT
     
     public:
         NoderSPPinEntry(QWidget *parent = nullptr);
 
-        void setContainer(NoderVar::Container ctn);
-        void setType(NoderVar::Type type);
+        void setVar(const NoderVarProps &varProps);
         void setDirection(PinProperty::Direction direction);
 
-        NoderVar::Container container(void) const {return _ctn;}
-        NoderVar::Type type(void) const {return _type;}
+        const NoderVarProps &varProps(void) {return _varProps;}
         PinProperty::Direction direction(void) const {return _direction;}
-        
+
         void remove(void) override {removed();}
 
     private:
-        NoderSPVarDrop *_varDrop;
-        NoderVar::Container _ctn;
-        NoderVar::Type _type;
+        NoderSPVarPicker *_varPicker;
+        NoderVarProps _varProps;
         PinProperty::Direction _direction;
         NoderSPDirBox *_dirBox;
 
@@ -58,8 +55,14 @@ class NoderSPPinArea : public NoderSPArea<NoderSPPinEntry>
         void removeEntry(NoderSPPinEntry *target) override;
         void selectEntry(NoderSPPinEntry *target) override;
 
+        void removeAllEntries(void) override {
+            PzaUtils::ForEachDeletedInVector<NoderSPPinEntry *>(_entryList, [&](NoderSPPinEntry *entry) {
+                removeEntry(entry);
+            });
+        }
+
     signals:
         void pinRemoved(NoderSPPinEntry *elem);
-        void varChanged(NoderSPPinEntry *elem);
+        void pinChanged(NoderSPPinEntry *elem);
         void directionChanged(NoderSPPinEntry *elem);
 };

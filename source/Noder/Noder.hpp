@@ -15,26 +15,50 @@ class Pin;
 class GNode;
 class NoderFrame;
 
+#define PIN_PROPERTY_VARIABLE(name) \
+    struct PinProperty name = { \
+        .type = PinProperty::Type::Variable, \
+    };
+
+#define PIN_PROPERTY_EXEC(name) \
+    struct PinProperty name = { \
+        .type = PinProperty::Type::Exec, \
+    };
+
+#define NODER_VAR_REF(name) \
+    struct NoderVarProps name = { \
+        .container = NoderVarProps::Container::Reference, \
+    };
+
+#define NODER_VAR_ARRAY(name) \
+    struct NoderVarProps name = { \
+        .container = NoderVarProps::Container::Array, \
+    };
+
+
 struct PinProperty
 {
     enum class Type
     {
-        Value,
+        Variable,
         Exec
     };
 
     enum class Direction
     {
-        Input = 0,
+        Input,
         Output
     };
+
+    Type type;
+    Direction direction;
 };
 
 struct NodeProperty
 {
     enum class Type
     {
-        Operation = 0,
+        Operation,
         Exec,
         Branch,
         Instance,
@@ -42,7 +66,7 @@ struct NodeProperty
     };
 
     enum class PlugType {
-            Value = 0,
+            Value,
             Array,
             Exec
         };
@@ -58,25 +82,28 @@ struct NodeProperty
     };
 };
 
-struct NoderVar
+struct NoderVarProps
 {
     enum class Container
     {
-        Variable = 0,
+        Reference,
         Array
     };
 
     enum class Type
     {
-        Wildcard = 0,
+        Wildcard,
         Int,
         Float,
         Bool,
         String,
         Enum,
-        Array,
         Interface
     };
+
+    Container container;
+    Type type;
+    QString subType;
 };
 
 struct s_varProperties
@@ -84,7 +111,8 @@ struct s_varProperties
     QString name;
     QColor color;
     bool canBeInstance;
-    bool canBePin;
+    bool hasSubType;
+    std::vector<NoderVarProps::Type> compatibleMap;
 };
 
 class Noder : public QObject
@@ -106,44 +134,55 @@ class Noder : public QObject
 
         typedef std::function<GNode *(void)> t_CreateNode;
 
-        static QString &pinTypeName(const PinProperty::Type type);
-        static PinProperty::Type pinTypeFromName(const QString &name);
+        static QString &PinTypeName(const PinProperty::Type type);
+        static PinProperty::Type PinTypeFromName(const QString &name);
 
-        static QString &pinDirName(const PinProperty::Direction dir);
-        static PinProperty::Direction pinDirFromName(const QString &name);
+        static QString &PinDirName(const PinProperty::Direction dir);
+        static PinProperty::Direction PinDirFromName(const QString &name);
 
-        static QString &varTypeName(const NoderVar::Type type);
-        static NoderVar::Type varTypeFromName(const QString &name);
+        static QString &VarTypeName(const NoderVarProps::Type type);
+        static NoderVarProps::Type VarTypeFromName(const QString &name);
 
-        static QString &varContainerName(const NoderVar::Container ctn);
-        static NoderVar::Container varContainerFromName(const QString &name);
+        static QString &VarContainerName(const NoderVarProps::Container ctn);
+        static NoderVarProps::Container VarContainerFromName(const QString &name);
 
-        static QColor &varTypeColor(const NoderVar::Type type);
-        static const s_varProperties &varTypeProperties(const NoderVar::Type type);
+        static QColor &VarTypeColor(const NoderVarProps::Type type);
+        static const s_varProperties &VarTypeProperties(const NoderVarProps::Type type);
+        static bool VarHasSubType(const NoderVarProps::Type type);
 
-        static QString &nodeTypeName(const NodeProperty::Type type);
-        static NodeProperty::Type nodeTypeFromName(const QString &name);
 
-        const std::vector<QString> &enumValues(const QString &name);
+        static QString &NodeTypeName(const NodeProperty::Type type);
+        static NodeProperty::Type NodeTypeFromName(const QString &name);
 
-        void forEachEnum(const std::function<void(const QString &name, const std::vector<QString> &list)> &f);
-        void forEachEnumName(const std::function<void(const QString &name)> &f);
-        void forEachEnumValues(const QString &name, const std::function<void(const QString &name)> &f);
+        static const std::vector<QString> &EnumValues(const QString &name);
 
-        static void forEachVarContainer(const std::function<void(const NoderVar::Container ctn)> &f);
-        static void forEachVarType(const std::function<void(const NoderVar::Type type)> &f);
-        static void forEachPinType(const std::function<void(const PinProperty::Type type)> &f);
-        static void forEachPinDirection(const std::function<void(const PinProperty::Direction direction)> &f);
+        static void ForEachEnum(const std::function<void(const QString &name, const std::vector<QString> &list)> &f);
+        static void ForEachEnumName(const std::function<void(const QString &name)> &f);
+        static void ForEachEnumValues(const QString &name, const std::function<void(const QString &name)> &f);
 
-        static const QByteArray &PlugValue(const NoderVar::Type type, bool linked);
-        static const QByteArray &PlugArray(const NoderVar::Type type, bool linked);
+        static void ForEachVarContainer(const std::function<void(const NoderVarProps::Container ctn)> &f);
+        static void ForEachVarType(const std::function<void(const NoderVarProps::Type type)> &f);
+        static void ForEachPinType(const std::function<void(const PinProperty::Type type)> &f);
+        static void ForEachPinDirection(const std::function<void(const PinProperty::Direction direction)> &f);
+
+        static const QByteArray &PlugValue(const NoderVarProps::Type type, bool linked);
+        static const QByteArray &PlugArray(const NoderVarProps::Type type, bool linked);
         static const QByteArray &PlugExec(bool linked);
 
-        static const QByteArray& (*PlugContainerFunc(NoderVar::Container ctn))(NoderVar::Type type, bool linked)
+        static bool IsTypeCompatible(NoderVarProps::Type type1, NoderVarProps::Type type2);
+
+        static void VarInfos(const NoderVarProps &varProps)
+        {
+            qDebug() << "Container" << Noder::VarContainerName(varProps.container);
+            qDebug() << "Type     " << Noder::VarTypeName(varProps.type);
+            qDebug() << "Subtype  " << varProps.subType;
+        }
+
+        static const QByteArray& (*PlugContainerFunc(NoderVarProps::Container ctn))(NoderVarProps::Type type, bool linked)
         {
             switch (ctn) {
-                case NoderVar::Container::Variable: return PlugValue;
-                case NoderVar::Container::Array: return PlugArray;
+                case NoderVarProps::Container::Reference: return PlugValue;
+                case NoderVarProps::Container::Array: return PlugArray;
             };
             return nullptr;
         }
@@ -151,52 +190,84 @@ class Noder : public QObject
     private:
         Noder();
 
-        static std::unordered_map<NoderVar::Type, s_varProperties> &varTypeMap(void)
+        static std::unordered_map<NoderVarProps::Type, s_varProperties> &VarTypeMap(void)
         {
-            static std::unordered_map<NoderVar::Type, s_varProperties> map = {
-                {NoderVar::Type::Bool,      {"Boolean",   "#E20909", true, true}},
-                {NoderVar::Type::Int,       {"Integer",   "#19C5CC", true, true}},
-                {NoderVar::Type::Wildcard,  {"Wildcard",  "#ffffff", false, false}},
-                {NoderVar::Type::Float,     {"Float",     "#3AC242", true, true}},
-                {NoderVar::Type::String,    {"String",    "#C05DC2", true, true}},
-                {NoderVar::Type::Enum,      {"Enum",      "#CE6135", false, true}},
-                {NoderVar::Type::Interface, {"Interface", "#C8B623", false, true}},
-                {NoderVar::Type::Array,     {"Array",     "#ffffff", false, true}}
+            static std::unordered_map<NoderVarProps::Type, s_varProperties> map = {
+                {NoderVarProps::Type::Bool, {"Boolean", "#E20909", true, false,
+                    {
+                        NoderVarProps::Type::Float,
+                        NoderVarProps::Type::Int,
+                        NoderVarProps::Type::String
+                    }}
+                },
+                {NoderVarProps::Type::Int, {"Integer", "#19C5CC", true, false,
+                    {
+                        NoderVarProps::Type::Float,
+                        NoderVarProps::Type::Int,
+                        NoderVarProps::Type::String
+                    }}
+                },
+                {NoderVarProps::Type::Wildcard, {"Wildcard", "#ffffff", false, false,
+                    {
+                        NoderVarProps::Type::Bool,
+                        NoderVarProps::Type::Int,
+                        NoderVarProps::Type::Float,
+                        NoderVarProps::Type::String,
+                        NoderVarProps::Type::Enum,
+                        NoderVarProps::Type::Interface
+                    }}
+                },
+                {NoderVarProps::Type::Float, {"Float", "#3AC242", true, false,
+                    {
+                        NoderVarProps::Type::Bool,
+                        NoderVarProps::Type::Int,
+                        NoderVarProps::Type::String
+                    }}
+                },
+                {NoderVarProps::Type::String, {"String", "#C05DC2", true, false,
+                    {
+                        NoderVarProps::Type::Float,
+                        NoderVarProps::Type::Int,
+                        NoderVarProps::Type::Bool
+                    }}
+                },
+                {NoderVarProps::Type::Enum, {"Enum", "#CE6135", false, true, {}}},
+                {NoderVarProps::Type::Interface, {"Interface", "#C8B623", false, true, {}}},
             };
             return map;
         }
 
-        static std::unordered_map<NoderVar::Container, QString> &varContainerMap(void)
+        static std::unordered_map<NoderVarProps::Container, QString> &VarContainerMap(void)
         {
-            static std::unordered_map<NoderVar::Container, QString> map = {
-                {NoderVar::Container::Variable, "Variable"},
-                {NoderVar::Container::Array,    "Array"},
+            static std::unordered_map<NoderVarProps::Container, QString> map = {
+                {NoderVarProps::Container::Reference, "Reference"},
+                {NoderVarProps::Container::Array,    "Array"},
             };
             return map;
         }
 
-        static std::unordered_map<NodeProperty::Type, QString> &nodeTypeMap(void)
+        static std::unordered_map<NodeProperty::Type, QString> &NodeTypeMap(void)
         {
             static std::unordered_map<NodeProperty::Type, QString> map = {
                 {NodeProperty::Type::Operation, "Operation"},
                 {NodeProperty::Type::Exec, "Execution"},
                 {NodeProperty::Type::Branch, "Branch"},
                 {NodeProperty::Type::Instance, "Instance"},
-                {NodeProperty::Type::Event , "Event"}
+                {NodeProperty::Type::Event, "Event"}
             };
             return map;
         }
 
-        static std::unordered_map<PinProperty::Type, QString> &pinTypeMap(void)
+        static std::unordered_map<PinProperty::Type, QString> &PinTypeMap(void)
         {
             static std::unordered_map<PinProperty::Type, QString> map = {
                 {PinProperty::Type::Exec, "Exec"},
-                {PinProperty::Type::Value, "Value"}
+                {PinProperty::Type::Variable, "Value"}
             };
             return map;
         }
 
-        static std::unordered_map<PinProperty::Direction, QString> &pinDirMap(void)
+        static std::unordered_map<PinProperty::Direction, QString> &PinDirMap(void)
         {
             static std::unordered_map<PinProperty::Direction, QString> map = {
                 {PinProperty::Direction::Input, "Input"},
@@ -205,7 +276,7 @@ class Noder : public QObject
             return map;
         }
 
-        static std::map<QString, std::vector<QString>> &enumMap(void)
+        static std::map<QString, std::vector<QString>> &EnumMap(void)
         {
             static std::map<QString, std::vector<QString>> map = {
                 {
@@ -227,17 +298,17 @@ class Noder : public QObject
         }
 
         struct NodeProperty::plugIcon initPlugType(NodeProperty::PlugType type);
-        static QByteArray FillPlugMap(const NodeProperty::PlugType &plugType, const NoderVar::Type &type, bool linked);
-        static QByteArray LoadCValue(const NoderVar::Type &type);
-        static QByteArray LoadNcValue(const NoderVar::Type &type);
-        static QByteArray LoadCArray(const NoderVar::Type &type);
-        static QByteArray LoadNcArray(const NoderVar::Type &type);
+        static QByteArray FillPlugMap(const NodeProperty::PlugType &plugType, const NoderVarProps::Type &type, bool linked);
+        static QByteArray LoadCValue(const NoderVarProps::Type &type);
+        static QByteArray LoadNcValue(const NoderVarProps::Type &type);
+        static QByteArray LoadCArray(const NoderVarProps::Type &type);
+        static QByteArray LoadNcArray(const NoderVarProps::Type &type);
 
         static inline std::unordered_map<NodeProperty::PlugType, struct NodeProperty::plugIcon> _mapPlugFiles;
-        static inline std::unordered_map<NoderVar::Type, QByteArray> _mapPlugValueNcIcon;
-        static inline std::unordered_map<NoderVar::Type, QByteArray> _mapPlugValueCIcon;
-        static inline std::unordered_map<NoderVar::Type, QByteArray> _mapPlugArrayNcIcon;
-        static inline std::unordered_map<NoderVar::Type, QByteArray> _mapPlugArrayCIcon;
+        static inline std::unordered_map<NoderVarProps::Type, QByteArray> _mapPlugValueNcIcon;
+        static inline std::unordered_map<NoderVarProps::Type, QByteArray> _mapPlugValueCIcon;
+        static inline std::unordered_map<NoderVarProps::Type, QByteArray> _mapPlugArrayNcIcon;
+        static inline std::unordered_map<NoderVarProps::Type, QByteArray> _mapPlugArrayCIcon;
 
         static inline QByteArray _plugExecNcIcon;
         static inline QByteArray _plugExecCIcon;

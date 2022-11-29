@@ -41,7 +41,8 @@ void PzaSpoiler::addWidget(QWidget *w)
 
 void PzaSpoiler::removeWidget(QWidget *w)
 {
-    _content->removeWidget(w);
+    if (w)
+        _content->removeWidget(w);
 }
 
 void PzaSpoiler::removeAllWidgets(void)

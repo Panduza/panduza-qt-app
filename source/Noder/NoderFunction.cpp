@@ -1,4 +1,5 @@
 #include "NoderFunction.hpp"
+#include "NoderVariable.hpp"
 
 NoderFunction::NoderFunction(QWidget *parent)
     : NoderView(parent)

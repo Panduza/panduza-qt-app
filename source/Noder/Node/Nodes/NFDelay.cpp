@@ -4,7 +4,7 @@
 Delay::Delay()
     : GNodeExec("Delay")
 {
-    _delay = addInput<PinDecl::Float>("Delay");
+    _delay = addInput<PinDecl::Ref::Float>("Delay");
 }
 
 void Delay::exec(void)

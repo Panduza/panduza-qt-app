@@ -2,8 +2,6 @@
 #include "NoderFunction.hpp"
 #include "NoderFrame.hpp"
 
-#include "NoderSidePanel.hpp"
-
 NoderSPFunctionArea::NoderSPFunctionArea(QWidget *parent)
     : NoderSPArea<NoderSPFunctionEntry>(parent)
 {
@@ -39,9 +37,9 @@ QJsonArray NoderSPFunctionArea::save(void)
 NoderSPFunctionEntry *NoderSPFunctionArea::newEntry(void)
 {
     NoderSPFunctionEntry *entry;
-    
-    entry = NoderSPArea::newEntry();
 
+    entry = NoderSPArea::newEntry();
+    
     _pinSpoiler->addWidget(entry->pinArea());
     _varSpoiler->addWidget(entry->varArea());
 
@@ -59,7 +57,11 @@ void NoderSPFunctionArea::removeEntry(NoderSPFunctionEntry *target)
     _pinSpoiler->removeWidget(target->pinArea());
     _varSpoiler->removeWidget(target->varArea());
 
+    target->pinArea()->removeAllEntries();
+    target->varArea()->removeAllEntries();
+
     target->elem()->dead();
+    target->elem()->deleteLater();
 
     NoderSPArea::removeEntry(target);
 
@@ -73,33 +75,45 @@ void NoderSPFunctionArea::selectEntry(NoderSPFunctionEntry *target)
 {
     NoderSPArea::selectEntry(target);
 
-    if (target && target->pinArea())
+    if (!target)
+        return ;
+
+    if (target->pinArea())
         _pinSpoiler->setCurrentWidget(target->pinArea());
 
-    if (target && target->varArea())
+    if (target->varArea()) {
         _varSpoiler->setCurrentWidget(target->varArea());
+        target->varArea()->selectEntry(target->varArea()->selected());
+    }
+
 }
 
 NoderSPFunctionEntry::NoderSPFunctionEntry(QWidget *parent)
     : NoderSPEntry<NoderFunction>(parent)
 {
+    _elem = new NoderFunction();
+    
     Noder::Get().Frame->Graph.newFunction(_elem);
 
     _pinArea = new NoderSPPinArea(this);
     _varArea = new NoderSPVarArea(this);
 
-    connect(_pinArea, &NoderSPPinArea::varChanged, this, &NoderSPFunctionEntry::updateVar);
+    _varArea->setFunction(_elem);
+
+    connect(_pinArea, &NoderSPPinArea::pinChanged, this, &NoderSPFunctionEntry::updatePin);
     connect(_pinArea, &NoderSPPinArea::directionChanged, this, &NoderSPFunctionEntry::updateDirection);
     connect(_pinArea, &NoderSPPinArea::pinRemoved, this, &NoderSPFunctionEntry::removePin);
 }
 
-void NoderSPFunctionEntry::updateVar(NoderSPPinEntry *entry)
+void NoderSPFunctionEntry::updatePin(NoderSPPinEntry *entry)
 {
-    PinValue *newPin;
+    PinVariable *newPin;
+    GNode *node = nullptr;
+    struct NoderVarProps var;
     const QString &name = entry->name();
     PinProperty::Direction direction = Pin::OppositeDirection(entry->direction());
-    NoderVar::Type type = entry->type();
-    GNode *node = nullptr;
+
+    var = entry->varProps();
 
     switch (entry->direction()) {
         case PinProperty::Direction::Input:
@@ -112,19 +126,20 @@ void NoderSPFunctionEntry::updateVar(NoderSPPinEntry *entry)
 
     if (entry->elem()) {
         int index = node->pinIndex(entry->elem());
-        newPin = node->addPinFromType(type, name, direction, index);
+        newPin = node->addVariable(name, direction, var, index);
         node->replacePin(entry->elem(), newPin);
     }
     else
-        newPin = node->addPinFromType(type, name, direction);
+        newPin = node->addVariable(name, direction, var);
 
     entry->setElem(newPin);
+    elem()->updated();
 }
 
 void NoderSPFunctionEntry::updateDirection(NoderSPPinEntry *entry)
 {
     PinProperty::Direction newDirection;
-    PinValue *newPin = nullptr;
+    PinVariable *newPin = nullptr;
     GNode *oldNode = nullptr;
     GNode *newNode = nullptr;
 
@@ -147,8 +162,9 @@ void NoderSPFunctionEntry::updateDirection(NoderSPPinEntry *entry)
     
     newDirection = Pin::OppositeDirection(entry->direction());
     oldNode->deletePin(entry->elem());
-    newPin = newNode->addPinFromType(entry->type(), entry->name(), newDirection);
+    newPin = newNode->addVariable(entry->name(), newDirection, entry->varProps());
     entry->setElem(newPin);
+    elem()->updated();
 }
 
 void NoderSPFunctionEntry::removePin(NoderSPPinEntry *entry)
@@ -165,6 +181,7 @@ void NoderSPFunctionEntry::removePin(NoderSPPinEntry *entry)
     }
     node->deletePin(entry->elem());
     entry->setElem(nullptr);
+    elem()->updated();
 }
 
 void NoderSPFunctionEntry::mouseMoveEvent(QMouseEvent *event)

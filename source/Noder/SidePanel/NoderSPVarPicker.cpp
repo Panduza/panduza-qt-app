@@ -1,6 +1,6 @@
-#include "NoderSPVarDrop.hpp"
+#include "NoderSPVarPicker.hpp"
 
-NoderSPVarDrop::NoderSPVarDrop(QWidget *parent)
+NoderSPVarPicker::NoderSPVarPicker(QWidget *parent)
     : PzaWidget(parent)
 {
     _typeDrop = new PzaToolButton(this);
@@ -8,18 +8,20 @@ NoderSPVarDrop::NoderSPVarDrop(QWidget *parent)
     _layout = new QHBoxLayout(this);
 
     _layout->setContentsMargins(0, 0, 0, 0);
-
-    _ctn = DEFAULT_VARIABLE_CONTAINER;
-    _type = DEFAULT_VARIABLE_TYPE;
-
-    _ctnDrop->addItem("Variable");
-    _ctnDrop->addItem("Array");
     _ctnDrop->setIconSize(QSize(8, 8));
-    connect(_ctnDrop, &PzaComboBox::currentIndexChanged, this, [&](int index) {
-        NoderVar::Container ctn = Noder::varContainerFromName(_ctnDrop->itemText(index));
-        
-        setContainer(ctn);
+    
+    DEFAULT_VARIABLE_VAR(_varProps);
+
+    Noder::Get().ForEachVarContainer([&](NoderVarProps::Container ctn) {
+        _ctnDrop->insertItem(0, Noder::VarContainerName(ctn));
     });
+    connect(_ctnDrop, &PzaComboBox::currentIndexChanged, this, [&](int index) {
+        struct NoderVarProps &v = _varProps;
+        v.container = Noder::VarContainerFromName(_ctnDrop->itemText(index));
+        setVar(v);
+    });
+
+    _typeDrop->setText(Noder::VarTypeName(_varProps.type));
 
     configureTree();
 
@@ -27,27 +29,33 @@ NoderSPVarDrop::NoderSPVarDrop(QWidget *parent)
     _layout->addWidget(_typeDrop);
 }
 
-void NoderSPVarDrop::setContainer(NoderVar::Container ctn)
+void NoderSPVarPicker::setVar(const NoderVarProps &varProps)
 {
-    _ctn = ctn;
-    refreshTypeIco();
-
-    _ctnDrop->blockSignals(true);
-    _ctnDrop->setCurrentText(Noder::varContainerName(ctn));
-    _ctnDrop->blockSignals(false);
-    varChanged(_ctn, _type);
+    setContainer(varProps.container);
+    setType(varProps.type, varProps.subType);
 }
 
-void NoderSPVarDrop::setType(NoderVar::Type type)
+void NoderSPVarPicker::setType(const NoderVarProps::Type type, const QString &subType)
 {
-    _type = type;
+    _varProps.type = type;
+    _varProps.subType = subType;
     refreshContainerIco();
-    _typeDrop->setText(Noder::varTypeName(type));
-    _typeDrop->setIcon(Noder::PlugContainerFunc(_ctn)(type, false));
-    varChanged(_ctn, _type);
+    _typeDrop->setIcon(Noder::PlugContainerFunc(_varProps.container)(_varProps.type, false));
+    (Noder::VarHasSubType(_varProps.type)) ? _typeDrop->setText(_varProps.subType) : _typeDrop->setText(Noder::VarTypeName(_varProps.type));
+    varChanged(_varProps);
 }
 
-void NoderSPVarDrop::configureTree(void)
+void NoderSPVarPicker::setContainer(const NoderVarProps::Container ctn)
+{
+    _varProps.container = ctn;
+    refreshTypeIco();
+    _ctnDrop->blockSignals(true);
+    _ctnDrop->setCurrentText(Noder::VarContainerName(ctn));
+    _ctnDrop->blockSignals(false);
+    varChanged(_varProps);
+}
+
+void NoderSPVarPicker::configureTree(void)
 {
     _typeDrop->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
@@ -72,17 +80,17 @@ void NoderSPVarDrop::configureTree(void)
 
     _variableCat->setExpanded(true);
 
-    Noder::Get().forEachVarType([&](NoderVar::Type type) {
-        if (Noder::Get().varTypeProperties(type).canBeInstance) {
-            PzaTreeWidgetItem *item = addItem(Noder::Get().varTypeName(type));
+    Noder::Get().ForEachVarType([&](NoderVarProps::Type type) {
+        if (Noder::Get().VarTypeProperties(type).canBeInstance) {
+            PzaTreeWidgetItem *item = addItem(Noder::Get().VarTypeName(type));
             _variableCat->insertChild(0, item);
             item->setSvgIcon(0, Noder::PlugValue(type, false));
         }
     });
 
-    Noder::Get().forEachEnumName([&](const QString &name) {
+    Noder::Get().ForEachEnumName([&](const QString &name) {
         PzaTreeWidgetItem *item = addItem(name, _enumCat);
-        item->setSvgIcon(0, Noder::PlugValue(NoderVar::Type::Enum, false));
+        item->setSvgIcon(0, Noder::PlugValue(NoderVarProps::Type::Enum, false));
     });
 
     connect(searchBar, &PzaLineEdit::textChanged, this, [&](const QString &s){
@@ -109,20 +117,20 @@ void NoderSPVarDrop::configureTree(void)
 
         if (item->isCategory() == false) {
             parent =  static_cast<PzaTreeWidgetItem *>(item->parent());
+            _varProps.subType = item->text(0);
             if (parent->text(0) == "Enums") {
-                _typeDrop->setIcon(Noder::PlugContainerFunc(_ctn)(NoderVar::Type::Enum, false));
-                setType(NoderVar::Type::Enum);
+                _typeDrop->setIcon(Noder::PlugContainerFunc(_varProps.container)(NoderVarProps::Type::Enum, false));
+                setType(NoderVarProps::Type::Enum, item->text(0));
             }
             else if (parent->text(0) == "Interfaces") {
-                _typeDrop->setIcon(Noder::PlugContainerFunc(_ctn)(NoderVar::Type::Interface, false));
-                setType(NoderVar::Type::Interface);
+                _typeDrop->setIcon(Noder::PlugContainerFunc(_varProps.container)(NoderVarProps::Type::Interface, false));
+                setType(NoderVarProps::Type::Interface, item->text(0));
             }
             else {
-                NoderVar::Type type = Noder::Get().varTypeFromName(item->text(0));
-                _typeDrop->setIcon(Noder::PlugContainerFunc(_ctn)(type, false));
+                NoderVarProps::Type type = Noder::Get().VarTypeFromName(item->text(0));
+                _typeDrop->setIcon(Noder::PlugContainerFunc(_varProps.container)(type, false));
                 setType(type);
             }
-            _typeDrop->setText(item->text(0));
             menu->close();
         }
     });
@@ -136,33 +144,33 @@ void NoderSPVarDrop::configureTree(void)
     _typeDrop->setMenu(menu);
 }
 
-void NoderSPVarDrop::refreshContainerIco(void)
+void NoderSPVarPicker::refreshContainerIco(void)
 {
     QPixmap pixmap;
 
-    pixmap.loadFromData(Noder::PlugValue(_type, false));
+    pixmap.loadFromData(Noder::PlugValue(_varProps.type, false));
     _ctnDrop->setItemIcon(0, pixmap);
 
-    pixmap.loadFromData(Noder::PlugArray(_type, false));
+    pixmap.loadFromData(Noder::PlugArray(_varProps.type, false));
     _ctnDrop->setItemIcon(1, pixmap);
 }
 
-void NoderSPVarDrop::refreshTypeIco(void)
+void NoderSPVarPicker::refreshTypeIco(void)
 {
     for (int i = 0; i < _variableCat->childCount(); i++) {
         PzaTreeWidgetItem *child = static_cast<PzaTreeWidgetItem *>(_variableCat->child(i));
-        child->setSvgIcon(0, Noder::PlugContainerFunc(_ctn)(Noder::varTypeFromName(child->text(0)), false));
+        child->setSvgIcon(0, Noder::PlugContainerFunc(_varProps.container)(Noder::VarTypeFromName(child->text(0)), false));
     }
 
     for (int i = 0; i < _enumCat->childCount(); i++) {
         PzaTreeWidgetItem *child = static_cast<PzaTreeWidgetItem *>(_enumCat->child(i));
-        child->setSvgIcon(0, Noder::PlugContainerFunc(_ctn)(NoderVar::Type::Enum, false));
+        child->setSvgIcon(0, Noder::PlugContainerFunc(_varProps.container)(NoderVarProps::Type::Enum, false));
     }
 
-    _typeDrop->setIcon(Noder::PlugContainerFunc(_ctn)(_type, false));
+    _typeDrop->setIcon(Noder::PlugContainerFunc(_varProps.container)(_varProps.type, false));
 }
 
-PzaTreeWidgetItem *NoderSPVarDrop::addItem(const QString &name, PzaTreeWidgetItem *parent)
+PzaTreeWidgetItem *NoderSPVarPicker::addItem(const QString &name, PzaTreeWidgetItem *parent)
 {
     PzaTreeWidgetItem *item = new PzaTreeWidgetItem(parent);
     
@@ -170,7 +178,7 @@ PzaTreeWidgetItem *NoderSPVarDrop::addItem(const QString &name, PzaTreeWidgetIte
     return item;
 }
 
-PzaTreeWidgetItem *NoderSPVarDrop::addCategory(const QString &name, PzaTreeWidget *parent)
+PzaTreeWidgetItem *NoderSPVarPicker::addCategory(const QString &name, PzaTreeWidget *parent)
 {
     PzaTreeWidgetItem *item = new PzaTreeWidgetItem(parent);
 

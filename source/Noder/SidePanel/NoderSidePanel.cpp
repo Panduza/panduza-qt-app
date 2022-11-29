@@ -10,6 +10,9 @@ NoderSP::NoderSP(QWidget *parent)
     _layout = new QVBoxLayout(_main);
     FunctionArea = new NoderSPFunctionArea(_main);
     VariableArea = new NoderSPVarArea(_main);
+    DefValArea = new PzaSpoiler("Default Values", _main);
+
+    VariableArea->setGlobal(true);
 
     PzaSpoiler *functionSpoiler = new PzaSpoiler("Functions", _main);
     PzaSpoiler *variableSpoiler = new PzaSpoiler("Global Variables", _main);
@@ -22,6 +25,7 @@ NoderSP::NoderSP(QWidget *parent)
 
     _layout->addWidget(functionSpoiler);
     _layout->addWidget(variableSpoiler);
+    _layout->addWidget(DefValArea);
     _layout->addStretch(1);
 
     setWidget(_main);

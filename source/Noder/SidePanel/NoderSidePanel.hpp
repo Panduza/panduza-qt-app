@@ -2,6 +2,7 @@
 
 #include <QVBoxLayout>
 #include <QFile>
+#include <QDrag>
 
 #include <PzaWidget.hpp>
 #include <PzaSpoiler.hpp>
@@ -17,21 +18,31 @@ class NoderSPFunctionArea;
 #define DEFAULT_FUNCTION_NAME       "New Function"
 #define DEFAULT_PIN_NAME            "New Pin"
 #define DEFAULT_VARIABLE_NAME       "New Variable"
-#define DEFAULT_VARIABLE_TYPE       NoderVar::Type::Bool
-#define DEFAULT_VARIABLE_CONTAINER  NoderVar::Container::Variable
+#define DEFAULT_VARIABLE_VAR(x)     x = {NoderVarProps::Container::Reference, NoderVarProps::Type::Bool, ""}
 #define DEFAULT_PIN_DIRECTION       PinProperty::Direction::Input
-#define DEFAULT_PIN_CONTAINER       NoderVar::Container::Variable
-#define DEFAULT_PIN_TYPE            NoderVar::Type::Bool
+
+class NoderSPEntryAbstract : public PzaWidget
+{
+    Q_OBJECT
+
+    public:
+        NoderSPEntryAbstract(QWidget *parent = nullptr) : PzaWidget(parent) {}
+
+    signals:
+        void requestedNewName(const QString &name);
+
+};
 
 template <class N>
-class NoderSPEntry : public PzaWidget
+class NoderSPEntry : public NoderSPEntryAbstract
 {
     public:
         virtual void setName(const QString &name)
         {
             _name = name;
             _nameEntry->setText(name);
-            //_elem->setName(name);
+            if (_elem)
+                _elem->setName(name);
         }
 
         const QString &name(void) {return _name;}
@@ -50,29 +61,18 @@ class NoderSPEntry : public PzaWidget
 
     protected:
         NoderSPEntry<N>(QWidget *parent = nullptr)
-            : PzaWidget(parent)
+            : NoderSPEntryAbstract(parent),
+            _elem(nullptr)
         {
             _layout = new QHBoxLayout(this);
             _deleteBtn = new PzaPushButton(this);
             _propBtn = new PzaPushButton(this);
             _nameEntry = new PzaNameEntry(this);
-            _elem = new N();
 
             setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-            connect(_nameEntry, &PzaNameEntry::newNameRequested, this, [&](const QString &s) {
-            //    bool ok = true;
-            //    auto list = Noder::Get().Frame->SidePanel.VariableArea->entryList();
-            //    for (auto const &item : list) {
-            //        if (item->name() == s) {
-            //            ok = false;
-            //            break;
-            //        }
-            //    }
-            //    (ok) ? setName(s) : setName(name());
-            });
-
-            connect(_deleteBtn, &PzaPushButton::clicked, [&](){remove();});
+            connect(_nameEntry, &PzaNameEntry::newNameRequested, this, [&](const QString &s) { requestedNewName(s); });
+            connect(_deleteBtn, &PzaPushButton::clicked, [&]() { remove(); });
 
             _layout->setContentsMargins(0, 0, 0, 0);
             _layout->setSpacing(5);
@@ -96,14 +96,16 @@ class NoderSPEntry : public PzaWidget
 };
 
 template <class N>
-class NoderSPArea : public PzaWidget
+class NoderSPArea : public QWidget
 {
     public:
         std::vector<N *> &entryList(void) {return _entryList;}
 
+        N *selected(void) const {return _selectedEntry;}
+
     protected:
-        NoderSPArea<N>(QWidget *parent)
-            : PzaWidget(parent)
+        NoderSPArea<N>(QWidget *parent = nullptr)
+            : QWidget(parent)
         {
             _layout = new QVBoxLayout(this);
             _entryTable = new PzaWidget(this);
@@ -124,16 +126,26 @@ class NoderSPArea : public PzaWidget
                 return entry->name();
             };
 
-            const QString &name = PzaUtils::allocateName<N *>(_entryList, _defaultEntryName, getNameInVector);
+            const QString &name = PzaUtils::AllocateName<N *>(_entryList, _defaultEntryName, getNameInVector);
 
             entry = new N(this);
             entry->setName(name);
 
-            connect(entry, &N::removed, this, [&, entry](){
+            connect(entry, &N::removed, this, [&, entry]() {
                 removeEntry(entry);
             });
             connect(entry, &N::clicked, this, [&, entry]() {
                 selectEntry(entry);
+            });
+            connect(entry, &N::requestedNewName, this, [&, entry](const QString &s) {
+                bool ok = true;
+                for (auto const &item : _entryList) {
+                    if (item->name() == s) {
+                        ok = false;
+                        break;
+                    }
+                }
+                (ok) ? entry->setName(s) : entry->setName(entry->name());
             });
 
             _entryList.push_back(entry);
@@ -148,18 +160,17 @@ class NoderSPArea : public PzaWidget
                 N *next = nullptr;
                 size_t index = PzaUtils::IndexInVector<N *>(_entryList, _selectedEntry) + 1;
 
-                if (index < _entryList.size())
-                    next = _entryList.at(index);
-                else if (index < 2)
+                if (_entryList.size() < 2)
                     next = nullptr;
-                else if (_entryList.size() > 0)
+                else if (index < _entryList.size())
+                    next = _entryList.at(index);
+                else
                     next = _entryList.at(index - 2);
 
                 selectEntry(next);
             }
 
             PzaUtils::DeleteFromVector(_entryList, target);
-            target->elem()->deleteLater();
             target->deleteLater();
         }
 
@@ -172,6 +183,8 @@ class NoderSPArea : public PzaWidget
             }
             _selectedEntry = target;
         }
+
+        virtual void removeAllEntries(void) {}
 
         PzaPushButton *_addBtn;
         QVBoxLayout *_layout;
@@ -194,6 +207,7 @@ class NoderSP : public PzaScrollArea
 
         NoderSPVarArea *VariableArea = nullptr;
         NoderSPFunctionArea *FunctionArea = nullptr;
+        PzaSpoiler *DefValArea = nullptr;
 
         void save();
 

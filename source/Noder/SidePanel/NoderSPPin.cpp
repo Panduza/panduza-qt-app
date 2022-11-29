@@ -9,14 +9,18 @@ NoderSPPinArea::NoderSPPinArea(QWidget *parent)
 
 NoderSPPinEntry *NoderSPPinArea::newEntry(void)
 {
-    NoderVar::Container prevCtn;
-    NoderVar::Type prevType;
+    NoderVarProps prevVar;
     PinProperty::Direction prevDir;
     NoderSPPinEntry *entry;
 
-    prevCtn = (_selectedEntry) ? _selectedEntry->container() : DEFAULT_PIN_CONTAINER;
-    prevType = (_selectedEntry) ? _selectedEntry->type() : DEFAULT_PIN_TYPE;
-    prevDir = (_selectedEntry) ? _selectedEntry->direction() : DEFAULT_PIN_DIRECTION;
+    if (_selectedEntry) {
+        prevVar = _selectedEntry->varProps();
+        prevDir = _selectedEntry->direction();
+    }
+    else {
+        DEFAULT_VARIABLE_VAR(prevVar);
+        prevDir = DEFAULT_PIN_DIRECTION;
+    }
 
     entry = NoderSPArea::newEntry();
 
@@ -25,19 +29,20 @@ NoderSPPinEntry *NoderSPPinArea::newEntry(void)
     });
 
     connect(entry, &NoderSPPinEntry::varChanged, this, [&, entry]() {
-        varChanged(entry);
+        pinChanged(entry);
     });
 
     entry->setDirection(prevDir);
-    entry->setContainer(prevCtn);
-    entry->setType(prevType);
+    entry->setVar(prevVar);
 
     selectEntry(entry);
+
     return entry;
 }
 
 void NoderSPPinArea::removeEntry(NoderSPPinEntry *target)
 {
+    qDebug() << "LIST DEL" << this << target;
     pinRemoved(target);
     NoderSPArea::removeEntry(target);
 }
@@ -48,14 +53,13 @@ void NoderSPPinArea::selectEntry(NoderSPPinEntry *target)
 }
 
 NoderSPPinEntry::NoderSPPinEntry(QWidget *parent)
-    : NoderSPEntry<PinValue>(parent)
+    : NoderSPEntry<PinVariable>(parent)
 {
     _dirBox = new NoderSPDirBox(this);
-    _varDrop = new NoderSPVarDrop(this);
+    _varPicker = new NoderSPVarPicker(this);
 
-    connect(_varDrop, &NoderSPVarDrop::varChanged, this, [&](NoderVar::Container ctn, NoderVar::Type type) {
-        _ctn = ctn;
-        _type = type;
+    connect(_varPicker, &NoderSPVarPicker::varChanged, this, [&](const NoderVarProps &varProps) {
+        _varProps = varProps;
         varChanged();
     });
 
@@ -64,23 +68,14 @@ NoderSPPinEntry::NoderSPPinEntry(QWidget *parent)
         directionChanged();
     });
 
-    elem()->deleteLater();
-    setElem(nullptr);
-
     _layout->insertWidget(1, _dirBox);
-    _layout->insertWidget(2, _varDrop);
+    _layout->insertWidget(2, _varPicker);
 }
 
-void NoderSPPinEntry::setContainer(NoderVar::Container ctn)
+void NoderSPPinEntry::setVar(const NoderVarProps &varProps)
 {
-    _ctn = ctn;
-    _varDrop->setContainer(ctn);
-}
-
-void NoderSPPinEntry::setType(NoderVar::Type type)
-{
-    _type = type;
-    _varDrop->setType(type);
+    _varProps = varProps;
+    _varPicker->setVar(varProps);
 }
 
 void NoderSPPinEntry::setDirection(PinProperty::Direction direction)
@@ -93,16 +88,16 @@ void NoderSPPinEntry::setDirection(PinProperty::Direction direction)
 NoderSPDirBox::NoderSPDirBox(QWidget *parent)
     : PzaComboBox(parent)
 {
-    Noder::Get().forEachPinDirection([&](PinProperty::Direction dir) {
-        insertItem(0, Noder::Get().pinDirName(dir));
+    Noder::Get().ForEachPinDirection([&](PinProperty::Direction dir) {
+        insertItem(0, Noder::Get().PinDirName(dir));
     });
     connect(this, &PzaComboBox::currentIndexChanged, this, [&](int index) {
-        directionChanged(Noder::Get().pinDirFromName(itemText(index)));
+        directionChanged(Noder::Get().PinDirFromName(itemText(index)));
     });
     setCurrentIndex(0);
 }
 
 void NoderSPDirBox::setDirection(PinProperty::Direction direction)
 {
-    setCurrentText(Noder::pinDirName(direction));
+    setCurrentText(Noder::PinDirName(direction));
 }

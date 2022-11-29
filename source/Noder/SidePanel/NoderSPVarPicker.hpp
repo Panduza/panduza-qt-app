@@ -10,26 +10,23 @@
 #include <PzaToolButton.hpp>
 #include "NoderSidePanel.hpp"
 
-class NoderSPVarDrop : public PzaWidget
+class NoderSPVarPicker : public PzaWidget
 {
     Q_OBJECT
 
     public:
-        NoderSPVarDrop(QWidget *parent = nullptr);
+        NoderSPVarPicker(QWidget *parent = nullptr);
 
-        void setType(NoderVar::Type type);
-        NoderVar::Type type(void) const {return _type;}
-        void setContainer(NoderVar::Container ctn);
-        NoderVar::Container container(void) const {return _ctn;}
+        void setVar(const NoderVarProps &varProps);
+        const NoderVarProps &varProps(void) const {return _varProps;}
 
     private:
+        NoderVarProps _varProps;
         PzaTreeWidgetItem *_variableCat;
         PzaTreeWidgetItem *_interfaceCat;
         PzaTreeWidgetItem *_enumCat;
         PzaToolButton *_typeDrop;
         PzaComboBox *_ctnDrop;
-        NoderVar::Type _type;
-        NoderVar::Container _ctn;
         QHBoxLayout *_layout;
 
         PzaTreeWidgetItem *addItem(const QString &name, PzaTreeWidgetItem *parent = nullptr);
@@ -37,7 +34,10 @@ class NoderSPVarDrop : public PzaWidget
         void refreshContainerIco(void);
         void refreshTypeIco(void);
         void configureTree(void);
+
+        void setType(const NoderVarProps::Type type, const QString &subType = "");
+        void setContainer(const NoderVarProps::Container ctn);
     
     signals:
-        void varChanged(NoderVar::Container ctn, NoderVar::Type type);
+        void varChanged(const NoderVarProps &varProps);
 };

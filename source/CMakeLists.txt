@@ -21,7 +21,7 @@ target_sources(${PROG}
 	Widgets/PzaMoreLess.cpp
 	Widgets/PzaLineEdit.cpp
 	Widgets/PzaLabel.cpp
-	Widgets/PzaPropertyTable.cpp
+	Widgets/PzaForm.cpp
 	Widgets/PzaCheckBox.cpp
 	Widgets/PzaSpinBox.cpp
 	Widgets/PzaDoubleSpinBox.cpp

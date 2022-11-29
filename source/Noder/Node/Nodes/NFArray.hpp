@@ -14,7 +14,7 @@ class Array : public GNodeOp
         virtual void onEventDisconnect(void) override;
 
     private:
-        NoderVar::Type _type;
-        PinDecl::Array *_result;
-        std::vector<PinValue *> _list;
+        NoderVarProps _var;
+        PinArray *_result;
+        std::vector<PinRef *> _list;
 };

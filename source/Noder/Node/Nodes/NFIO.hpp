@@ -10,9 +10,9 @@ class IoInit : public GNodeExec
         void exec() override;
 
     private:
-        PinDecl::Interface *_interface;
-        PinDecl::Enum *_direction;
-        PinDecl::Enum *_value;
+        PinDecl::Ref::Interface *_interface;
+        PinDecl::Ref::Enum *_direction;
+        PinDecl::Ref::Enum *_value;
 };
 
 class IoSetDirection : public GNodeExec

@@ -11,5 +11,5 @@ class Delay : public GNodeExec
 
         void exec(void) override;
     private:
-        PinDecl::Float *_delay;
+        PinDecl::Ref::Float *_delay;
 };

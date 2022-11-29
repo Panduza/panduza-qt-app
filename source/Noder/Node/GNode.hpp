@@ -11,7 +11,9 @@
 #include <QFont>
 #include <QCoreApplication>
 
-#include <Node/Pin.hpp>
+#include <PinExec.hpp>
+#include <PinRef.hpp>
+#include <PinArray.hpp>
 #include <PzaComboBox.hpp>
 #include <PzaLabel.hpp>
 #include <PzaUtils.hpp>
@@ -19,7 +21,7 @@
 #include <PzaMoreLess.hpp>
 #include <PzaCheckBox.hpp>
 #include <PzaSpinBox.hpp>
-#include <PzaPropertyTable.hpp>
+#include <PzaForm.hpp>
 #include <PzaDoubleSpinBox.hpp>
 #include <PzaColorBox.hpp>
 
@@ -40,12 +42,14 @@ class GNode : public QGraphicsObject
         void process(void);
         virtual void exec(void) {};
         virtual GNode *branch(void) {return nullptr;}
+
+        void kill(void);
         
         virtual void refreshNode(void) = 0;
 
         NoderScene *scene() const {return _scene;}
         void setScene(NoderScene *scene);
-        PzaPropertyTable *propTable(void) const {return _propTable;}
+        PzaForm *propTable(void) const {return _propTable;}
         bool isInPlugzone(const QPoint &pos);
         void forEachInputPin(const std::function<void(Pin *pin)> &func);
         void forEachOutputPin(const std::function<void(Pin *pin)> &func);
@@ -65,12 +69,24 @@ class GNode : public QGraphicsObject
 
         template <typename N>
         static GNode *CreateNode(void) {return new N();}
-        PinValue *addPinFromType(NoderVar::Type type, const QString &name, PinProperty::Direction direction, int index = -1);
         int pinIndex(Pin *pin);
+        void replacePin(Pin **oldPin, Pin *newPin);
         void replacePin(Pin *oldPin, Pin *newPin);
         void deletePin(Pin *pin);
         void deleteValuePins(void);
         virtual void refreshUserName(const QString &name);
+
+        Pin *addPin(const QString &name, const PinProperty &pinProp, const NoderVarProps &varProps, int index = -1);
+        PinDecl::Exec *addExec(const QString &name, const PinProperty::Direction direction, int index = -1);
+        PinDecl::Exec *addExecInput(const QString &name, int index = -1);
+        PinDecl::Exec *addExecOutput(const QString &name, int index = -1);
+        PinVariable *addVariable(const QString &name, const PinProperty::Direction direction, const NoderVarProps &varProps, int index = -1);
+        PinRef *addRef(const QString &name, const PinProperty::Direction dir, const NoderVarProps::Type type, const QString &subType = "", int index = -1);
+        PinRef *addRefInput(const QString &name, const NoderVarProps::Type type, const QString &subType = "", int index = -1);
+        PinRef *addRefOutput(const QString &name, const NoderVarProps::Type type, const QString &subType = "", int index = -1);
+        PinArray *addArray(const QString &name, const PinProperty::Direction dir, const NoderVarProps::Type type, const QString &subType = "", int index = -1);
+        PinArray *addArrayInput(const QString &name, const NoderVarProps::Type type, const QString &subType = "", int index = -1);
+        PinArray *addArrayOutput(const QString &name, const NoderVarProps::Type type, const QString &subType = "", int index = -1);
 
     protected:
         
@@ -106,9 +122,10 @@ class GNode : public QGraphicsObject
         inline bool needSpacing(void) {return (_inputPins.size() > 0 && _outputPins.size() > 0);}
         void setPinPlugzone(Pin *pin, const QPoint &origin);
 
-        void drawValuePlug(QPainter *painter, PinValue *pin);
-        void drawArrayPlug(QPainter *painter, PinDecl::Array *pin);
-        void drawExecPlug(QPainter *painter, PinExec *pin);
+        void drawVariablePlug(QPainter *painter, PinVariable *pin);
+        void drawRefPlug(QPainter *painter, PinRef *pin);
+        void drawArrayPlug(QPainter *painter, PinArray *pin);
+        void drawExecPlug(QPainter *painter, PinDecl::Exec *pin);
 
         template <typename N>
         N *_addPin(const QString &name, PinProperty::Direction direction, int index = -1)
@@ -149,6 +166,28 @@ class GNode : public QGraphicsObject
             return pin;
         }
 
+        template <typename N>
+        N *addVariable(const QString &name, const PinProperty::Direction dir, const QString &subType = "", int index = -1)
+        {
+            N *ret;
+            
+            ret = addPin<N>(name, dir, index);
+            ret->setSubType(subType);
+            return ret;
+        }
+
+        template <typename N>
+        N *addVariableInput(const QString &name, const QString &subType = "", int index = -1)
+        {
+            return addVariable<N>(name, PinProperty::Direction::Input, subType, index);
+        }
+
+        template <typename N>
+        N *addVariableOutput(const QString &name, const QString &subType = "", int index = -1)
+        {
+            return addVariable<N>(name, PinProperty::Direction::Output, subType, index);
+        }
+
         NoderScene *_scene;
         std::vector<Pin *> _inputPins;
         std::vector<Pin *> _outputPins;
@@ -166,7 +205,7 @@ class GNode : public QGraphicsObject
         QPointF _prevPos;
         bool _eternal = false;
 
-        PzaPropertyTable *_propTable = nullptr;
+        PzaForm *_propTable = nullptr;
         PzaLabel *_propType = nullptr;
         PzaColorBox *_propBoxColor = nullptr;
 

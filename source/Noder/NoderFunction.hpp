@@ -13,10 +13,12 @@
 #include <NFDelay.hpp>
 #include <NFIO.hpp>
 
+class NoderVariable;
+
 class NoderFunction : public NoderView
 {
     Q_OBJECT
-    
+
     public:
         NoderFunction(QWidget *parent = nullptr);
 
@@ -25,10 +27,21 @@ class NoderFunction : public NoderView
         GNode *startNode(void) const {return _startNode;}
         GNode *endNode(void) const {return _endNode;}
 
+        void registerVariable(NoderVariable *v)
+        {
+            _varList.push_back(v);
+        }
+        
+        void deleteVariable(NoderVariable *v)
+        {
+            PzaUtils::DeleteFromVector<NoderVariable *>(_varList, v);
+        }
+
     private:
         QString _name;
         GNode *_startNode;
         GNode *_endNode;
+        std::vector<NoderVariable *> _varList;
     
     signals:
         void nameChanged(const QString &name);

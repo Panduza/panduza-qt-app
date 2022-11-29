@@ -1,9 +1,11 @@
 #include "NoderView.hpp"
 #include "Noder.hpp"
+#include "NoderFrame.hpp"
 
 #include <GNode.hpp>
 #include <Nodes/NFInstance.hpp>
 #include <Nodes/NFMath.hpp>
+#include <QGuiApplication>
 
 NoderGraphicsView::NoderGraphicsView(QWidget *parent)
     : QGraphicsView(parent),
@@ -35,40 +37,53 @@ void NoderGraphicsView::dragEnterEvent(QDragEnterEvent *event)
 void NoderGraphicsView::dragMoveEvent(QDragMoveEvent *event)
 {
     QGraphicsView::dragMoveEvent(event);
-    if (event->mimeData()->hasFormat("noder/variable") == true
-            || event->mimeData()->hasFormat("noder/function") == true) {
+    if (event->mimeData()->hasFormat("application/json"))
         event->accept();
-        }
-    
     else
         event->ignore();
 }
 
 void NoderGraphicsView::dropEvent(QDropEvent *event)
 {
-    const PzaMimeData *mime;
+    const QMimeData *mime;
+    QJsonDocument doc;
+    QJsonObject obj;
 
     QGraphicsView::dropEvent(event);
-    if (event->mimeData()->hasFormat("noder/variable") == true) {
-        NoderSPVariable *variable;
+//    if (event->mimeData()->hasFormat("noder/function") == true) {
+//        NoderFunction *function;
+//
+//        mime = static_cast<const PzaMimeData *>(event->mimeData());
+//        function = static_cast<NoderFunction *>(mime->dataPtr());
+//        if (function && function->view() != this) {
+//            QPointF pos = mapToScene(event->position().toPoint());
+//            GNode *node = createNode(GNode::CreateNode<FuncInstance>, pos);
+//            static_cast<FuncInstance *>(node)->setFunction(function);
+//        }
+//    }
+    if (event->mimeData()->hasFormat("application/json") == true) {
+        mime = event->mimeData();
+        doc = QJsonDocument::fromJson(mime->data("application/json"));
+        obj = doc.object();
+        const QString &type = obj["Object Type"].toString();
+        const QString &name = obj["Name"].toString();
+        if (type == "Variable") {
+            NoderSPVariableEntry *variable;
 
-        mime = static_cast<const PzaMimeData *>(event->mimeData());
-        variable = static_cast<NoderSPVariable *>(mime->dataPtr());
-        if (variable) {
-            QPointF pos = mapToScene(event->position().toPoint());
-            GNode *node = createNode(GNode::CreateNode<Instance>, pos);
-            static_cast<Instance *>(node)->setVariable(variable);
+            if (obj["Global"].toBool() == true) {
+                variable = Noder::Get().Frame->SidePanel.VariableArea->findVariableEntry(name);
+                GNode *node;
+                if (variable) {
+                    //if (QGuiApplication::keyboardModifiers() & Qt::KeyboardModifier::ControlModifier) {
+                    //    qDebug() << "Mdr";
+                    //}
+                    node = createNode(GNode::CreateNode<VariableInstance>, mapToScene(event->position().toPoint()));
+                    static_cast<VariableInstance *>(node)->setVariableEntry(variable);
+                }
+            }
         }
-    }
-    else if (event->mimeData()->hasFormat("noder/function") == true) {
-        NoderFunction *function;
+        else if (type == "Function") {
 
-        mime = static_cast<const PzaMimeData *>(event->mimeData());
-        function = static_cast<NoderFunction *>(mime->dataPtr());
-        if (function && function->view() != this) {
-            QPointF pos = mapToScene(event->position().toPoint());
-            GNode *node = createNode(GNode::CreateNode<FuncInstance>, pos);
-            static_cast<FuncInstance *>(node)->setFunction(function);
         }
     }
 }
@@ -110,7 +125,7 @@ void NoderGraphicsView::keyPressEvent(QKeyEvent *event)
                     if (_selectedNode == node)
                         _selectedNode = nullptr;
                     _scene->removeItem(item);
-                    node->deleteLater();
+                    node->kill();
                 }
             }
             break;
@@ -195,7 +210,6 @@ GNode *NoderGraphicsView::createNode(const Noder::t_CreateNode &f, const QPointF
 void NoderGraphicsView::createNodeFromMenu(void)
 {
     QAction *action = static_cast<QAction *>(sender());
-    action->data();
     const Noder::t_CreateNode &f = action->data().value<Noder::t_CreateNode>();
     createNode(f, _clickpos);
 }
@@ -239,7 +253,7 @@ void NoderGraphicsView::deleteNode(GNode *node)
 {
     if (node->isEternal() == false) {
         _scene->removeItem(node);
-        node->deleteLater();
+        node->kill();
     }
 }
 

@@ -13,7 +13,7 @@ Noder::Noder()
     _plugExecNcIcon = _mapPlugFiles[NodeProperty::PlugType::Exec].plugNc.data.toUtf8();
     _plugExecCIcon = _mapPlugFiles[NodeProperty::PlugType::Exec].plugC.data.toUtf8();
 
-    forEachVarType([&](const NoderVar::Type type) {
+    ForEachVarType([&](const NoderVarProps::Type type) {
         _mapPlugValueCIcon[type] = LoadCValue(type);
         _mapPlugValueNcIcon[type] = LoadNcValue(type);
         _mapPlugArrayCIcon[type] = LoadCArray(type);
@@ -21,138 +21,153 @@ Noder::Noder()
     });
 }
 
-QString &Noder::pinTypeName(const PinProperty::Type type)
+QString &Noder::PinTypeName(const PinProperty::Type type)
 {
-    return pinTypeMap()[type];
+    return PinTypeMap()[type];
 }
 
-PinProperty::Type Noder::pinTypeFromName(const QString &name)
+PinProperty::Type Noder::PinTypeFromName(const QString &name)
 {
-    for (const auto& [key, value] : pinTypeMap())
+    for (const auto& [key, value] : PinTypeMap())
         if (value == name)
             return key;
     // Should not be possible
     std::abort();
 }
 
-QString &Noder::pinDirName(const PinProperty::Direction type)
+QString &Noder::PinDirName(const PinProperty::Direction type)
 {
-    return pinDirMap()[type];
+    return PinDirMap()[type];
 }
 
-PinProperty::Direction Noder::pinDirFromName(const QString &name)
+PinProperty::Direction Noder::PinDirFromName(const QString &name)
 {
-    for (const auto& [key, value] : pinDirMap())
+    for (const auto& [key, value] : PinDirMap())
         if (value == name)
             return key;
     // Should not be possible
     std::abort();
 }
 
-QString &Noder::varTypeName(const NoderVar::Type type)
+QString &Noder::VarTypeName(const NoderVarProps::Type type)
 {
-    return varTypeMap()[type].name;
+    return VarTypeMap()[type].name;
 }
 
-QColor &Noder::varTypeColor(const NoderVar::Type type)
+QColor &Noder::VarTypeColor(const NoderVarProps::Type type)
 {
-    return varTypeMap()[type].color;
+    return VarTypeMap()[type].color;
 }
 
-const s_varProperties &Noder::varTypeProperties(const NoderVar::Type type)
+bool Noder::VarHasSubType(const NoderVarProps::Type type)
 {
-    return varTypeMap()[type];
+    return VarTypeMap()[type].hasSubType;
 }
 
-NoderVar::Type Noder::varTypeFromName(const QString &name)
+const s_varProperties &Noder::VarTypeProperties(const NoderVarProps::Type type)
 {
-    for (const auto& [key, value] : varTypeMap())
+    return VarTypeMap()[type];
+}
+
+NoderVarProps::Type Noder::VarTypeFromName(const QString &name)
+{
+    for (const auto& [key, value] : VarTypeMap())
         if (value.name == name)
             return key;
     // Should not be possible
     std::abort();
 }
 
-QString &Noder::varContainerName(const NoderVar::Container ctn)
+QString &Noder::VarContainerName(const NoderVarProps::Container ctn)
 {
-    return varContainerMap()[ctn];
+    return VarContainerMap()[ctn];
 }
 
-NoderVar::Container Noder::varContainerFromName(const QString &name)
+NoderVarProps::Container Noder::VarContainerFromName(const QString &name)
 {
-    for (const auto& [key, value] : varContainerMap())
+    for (const auto& [key, value] : VarContainerMap())
         if (value == name)
             return key;
     // Should not be possible
     std::abort();
 }
 
-QString &Noder::nodeTypeName(const NodeProperty::Type type)
+QString &Noder::NodeTypeName(const NodeProperty::Type type)
 {
-    return nodeTypeMap()[type];
+    return NodeTypeMap()[type];
 }
 
-NodeProperty::Type Noder::nodeTypeFromName(const QString &name)
+NodeProperty::Type Noder::NodeTypeFromName(const QString &name)
 {
-    for (const auto& [key, value] : nodeTypeMap())
+    for (const auto& [key, value] : NodeTypeMap())
         if (value == name)
             return key;
     // Should not be possible
     std::abort();
 }
 
-const std::vector<QString> &Noder::enumValues(const QString &name)
+const std::vector<QString> &Noder::EnumValues(const QString &name)
 {
-    return enumMap()[name];
+    return EnumMap()[name];
 }
 
-void Noder::forEachEnum(const std::function<void(const QString &name, const std::vector<QString> &list)> &f)
+void Noder::ForEachEnum(const std::function<void(const QString &name, const std::vector<QString> &list)> &f)
 {
-    for (auto const &var : enumMap()) {
+    for (auto const &var : EnumMap()) {
         f(var.first, var.second);
     }
 }
 
-void Noder::forEachEnumName(const std::function<void(const QString &name)> &f)
+void Noder::ForEachEnumName(const std::function<void(const QString &name)> &f)
 {
-    for (auto const &var : enumMap()) {
+    for (auto const &var : EnumMap()) {
         f(var.first);
     }
 }
 
-void Noder::forEachEnumValues(const QString &name, const std::function<void(const QString &name)> &f)
+void Noder::ForEachEnumValues(const QString &name, const std::function<void(const QString &name)> &f)
 {
-    for (auto const &var : enumMap()[name]) {
+    for (auto const &var : EnumMap()[name]) {
         f(var);
     }
 }
 
-void Noder::forEachVarContainer(const std::function<void(const NoderVar::Container ctn)> &f)
+void Noder::ForEachVarContainer(const std::function<void(const NoderVarProps::Container ctn)> &f)
 {
-    for (auto const &var : varContainerMap()) {
+    for (auto const &var : VarContainerMap()) {
         f(var.first);
     }
 }
 
-void Noder::forEachVarType(const std::function<void(const NoderVar::Type type)> &f)
+void Noder::ForEachVarType(const std::function<void(const NoderVarProps::Type type)> &f)
 {
-    for (auto const &var : varTypeMap()) {
+    for (auto const &var : VarTypeMap()) {
         f(var.first);
     }
 }
 
-void Noder::forEachPinType(const std::function<void(const PinProperty::Type type)> &f)
+void Noder::ForEachPinType(const std::function<void(const PinProperty::Type type)> &f)
 {
-    for (auto const &var : pinTypeMap()) {
+    for (auto const &var : PinTypeMap()) {
         f(var.first);
     }
 }
 
-void Noder::forEachPinDirection(const std::function<void(const PinProperty::Direction direction)> &f)
+void Noder::ForEachPinDirection(const std::function<void(const PinProperty::Direction direction)> &f)
 {
-    for (auto const &var : pinDirMap()) {
+    for (auto const &var : PinDirMap()) {
         f(var.first);
     }
+}
+
+bool Noder::IsTypeCompatible(NoderVarProps::Type type1, NoderVarProps::Type type2)
+{
+    std::vector<NoderVarProps::Type> &map = VarTypeMap()[type1].compatibleMap;
+
+    if (type1 == type2)
+        return true;
+
+    return PzaUtils::IsInVector<NoderVarProps::Type>(map, type2);
 }
 
 struct NodeProperty::plugIcon Noder::initPlugType(NodeProperty::PlugType type)
@@ -198,12 +213,12 @@ struct NodeProperty::plugIcon Noder::initPlugType(NodeProperty::PlugType type)
     return s;
 }
 
-QByteArray Noder::FillPlugMap(const NodeProperty::PlugType &plugType, const NoderVar::Type &type, bool linked)
+QByteArray Noder::FillPlugMap(const NodeProperty::PlugType &plugType, const NoderVarProps::Type &type, bool linked)
 {
     QString xml;
     QColor color;
 
-    color = varTypeColor(type);
+    color = VarTypeColor(type);
     if (linked)
         xml = _mapPlugFiles[plugType].plugC.data;
     else
@@ -212,27 +227,27 @@ QByteArray Noder::FillPlugMap(const NodeProperty::PlugType &plugType, const Node
     return xml.toUtf8();
 }
 
-QByteArray Noder::LoadCValue(const NoderVar::Type &type)
+QByteArray Noder::LoadCValue(const NoderVarProps::Type &type)
 {
     return FillPlugMap(NodeProperty::PlugType::Value, type, 1);
 }
 
-QByteArray Noder::LoadNcValue(const NoderVar::Type &type)
+QByteArray Noder::LoadNcValue(const NoderVarProps::Type &type)
 {
     return FillPlugMap(NodeProperty::PlugType::Value, type, 0);
 }
 
-QByteArray Noder::LoadCArray(const NoderVar::Type &type)
+QByteArray Noder::LoadCArray(const NoderVarProps::Type &type)
 {
     return FillPlugMap(NodeProperty::PlugType::Array, type, 1);
 }
 
-QByteArray Noder::LoadNcArray(const NoderVar::Type &type)
+QByteArray Noder::LoadNcArray(const NoderVarProps::Type &type)
 {
     return FillPlugMap(NodeProperty::PlugType::Array, type, 0);
 }
 
-const QByteArray &Noder::PlugValue(const NoderVar::Type type, bool linked)
+const QByteArray &Noder::PlugValue(const NoderVarProps::Type type, bool linked)
 {
     if (linked)
         return _mapPlugValueCIcon[type];
@@ -240,7 +255,7 @@ const QByteArray &Noder::PlugValue(const NoderVar::Type type, bool linked)
         return _mapPlugValueNcIcon[type];
 }
 
-const QByteArray &Noder::PlugArray(const NoderVar::Type type, bool linked)
+const QByteArray &Noder::PlugArray(const NoderVarProps::Type type, bool linked)
 {
     if (linked)
         return _mapPlugArrayCIcon[type];

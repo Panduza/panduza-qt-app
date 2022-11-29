@@ -104,7 +104,9 @@
         "qactionevent": "cpp",
         "csignal": "cpp",
         "source_location": "cpp",
-        "qtreewidget": "cpp"
+        "qtreewidget": "cpp",
+        "qformlayout": "cpp",
+        "qpainter": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

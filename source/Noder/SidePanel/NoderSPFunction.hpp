@@ -14,10 +14,8 @@ class NoderSPFunctionEntry : public NoderSPEntry<NoderFunction>
         
         void remove(void) override {removed();}
         NoderSPPinArea *pinArea(void) const {return _pinArea;}
-        void setPinArea(NoderSPPinArea *pinArea) {_pinArea = pinArea;}
         NoderSPVarArea *varArea(void) const {return _varArea;}
-        void setVarArea(NoderSPVarArea *varArea) {_varArea = varArea;}
-        void updateVar(NoderSPPinEntry *pin);
+        void updatePin(NoderSPPinEntry *pin);
         void updateDirection(NoderSPPinEntry *pin);
         void removePin(NoderSPPinEntry *pin);
 
