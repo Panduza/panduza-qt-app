@@ -39,6 +39,26 @@ QPushButton:flat:disabled
    background-color: #7f8c8d;
 }
 
+QPushButton#more {
+   max-width: 8px;
+   max-height: 8px;
+   border-image: url(:/images/noder/plus.png) 0 0 0 0 stretch;
+}
+
+QPushButton#less {
+   max-width: 8px;
+   max-height: 8px;
+   border-image: url(:/images/noder/minus.png) 0 0 0 0 stretch;
+}
+
+QPushButton#more::hover {
+   border-image: url(:/images/noder/plus_hover.png) 0 0 0 0 stretch;
+}
+
+QPushButton#less::hover {
+   border-image: url(:/images/noder/minus_hover.png) 0 0 0 0 stretch;
+}
+
 
 [objectName^="blue-back"] { background-color: #2980b9; }
 

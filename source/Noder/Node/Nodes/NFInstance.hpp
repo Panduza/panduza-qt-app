@@ -5,22 +5,23 @@
 #include <NoderSPVariable.hpp>
 #include <NoderFunction.hpp>
 
-class Instance : public GNodeInstance
+class VariableInstance : public GNodeInstance
 {
     Q_OBJECT
 
     public:
-        Instance();
+        VariableInstance();
 
         void exec() override;
-        void setVariable(NoderSPVariable *ref);
+        void setVariableEntry(NoderSPVariableEntry *ref);
 
     private:
-        PinValue *_pin = nullptr;
-        NoderSPVariable *_var;
+        PinVariable *_pin = nullptr;
+        NoderSPVariableEntry *_varEntry = nullptr;
+        NoderVariable *_var = nullptr;
     
     private slots:
-        void updatePin(void);
+        void newVariable(NoderVariable *var);
 };
 
 class FuncInstance : public GNodeExec

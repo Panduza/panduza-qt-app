@@ -3,9 +3,9 @@
 If::If()
     : GNodeBranch("If")
 {
-    _true = addOutput<PinExec>("True");
-    _false = addOutput<PinExec>("False");
-    _cond = addInput<PinDecl::Bool>("Condition");
+    _true = addOutput<PinDecl::Exec>("True");
+    _false = addOutput<PinDecl::Exec>("False");
+    _cond = addInput<PinDecl::Ref::Bool>("Condition");
 }
 
 GNode *If::branch(void)

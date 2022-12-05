@@ -11,7 +11,7 @@ class Print : public GNodeExec
         void exec() override;
 
     private:
-        std::vector<PinValue *> _list;
+        std::vector<PinRef *> _list;
         
 };
 
@@ -23,7 +23,7 @@ class Cat : public GNodeOp
         void exec() override;
 
     private:
-        std::vector<PinValue *> _list;
-        PinDecl::String *_spacer;
-        PinDecl::String *_result;
+        std::vector<PinRef *> _list;
+        PinDecl::Ref::String *_spacer;
+        PinDecl::Ref::String *_result;
 };

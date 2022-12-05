@@ -1,7 +1,7 @@
 #include "NoderMenuBar.hpp"
 #include "NoderFrame.hpp"
 #include "NoderGraph.hpp"
-#include "NoderSP.hpp"
+#include "NoderSidePanel.hpp"
 
 NoderMenuBar::NoderMenuBar(QWidget *parent)
     : PzaMenuBar(parent)

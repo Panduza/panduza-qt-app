@@ -11,11 +11,11 @@ class For : public GNodeBranch
         GNode *branch(void) override;
     
     private:
-        PinDecl::Int *_start;
-        PinDecl::Int *_end;
-        PinExec *_scope;
-        PinExec *_done;
-        PinDecl::Int *_index;
+        PinDecl::Ref::Int *_start;
+        PinDecl::Ref::Int *_end;
+        PinDecl::Exec *_scope;
+        PinDecl::Exec *_done;
+        PinDecl::Ref::Int *_index;
 };
 
 class ForEachInArray : public GNodeBranch
@@ -29,8 +29,8 @@ class ForEachInArray : public GNodeBranch
         virtual void onEventDisconnect(void) override;
     
     private:
-        PinDecl::Array *_array;
-        PinValue *_elem;
-        PinExec *_scope;
-        PinExec *_done;
+        //PinDecl::Ref::Array *_array;
+        PinRef *_elem;
+        PinDecl::Exec *_scope;
+        PinDecl::Exec *_done;
 };

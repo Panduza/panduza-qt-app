@@ -33,6 +33,15 @@ Link::Link(Pin *from, Pin *to)
     setPin(to);
 }
 
+void Link::kill(void)
+{
+    if (_inPin && _inPin->dead() == false)
+        _inPin->removeLink(this);
+    if (_outPin && _outPin->dead() == false)
+        _outPin->removeLink(this);
+    deleteLater();
+}
+
 void Link::setPin(Pin *pin)
 {
     switch (pin->direction()) {
@@ -165,12 +174,12 @@ void Link::paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWid
 {
     (void)option;
     (void)w;
-    
-    if (_inPin && _outPin) {
+
+    if (_inPin && _inPin->dead() == false && _outPin && _outPin->dead() == false) {
         QColor col_in;
         QColor col_out;
         QPen pen;
-        
+
         if (_inPin->type() == PinProperty::Type::Exec) {
             pen.setColor("#cccccc");
             pen.setWidth(3.0);
@@ -178,16 +187,15 @@ void Link::paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWid
         }
         else {
             QLinearGradient gradient(_inpos, _outpos);
-
-            col_in = static_cast<PinValue *>(_inPin)->plugColor();
-            col_out = static_cast<PinValue *>(_outPin)->plugColor();
+            col_in = static_cast<PinVariable *>(_inPin)->plugColor();
+            col_out = static_cast<PinVariable *>(_outPin)->plugColor();
             gradient.setColorAt(0, col_in);
             gradient.setColorAt(1, col_out);
             pen.setBrush(QBrush(gradient));
             pen.setWidth(2.5);
         }
         painter->setPen(pen);
-    }
+        }
     else
         painter->setPen(_offpen);
     painter->drawLine(_outpos, _inpos);
@@ -195,8 +203,5 @@ void Link::paint(QPainter *painter, QStyleOptionGraphicsItem const *option, QWid
 
 Link::~Link()
 {
-    if (_inPin && _inPin->dead() == false)
-        _inPin->removeLink(this);
-    if (_outPin && _outPin->dead() == false)
-        _outPin->removeLink(this);
+
 }

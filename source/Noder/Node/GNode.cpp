@@ -29,7 +29,7 @@ GNode::GNode(const QString &name)
 
     setOnTop();
 
-    _propTable = new PzaPropertyTable();
+    _propTable = new PzaForm();
 }
 
 void GNode::setColor(const QColor &color)
@@ -41,7 +41,7 @@ void GNode::setColor(const QColor &color)
 void GNode::setType(NodeProperty::Type type)
 {
     _type = type;
-    _propType->setText(Noder::Get().nodeTypeName(_type));
+    _propType->setText(Noder::Get().NodeTypeName(_type));
 }
 
 void GNode::refreshUserName(const QString &name)
@@ -76,21 +76,136 @@ void GNode::setScene(NoderScene *scene)
     _scene = scene;
 }
 
-PinValue *GNode::addPinFromType(NoderVar::Type type, const QString &name, PinProperty::Direction direction, int index)
+Pin *GNode::addPin(const QString &name, const PinProperty &pinProp, const NoderVarProps &varProps, int index)
 {
-    PinValue *pin = nullptr;
+    Pin *ret = nullptr;
+
+    switch (pinProp.type) {
+        case PinProperty::Type::Exec:
+            ret = addExec(name, pinProp.direction, index);
+            break;
+        case PinProperty::Type::Variable:
+            ret = addVariable(name, pinProp.direction, varProps, index);
+            if (ret)
+                static_cast<PinVariable *>(ret)->setSubType(varProps.subType);
+            break;
+    }
+    return ret;
+}
+
+PinDecl::Exec *GNode::addExec(const QString &name, const PinProperty::Direction direction, int index)
+{
+    return addPin<PinDecl::Exec>(name, direction, index);
+}
+
+PinDecl::Exec *GNode::addExecInput(const QString &name, int index)
+{
+    return addExec(name, PinProperty::Direction::Input, index);
+}
+
+PinDecl::Exec *GNode::addExecOutput(const QString &name, int index)
+{
+    return addExec(name, PinProperty::Direction::Output, index);
+}
+
+PinVariable *GNode::addVariable(const QString &name, const PinProperty::Direction direction, const NoderVarProps &varProps, int index)
+{
+    PinVariable *ret = nullptr;
+
+    switch (varProps.container) {
+        case NoderVarProps::Container::Reference:
+            ret = addRef(name, direction, varProps.type, varProps.subType, index);
+            break;
+        case NoderVarProps::Container::Array:
+            ret = addArray(name, direction, varProps.type, varProps.subType, index);
+            break;
+    }
+    return ret;
+}
+
+PinRef *GNode::addRef(const QString &name, const PinProperty::Direction dir, const NoderVarProps::Type type, const QString &subType, int index)
+{
+    PinRef *ret = nullptr;
 
     switch (type) {
-        case NoderVar::Type::Bool:       pin = addPin<PinDecl::Bool>(name, direction, index); break ;
-        case NoderVar::Type::Float:      pin = addPin<PinDecl::Float>(name, direction, index); break ;
-        case NoderVar::Type::Int:        pin = addPin<PinDecl::Int>(name, direction, index); break ;
-        case NoderVar::Type::String:     pin = addPin<PinDecl::String>(name, direction, index); break ;
-        case NoderVar::Type::Wildcard:   pin = addPin<PinDecl::Wildcard>(name, direction, index); break ;
-        case NoderVar::Type::Enum:       pin = addPin<PinDecl::Enum>(name, direction, index); break ;
-        case NoderVar::Type::Array:      pin = addPin<PinDecl::Array>(name, direction, index); break ;
-        case NoderVar::Type::Interface:  pin = addPin<PinDecl::Interface>(name, direction, index); break ;
+        case NoderVarProps::Type::Bool:
+            ret = addPin<PinDecl::Ref::Bool>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Int:
+            ret = addPin<PinDecl::Ref::Int>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Float:
+            ret = addPin<PinDecl::Ref::Float>(name, dir, index);
+            break;
+        case NoderVarProps::Type::String:
+            ret = addPin<PinDecl::Ref::String>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Enum:
+            ret = addPin<PinDecl::Ref::Enum>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Interface:
+            ret = addPin<PinDecl::Ref::Interface>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Wildcard:
+            ret = addPin<PinDecl::Ref::Wildcard>(name, dir, index);
+            break;
     }
-    return pin;
+    ret->setSubType(subType);
+    return ret;
+}
+
+PinRef *GNode::addRefInput(const QString &name, const NoderVarProps::Type type, const QString &subType, int index)
+{
+    return addRef(name, PinProperty::Direction::Input, type, subType, index);
+}
+
+PinRef *GNode::addRefOutput(const QString &name, const NoderVarProps::Type type, const QString &subType, int index)
+{
+    return addRef(name, PinProperty::Direction::Output, type, subType, index);
+}
+
+PinArray *GNode::addArray(const QString &name, const PinProperty::Direction dir, const NoderVarProps::Type type, const QString &subType, int index)
+{
+    PinArray *ret = nullptr;
+
+    switch (type) {
+        case NoderVarProps::Type::Bool:
+            ret = addPin<PinDecl::Array::Bool>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Int:
+            ret = addPin<PinDecl::Array::Int>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Float:
+            ret = addPin<PinDecl::Array::Float>(name, dir, index);
+            break;
+        case NoderVarProps::Type::String:
+            ret = addPin<PinDecl::Array::String>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Enum:
+            ret = addPin<PinDecl::Array::Enum>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Interface:
+            ret = addPin<PinDecl::Array::Interface>(name, dir, index);
+            break;
+        case NoderVarProps::Type::Wildcard:
+            ret = addPin<PinDecl::Array::Wildcard>(name, dir, index);
+            break;
+        default:
+            break;
+    }
+    if (ret)
+        ret->setSubType(subType);
+    return ret;
+}
+
+PinArray *GNode::addArrayInput(const QString &name, const NoderVarProps::Type type, const QString &subType, int index)
+{
+    return addArray(name, PinProperty::Direction::Input, type, subType, index);
+}
+
+PinArray *GNode::addArrayOutput(const QString &name, const NoderVarProps::Type type, const QString &subType, int index)
+{
+    return addArray(name, PinProperty::Direction::Output, type, subType, index);
 }
 
 void GNode::addProxyWidget(Pin *pin)
@@ -103,9 +218,8 @@ void GNode::addProxyWidget(Pin *pin)
 void GNode::deletePin(Pin *pin)
 {
     auto removeFromList = [&](Pin *pin, std::vector<Pin *> &list) {
-        auto it = find(list.begin(), list.end(), pin);
-        list.erase(it);
-        pin->deleteLater();
+        PzaUtils::DeleteFromVector<Pin *>(list, pin);
+        pin->kill();
     };
     if (pin->isInput())
         removeFromList(pin, _inputPins);
@@ -124,7 +238,7 @@ void GNode::deleteValuePins(void)
             pin = *it;
             if (pin->type() != PinProperty::Type::Exec) {
                 it = list.erase(it);
-                pin->deleteLater();
+                pin->kill();
             }
             else
                 it++;
@@ -248,18 +362,30 @@ void GNode::setPinPlugzone(Pin *pin, const QPoint &origin)
     pin->setPlugzone(QRect(pos.x(), pos.y(), _plugzone, _plugzone));
 }
 
-void GNode::drawValuePlug(QPainter *painter, PinValue *pin)
+void GNode::drawVariablePlug(QPainter *painter, PinVariable *pin)
+{
+    switch (pin->varProps().container) {
+        case NoderVarProps::Container::Reference:
+            drawRefPlug(painter, static_cast<PinRef *>(pin));
+            break;
+        case NoderVarProps::Container::Array:
+            drawArrayPlug(painter, static_cast<PinArray *>(pin));
+            break;
+    }
+}
+
+void GNode::drawRefPlug(QPainter *painter, PinRef *pin)
 {
     QSvgRenderer svgr;
 
     if (pin->linked())
-        svgr.load(Noder::PlugValue(pin->valueType(), true));
+        svgr.load(Noder::PlugValue(pin->varProps().type, true));
     else
-        svgr.load(Noder::PlugValue(pin->valueType(), false));
+        svgr.load(Noder::PlugValue(pin->varProps().type, false));
     svgr.render(painter, pin->plugzoneIcon());
 }
 
-void GNode::drawExecPlug(QPainter *painter, PinExec *pin)
+void GNode::drawExecPlug(QPainter *painter, PinDecl::Exec *pin)
 {
     QSvgRenderer svgr;
 
@@ -270,14 +396,14 @@ void GNode::drawExecPlug(QPainter *painter, PinExec *pin)
     svgr.render(painter, pin->plugzone());
 }
 
-void GNode::drawArrayPlug(QPainter *painter, PinDecl::Array *pin)
+void GNode::drawArrayPlug(QPainter *painter, PinArray *pin)
 {
     QSvgRenderer svgr;
 
     if (pin->linked())
-        svgr.load(Noder::PlugArray(pin->valueType(), true));
+        svgr.load(Noder::PlugArray(pin->varProps().type, true));
     else
-        svgr.load(Noder::PlugArray(pin->valueType(), false));
+        svgr.load(Noder::PlugArray(pin->varProps().type, false));
     svgr.render(painter, pin->plugzoneIcon());
 }
 
@@ -301,4 +427,15 @@ void GNode::process(void)
     });
 
     exec();
+}
+
+void GNode::kill(void)
+{
+    PzaUtils::ForEachDeleteInVector<Pin *>(_inputPins, [&](Pin *pin) {
+        pin->kill();
+    });
+    PzaUtils::ForEachDeleteInVector<Pin *>(_outputPins, [&](Pin *pin) {
+        pin->kill();
+    });
+    deleteLater();
 }

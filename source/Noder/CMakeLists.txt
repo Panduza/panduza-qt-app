@@ -1,5 +1,7 @@
 target_include_directories(${PROG} PRIVATE "./")
+target_include_directories(${PROG} PRIVATE "./SidePanel")
 target_include_directories(${PROG} PRIVATE "./Node")
+target_include_directories(${PROG} PRIVATE "./Node/Pin")
 target_include_directories(${PROG} PRIVATE "./Node/Nodes")
 
 target_sources(${PROG}
@@ -10,15 +12,24 @@ target_sources(${PROG}
 	NoderFunction.cpp
 	NoderScenario.cpp
 	NoderMenuBar.cpp
-	NoderSP.cpp
-	NoderSPVariable.cpp
+	NoderVariable.cpp
 	NoderView.cpp
 	NoderScene.cpp
 	NoderConsole.cpp
 	NoderOutputArea.cpp
 
+	SidePanel/NoderSidePanel.cpp
+	SidePanel/NoderSPFunction.cpp
+	SidePanel/NoderSPPin.cpp
+	SidePanel/NoderSPVarPicker.cpp
+	SidePanel/NoderSPVariable.cpp
+
+	Node/Pin/Pin.cpp
+	Node/Pin/PinExec.cpp
+	Node/Pin/PinArray.cpp
+	Node/Pin/PinRef.cpp
+
 	Node/GNode.cpp
-	Node/Pin.cpp
 	Node/Link.cpp
 	Node/GNodeInstance.cpp
 	Node/GNodeBranch.cpp

@@ -6,8 +6,8 @@ GNodeInstance::GNodeInstance()
     _pinBoxOffsetY = 5;
     _boxRadius = 20;
 
-    _propType = _propTable->addProperty<PzaLabel>("Type");
-    _propBoxColor = _propTable->addProperty<PzaColorBox>("Box color");
+    _propType = _propTable->addRow<PzaLabel>("Type");
+    _propBoxColor = _propTable->addRow<PzaColorBox>("Box color");
     connect(_propBoxColor, &PzaColorBox::colorChanged, this, &GNode::setColor);
     
     setType(NodeProperty::Type::Instance);
@@ -111,7 +111,7 @@ void GNodeInstance::paint(QPainter *painter, QStyleOptionGraphicsItem const *opt
     drawBoxes(painter);
 
     forEachOutputPin([&](Pin *pin) {
-        drawValuePlug(painter, static_cast<PinValue *>(pin));
+        drawVariablePlug(painter, static_cast<PinVariable *>(pin));
         return ;
     });
 }

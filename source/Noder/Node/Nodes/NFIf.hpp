@@ -11,7 +11,7 @@ class If : public GNodeBranch
         GNode *branch(void) override;
     
     private:
-        PinDecl::Bool *_cond;
-        PinExec *_true;
-        PinExec *_false;
+        PinDecl::Ref::Bool *_cond;
+        PinDecl::Exec *_true;
+        PinDecl::Exec *_false;
 };

@@ -6,7 +6,7 @@
 #include <QDockWidget>
 #include <QSplitter>
 #include "NoderMenuBar.hpp"
-#include "NoderSP.hpp"
+#include "NoderSidePanel.hpp"
 #include "NoderGraph.hpp"
 #include "Noder.hpp"
 

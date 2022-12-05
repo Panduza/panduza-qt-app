@@ -11,8 +11,8 @@ class ABasicOperation : public GNodeOp
 
         void exec(void) override;
 
-        PinDecl::Float *_result;
-        std::vector<PinValue *> _list;
+        PinDecl::Ref::Float *_result;
+        std::vector<PinRef *> _list;
 };
 
 class Addition : public ABasicOperation

@@ -1,89 +1,78 @@
 #include "NFInstance.hpp"
 
-Instance::Instance()
+VariableInstance::VariableInstance()
     : GNodeInstance()
 {
 
 }
 
-void Instance::exec(void)
+void VariableInstance::exec(void)
 {
  /*   switch (_pin->valueType()) {
-        case NoderVar::Type::Bool:
+        case NoderVarProps::Type::Bool:
         {
-            PinDecl::Bool *pin = static_cast<PinDecl::Bool *>(_pin);
+            PinDecl::Ref::Bool *pin = static_cast<PinDecl::Ref::Bool *>(_pin);
             NoderValBool *table = static_cast<NoderValBool *>(_var->defValTable());
             pin->sendValue(table->value());
             break;
         }
-        case NoderVar::Type::Int:
+        case NoderVarProps::Type::Int:
         {
-            PinDecl::Int *pin = static_cast<PinDecl::Int *>(_pin);
+            PinDecl::Ref::Int *pin = static_cast<PinDecl::Ref::Int *>(_pin);
             NoderValInt *table = static_cast<NoderValInt *>(_var->defValTable());
             pin->sendValue(table->value());
             break;
         }
-        case NoderVar::Type::Float:
+        case NoderVarProps::Type::Float:
         {
-            PinDecl::Float *pin = static_cast<PinDecl::Float *>(_pin);
+            PinDecl::Ref::Float *pin = static_cast<PinDecl::Ref::Float *>(_pin);
             NoderValFloat *table = static_cast<NoderValFloat *>(_var->defValTable());
             pin->sendValue(table->value());
             break;
         }
-        case NoderVar::Type::String:
+        case NoderVarProps::Type::String:
         {
-            PinDecl::String *pin = static_cast<PinDecl::String *>(_pin);
+            PinDecl::Ref::String *pin = static_cast<PinDecl::Ref::String *>(_pin);
             NoderValString *table = static_cast<NoderValString *>(_var->defValTable());
             pin->sendValue(table->text());
             break;
         }
-        case NoderVar::Type::Enum:
+        case NoderVarProps::Type::Enum:
         {
-            PinDecl::Enum *pin = static_cast<PinDecl::Enum *>(_pin);
+            PinDecl::Ref::Enum *pin = static_cast<PinDecl::Ref::Enum *>(_pin);
             NoderValEnum *table = static_cast<NoderValEnum *>(_var->defValTable());
             pin->sendValue(table->enumValue());
             break;
         }
 
-        case NoderVar::Type::Wildcard:
-        case NoderVar::Type::Interface:
-        case NoderVar::Type::Array:
+        case NoderVarProps::Type::Wildcard:
+        case NoderVarProps::Type::Interface:
+        case NoderVarProps::Type::Array:
             break ;
     }
     */
 }
 
-void Instance::updatePin(void)
+void VariableInstance::newVariable(NoderVariable *var)
 {
-    PinValue *newPin;
-/*
-    newPin = addPinFromType(_var->type(), _var->name(), PinProperty::Direction::Output);
-    if (_var->type() == NoderVar::Type::Enum) {
-        PinDecl::Enum *pin = static_cast<PinDecl::Enum *>(newPin);
-        NoderValEnum *value = static_cast<NoderValEnum *>(_var->defValTable());
-        //pin->initialize(value->enumName());
-        connect(value, &NoderValEnum::enumNameChanged, pin, &PinDecl::Enum::modifyEnumName);
-    }
+    PinVariable *newPin;
 
+    newPin = addVariable(var->name(), PinProperty::Direction::Output, var->props());
     if (_pin)
         replacePin(_pin, newPin);
-
     _pin = newPin;
 
-    connect(_var, &NoderSPVariable::nameChanged, _pin, &Pin::setName);
-    */
+    _var = var;
+
+    connect(_var, &NoderVariable::nameChanged, _pin, &Pin::setName);
 }
 
-void Instance::setVariable(NoderSPVariable *var)
+void VariableInstance::setVariableEntry(NoderSPVariableEntry *entry)
 {
-    /*
-    _var = var;
-    connect(var, &NoderSPVariable::typeChanged, this, &Instance::updatePin);
-    connect(_var, &NoderSPVariable::dead, this, [&]() {
-        deleteLater();
-    });
-    updatePin();
-    */
+    _varEntry = entry;
+    connect(_varEntry, &NoderSPVariableEntry::varChanged, this, &VariableInstance::newVariable);
+    connect(_varEntry, &NoderSPVariableEntry::destroyed, this, &QObject::deleteLater);
+    newVariable(entry->elem());
 }
 
 FuncInstance::FuncInstance()
@@ -98,7 +87,7 @@ void FuncInstance::setFunction(NoderFunction *func)
     connect(_function, &NoderFunction::updated, this, &FuncInstance::updateNode);
     connect(_function, &NoderFunction::nameChanged, this, &FuncInstance::refreshUserName);
     connect(_function, &NoderFunction::dead, this, [&]() {
-        deleteLater();
+        kill();
     });
     refreshUserName(_function->name());
     updateNode();
@@ -111,9 +100,9 @@ void FuncInstance::updateNode(void)
             if (pin->type() == PinProperty::Type::Exec)
                 return;
             const QString &name = pin->name();
-            NoderVar::Type type = static_cast<PinValue *>(pin)->valueType();
+            const NoderVarProps &varProps = static_cast<PinVariable *>(pin)->varProps();
             PinProperty::Direction direction = Pin::OppositeDirection(pin->direction());
-            addPinFromType(type, name, direction);
+            addVariable(name, direction, varProps);
         });
     };
 
